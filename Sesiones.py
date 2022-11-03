@@ -1,3 +1,6 @@
+import base64
+import urllib
+
 import psycopg2
 import streamlit as st
 from PIL import Image
@@ -23,6 +26,16 @@ def cargar_preguntas():
     claves = list(preguntas["seccion"].keys())
     return (preguntas, claves)
 
+def displayPDF(file):
+    # Opening file from file path. this is used to open the file from a website rather than local
+    with urllib.request.urlopen(file) as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+    # Embedding PDF in HTML
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="950" type="application/pdf"></iframe>'
+
+    # Displaying File
+    st.markdown(pdf_display, unsafe_allow_html=True)
 
 def limpiar():
     membrete = st.empty()
@@ -115,6 +128,11 @@ def obtener_historial(buscar):
             estado_terapia[0][0]
 
             st.subheader("Archivos adjuntos a la sesión")
+            archivo_seleccionado=st.radio("Seleccione un archivo a mostrar",("Test 1","Test 2"))
+            if archivo_seleccionado == "Test 1":
+                displayPDF("https://www.orimi.com/pdf-test.pdf")
+            if archivo_seleccionado == "Test 2":
+                displayPDF("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf")
 
         total=len(tabla)
         asistidos=tabla[tabla["Asistencia"]==True].count()
