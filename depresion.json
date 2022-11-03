@@ -1,0 +1,131 @@
+{
+  "seccion": {
+    "Tristeza": {
+      "0": "0 No me siento triste",
+      "1": "1 Me siento triste gran parte del tiempo",
+      "2": "2 Me siento triste todo el tiempo.",
+      "3": "3 Me siento tan triste o soy tan infeliz que no puedo soportarlo."
+    },
+    "Pesimismo": {
+      "0": "0 No estoy desalentado respecto del mi futuro.",
+      "1": "1 Me siento más desalentado respecto de mi futuro que lo que solía estarlo.",
+      "2": "2 No espero que las cosas funcionen para mi.",
+      "3": "3 Siento que no hay esperanza para mi futuro y que sólo puede empeorar."
+    },
+    "Fracaso": {
+      "0": "0 No me siento como un fracasado.",
+      "1": "1 He fracasado más de lo que hubiera debido.",
+      "2": "2 Cuando miro hacia atrás, veo muchos fracasos.",
+      "3": "3 Siento que como persona soy un fracaso total."
+    },
+    "Pérdida de Placer": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Sentimientos de Culpa": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Sentimientos de Castigo": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Disconformidad con uno mismo.": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Autocrítica": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Pensamientos o Deseos Suicidas": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Llanto": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Agitación": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Pérdida de Interés": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Indecisión": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Desvalorización": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Pérdida de Energía": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Cambios en los Hábitos de Sueño": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Pensamientos o Deseos Suicidas": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Cambios en el Apetito": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Dificultad de Concentración": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Cansancio o Fatiga": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    },
+    "Pérdida de Interés en el Sexo": {
+      "0": "0 Obtengo tanto placer como siempre por las cosas de las que disfruto.",
+      "1": "1 No disfruto tanto de las cosas como solía hacerlo.",
+      "2": "2 Obtengo muy poco placer de las cosas que solía disfrutar.",
+      "3": "3 No puedo obtener ningún placer de las cosas de las que solía disfrutar."
+    }
+  },
+  "indicaciones": "Instrucciones: Este cuestionario consta de 21 grupos de afirmaciones. Por favor, lea con atención cada uno de ellos cuidadosamente. Luego elija uno de cada grupo, el que mejor describa el modo como se ha sentido las últimas dos semanas, incluyendo el día de hoy. Si varios enunciados de un mismo grupo le parecen igualmente apropiados, marque el número más alto. "
+}
