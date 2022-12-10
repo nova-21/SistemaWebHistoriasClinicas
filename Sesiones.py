@@ -1,39 +1,29 @@
 import base64
+import time
 import urllib
 
 import psycopg2
 import streamlit as st
 from PIL import Image
-import json
-import streamlit_google_oauth as oauth
 import pandas as pd
 
-from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid import AgGrid, GridOptionsBuilder, DataReturnMode
+
+from utilidades.conexion import connect, buscar_datos_personales, registrar_sesion_db, guardar_archivos, \
+    buscar_historial, buscar_sesion
 
 st.set_page_config(layout="centered")
 
-if 'num' not in st.session_state:
-    st.session_state.num = 0
-    st.session_state.contador = 0
+
+if 'pagina' not in st.session_state:
     st.session_state.pagina = "Busqueda"
-    st.session_state.paciente = 0
 
 if 'cedula' not in st.session_state:
     st.session_state.cedula = " "
 
-if 'atras' not in st.session_state:
-    st.session_state.atras = " "
 
-if 'login' not in st.session_state:
-    st.session_state.atras = None
-
-def cargar_preguntas():
-    num = st.session_state.num
-    f = open("depresion.json", encoding='utf-8')
-    preguntas = json.load(f)
-    claves = list(preguntas["seccion"].keys())
-    return (preguntas, claves)
-
+membrete = st.empty()
+contenedor_general = st.empty()
 
 def displayPDF(file):
     # Opening file from file path. this is used to open the file from a website rather than local
@@ -46,136 +36,81 @@ def displayPDF(file):
     # Displaying File
     st.markdown(pdf_display, unsafe_allow_html=True)
 
-
 def limpiar():
-    membrete = st.empty()
     membrete.empty()
     with membrete.container():
         img = Image.open("ucuenca.png")
         st.image(img, width=200)
         st.header("Departamento de Bienestar Universitario")
 
-
-def connect():
-    conn = psycopg2.connect(
-        host="localhost",
-        database="bienestar",
-        user="postgres",
-        password="admin")
-    return conn
-
-
 def inicio():
     st.session_state.pagina = "Busqueda"
 
 def atras():
-    st.session_state.atras = "Cancelar"
-    st.session_state.pagina = "Busqueda"
+    st.session_state.pagina = "Paciente"
 
+def cambiar_pagina_historial():
+    st.session_state.pagina = "Historial"
 
-def buscarcedula(buscar):
-    conn = None
-    try:
-        conn = connect()
-        cur = conn.cursor()
-        query = "SELECT paciente.cedula,paciente.nombre,carrera.nombre,paciente.sexo,paciente.fecha_nacimiento,paciente.ocupacion,paciente.estado_civil FROM paciente paciente join carrera on carrera=id WHERE cedula='{0}' OR UPPER(paciente.nombre) like UPPER('%{0}%')".format(
-            buscar)
+def cambiar_pagina_cita():
+    st.session_state.pagina = "Nueva cita"
 
-        cur.execute(query)
-        paciente = cur.fetchone()
-        print(paciente)
-        if (paciente is None):
-            st.warning("El paciente no está registrado")
-            link = '[Registrar](http://localhost:8501/Registar_nuevo_paciente)'
-            st.markdown(link, unsafe_allow_html=True)
-        else:
-            st.session_state.paciente = paciente
-            cedula, nombre, carrera, sexo, fecha_nacimiento, ocupacion, estado_civil = paciente
-            if (cedula == buscar or buscar.upper() in nombre.upper()):
-                exito = nombre + "-" + carrera
-                st.success(exito)
-                st.write("¿Qué desea realizar con el paciente?")
-                col1, col2, col3 = st.columns([1,1,4],gap="small")
+def cambiar_pagina_paciente(cedula):
+    st.session_state.cedula = cedula
+    st.session_state.pagina = "Paciente"
 
-                with col1:
-                    st.button('Nueva cita', on_click=seleccionar_nueva_cita)
-                with col2:
-                    st.button('Ver historial', on_click=seleccionar_historial)
-
-                # with col3:
-
-                #     st.button('Modificar datos', on_click=seleccionar_modificar_datos)
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-            print('Database connection closed.')
-
+def cambiar_pagina_editar():
+    st.session_state.pagina = "Editar datos"
 
 def obtener_historial(buscar):
+    paciente = buscar_datos_personales(buscar)
+    cedula, nombre = paciente[0]
     conn = None
     col1, col2 = st.columns([1, 1])
     try:
-        conn = connect()
-        cur = conn.cursor()
-
-        query = "SELECT to_char(fecha, 'YYYY-MM-DD'),asistencia,motivo_ausencia from cita where paciente='{0}'".format(
-            buscar)
-        cur.execute(query, buscar)
-        historial = cur.fetchall()
-        conn.close()
-        tabla = pd.DataFrame(historial, columns=["Fecha", "Asistencia", "Motivo Ausencia"], index=None)
-        tabla["Motivo Ausencia"].fillna("", inplace=True)
+        cancelado = st.button("Salir", key="dos", on_click=atras)
+        historial = buscar_historial(cedula)
+        tabla = pd.DataFrame(historial, columns=["Fecha","Descripción corta"], index=None)
+        tabla["Descripción corta"].fillna("", inplace=True)
         builder = GridOptionsBuilder.from_dataframe(tabla)
         builder.configure_column("Fecha", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
         builder.configure_selection(selection_mode='single', use_checkbox=True)
         gridoptions = builder.build()
-        sesion = AgGrid(tabla, gridOptions=gridoptions)
 
-        sesio_seleccionada = sesion["selected_rows"]
+        with st.sidebar:
 
-        if sesio_seleccionada:
-            fecha = sesio_seleccionada[0]["Fecha"]
+            st.write("Seleccione la sesión que desea visualizar")
+            sesion = AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True, enable_enterprise_modules=False, data_return_mode=DataReturnMode.FILTERED_AND_SORTED)
 
-            conn = connect()
-            cur = conn.cursor()
-            query2 = "SELECT estado_terapia from cita where paciente='{0}' and fecha='{1}'".format(buscar, fecha)
-            cur.execute(query2, buscar)
-            estado_terapia = cur.fetchall()
-            conn.close()
 
+        sesion_seleccionada = sesion["selected_rows"]
+
+        if sesion_seleccionada:
+            fecha = sesion_seleccionada[0]["Fecha"]
+            resultado_sesion=buscar_sesion(cedula,fecha)
             st.subheader("Asuntos tratados en la sesión")
-            st.write(estado_terapia[0][0])
+            st.write(resultado_sesion[0][0])
             st.subheader("Archivos adjuntos a la sesión")
 
-            archivo_seleccionado = st.selectbox("",options=("Seleccione el archivo a visualizar","Test 1", "Test 2"))
+            archivo_seleccionado = st.selectbox(label="  ",options=("Seleccione el archivo a visualizar","Test 1", "Test 2"))
             if archivo_seleccionado == "Test 1":
                 displayPDF("https://www.orimi.com/pdf-test.pdf")
             if archivo_seleccionado == "Test 2":
                 displayPDF("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf")
 
-        total = len(tabla)
-        asistidos = tabla[tabla["Asistencia"] == True].count()
-        citas_asistidas = asistidos["Asistencia"]
-        ausencias = total - citas_asistidas
-        tipos_cita = ['Asistidas', 'Ausente']
-
-        values = [citas_asistidas, ausencias]
-
         with col1:
-            st.subheader(nombre)
-            st.subheader(carrera)
-            if (sexo == False):
-                st.subheader("Masculino")
-            else:
-                st.subheader("Femenino")
+            st.subheader(cedula)
+            # if (sexo == False):
+            #     st.subheader("Masculino")
+            # else:
+            #     st.subheader("Femenino")
 
         with col2:
-            st.subheader(fecha_nacimiento)
-            st.subheader(estado_civil)
-            st.subheader(ocupacion)
-        cancelado = st.button("Salir", on_click=atras)
+            st.subheader(nombre)
+            # st.subheader(fecha_nacimiento)
+            # st.subheader(estado_civil)
+            # st.subheader(ocupacion)
+
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     finally:
@@ -184,101 +119,120 @@ def obtener_historial(buscar):
             print('Database connection closed.')
 
 
-def registrar_cita(cedula, nombre):
+def registrar_sesion(cedula):
     placeholder = st.form(key="cita")
     with placeholder:
         fecha = st.date_input("Fecha de cita")
         comentarios = st.text_input("Comentarios")
         asistencia = st.checkbox("Asistió a la cita")
-        st.text_input("En caso de no asistir indique la razón:")
-        st.text_area("Qué se abordó en la sesión:")
-        st.file_uploader("Adjuntar archivos:")
-        st.form_submit_button()
+        razon_inasistencia=st.text_input("En caso de no asistir indique la razón:")
+        encargado=st.text_area("Qué se abordó en la sesión:")
+        archivos=st.file_uploader("Adjuntar archivos:")
+        st.form_submit_button(label="Guardar")
+        lista_datos=(fecha,comentarios,asistencia,razon_inasistencia,encargado)
+        registrar_sesion_db(lista_datos)
+        guardar_archivos(archivos)
     cancelado = st.button("Cancelar", on_click=atras)
-
-
-def seleccionar_historial():
-    st.session_state.pagina = "Historial"
-
-
-def seleccionar_nueva_cita():
-    st.session_state.pagina = "Nueva cita"
-
-
-def seleccionar_modificar_datos():
-    st.session_state.pagina = "Modificar datos"
-
-
-def main():
-    if (st.session_state.num == 0):
-        cedula = st.text_input("Cédula")
-        if cedula == "0106785215":
-            st.text("Es usted Alex Pinos")
-            st.button("Si")
-        else:
-            st.warning("Ingrese una cédula válida")
-    else:
-        print("ok")
-
-with st.sidebar:
-    login_info = oauth.login(
-            client_id="418217949250-26re6hs241ls4v3eu3l73i433v53v6mo.apps.googleusercontent.com",
-            client_secret="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",
-            redirect_uri="http://localhost:8501",
-            login_button_text="Inicie sesión con Google",
-            logout_button_text="Cerrar sesión",
-        )
-    st.session_state.login = login_info
-
 
 limpiar()
 
-if login_info:
-    user_id, user_email = login_info
-    with st.sidebar as sd:
-        st.write(f"{user_email}")
+if st.session_state.pagina == "Busqueda":
+    contenedor_general.empty()
+    time.sleep(0.001)
+    with contenedor_general.container():
+        valor_busqueda_anterior = ""
+        valor_busqueda = st.text_input("Ingrese la cédula o los apellidos del paciente:")
+        if valor_busqueda_anterior != valor_busqueda:
+            valor_busqueda_anterior = valor_busqueda
+            resultado_busqueda = buscar_datos_personales(valor_busqueda)
 
-
-    if user_email == "alex.pinos@ucuenca.edu.ec":
-        if st.session_state.pagina == "Busqueda":
-            if st.session_state.atras == "Cancelar":
-
-                cedula_anterior = ""
-                cedula = st.text_input("Ingrese la cédula o los apellidos del paciente:", value=st.session_state.cedula)
-                # buscar = st.button("Buscar paciente")
-
-                buscarcedula(st.session_state.cedula)
-                st.session_state.atras = ""
+            if (len(resultado_busqueda) == 0):
+                st.warning("No existen resultados. ¿Deseas registrar un nuevo paciente?")
+                link = '[Registrar](http://localhost:8501/Registar_nuevo_paciente)'
+                st.markdown(link, unsafe_allow_html=True)
             else:
-                cedula_anterior = ""
-                cedula = st.text_input("Ingrese la cédula o los apellidos del paciente:")
-                # buscar = st.button("Buscar paciente")
+                resultadosDataframe = pd.DataFrame(resultado_busqueda, columns=['Cédula', 'Nombre'], index=None)
+                # builder = GridOptionsBuilder.from_dataframe(tabla)
+                # builder.configure_column("Nacimiento", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
+                # builder.configure_selection(selection_mode='single', use_checkbox=True)
+                # gridoptions = builder.build()
+                # with contenedor_general:
+                #     AgGrid(tabla, gridOptions=gridoptions, enable_enterprise_modules=False,
+                #                     fit_columns_on_grid_load=True)
+                # paciente_seleccionado = pacientes["selected_rows"]
 
-                # if buscar == True or (cedula_anterior != cedula):
-                if cedula_anterior != cedula:
-                    cedula_anterior = cedula
-                    buscarcedula(cedula)
+                # # Mostrar tabla de resultados
+                colms = st.columns((1, 2, 2))
+                fields = ["Cédula", 'Nombre']
+                for col, field_name in zip(colms, fields):
+                    col.write(field_name)
 
-        if st.session_state.pagina == "Historial":
-            st.header("Historial de citas")
-            paciente = st.session_state.paciente
-            cedula, nombre, carrera, sexo, fecha_nacimiento, ocupacion, estado_civil = paciente
-            obtener_historial(cedula)
+                for x, email in enumerate(resultadosDataframe['Cédula']):
+                    col1, col2, col3= st.columns((1, 2, 2))
+                    col1.write(resultadosDataframe['Cédula'][x])  # cedula identidad
+                    col2.write(resultadosDataframe['Nombre'][x])  # nombre completo
+                    button_phold = col3.empty()  # create a placeholder
+                    do_action = button_phold.button("Seleccionar", key=x)
+                    if do_action:
+                        cambiar_pagina_paciente(resultadosDataframe['Cédula'][x])
+                        break
+        # if cita and len(paciente_seleccionado)>0:
+        #
+        #     cedula_seleccion = paciente_seleccionado[0]["Cédula"]
+        #     st.session_state.cedula=cedula_seleccion
+        #     seleccionar_nueva_cita()
+        #
+        # if historial and len(paciente_seleccionado)>0:
+        #     cedula_seleccion = paciente_seleccionado[0]["Cédula"]
+        #     st.session_state.cedula=cedula_seleccion
+        #     seleccionar_historial()
 
-        if st.session_state.pagina == "Nueva cita":
-            st.header("Registrar nueva cita")
-            paciente = st.session_state.paciente
-            cedula, nombre, carrera, sexo, fecha_nacimiento, ocupacion, estado_civil = paciente
-            st.text(nombre)
-            st.session_state.cedula=cedula
-            registrar_cita(cedula, nombre)
+if st.session_state.pagina == "Paciente":
+    contenedor_general.empty()
+    time.sleep(0.01)
 
-        # if st.session_state.pagina == "Modificar datos":
-        #     st.header("Modificar datos")
-        #     paciente = st.session_state.paciente
-        #     cedula, nombre, carrera, sexo, fecha_nacimiento, ocupacion, estado_civil = paciente
-        #     st.text(nombre)
+    cedula_busqueda = st.session_state.cedula
+    cedula, nombre = buscar_datos_personales(cedula_busqueda)[0]
 
-else:
-        st.subheader("Bienvenido al sistema de manejo de historias clínicas psicológicas.")
-        st.subheader("Por favor inicie sesión con su cuenta de correo universitaria para continuar.")
+    with contenedor_general.container():
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.subheader(cedula)
+            # if (sexo == False):
+            #     st.subheader("Masculino")
+            # else:
+            #     st.subheader("Femenino")
+            # st.subheader(estado_civil)
+        with col2:
+            st.subheader(nombre)
+            # st.subheader(fecha_nacimiento)
+            # st.subheader(ocupacion)
+
+
+        st.subheader("¿Qué desea realizar con el paciente?")
+        but1, but2, but3 = st.columns([1, 1, 1])
+        but1.button("Registrar sesión", on_click=cambiar_pagina_cita)
+        but2.button("Revisar historial", on_click=cambiar_pagina_historial)
+        but3.button("Regresar al Inicio", on_click=inicio)
+
+if st.session_state.pagina == "Nueva cita":
+    contenedor_general.empty()
+    time.sleep(0.01)
+    with contenedor_general.container():
+        st.header("Registrar nueva cita")
+        cedula = st.session_state.cedula
+        st.subheader(cedula)
+        registrar_sesion(cedula)
+
+if st.session_state.pagina == "Historial":
+    contenedor_general.empty()
+    time.sleep(0.01)
+    with contenedor_general.container():
+        st.header("Historial de citas")
+        obtener_historial(st.session_state.cedula)
+
+# if st.session_state.pagina == "Modificar datos":
+#     st.header("Modificar datos")
+#     paciente = st.session_state.paciente
+#     cedula, nombre, sexo, fecha_nacimiento, ocupacion, estado_civil = paciente
+#     st.text(nombre)
