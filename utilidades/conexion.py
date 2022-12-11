@@ -17,6 +17,23 @@ def buscar_datos_personales(datos_personales):
             datos_personales)
         cur.execute(query)
         resultado_busqueda = cur.fetchall()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
+        return resultado_busqueda
+
+def buscar_datos_personales2(cedula):
+    conn = None
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        query = "SELECT paciente.cedula, paciente.nombre,fecha_nacimiento,ocupacion,estado_civil o FROM paciente paciente join carrera on carrera=id WHERE cedula='{0}' OR UPPER(paciente.nombre) like UPPER('%{0}%')".format(
+            cedula)
+        cur.execute(query)
+        resultado_busqueda = cur.fetchone()
         print(resultado_busqueda)
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)

@@ -3,8 +3,11 @@ import datetime
 import psycopg2
 from psycopg2 import errors
 from PIL import Image
-
+import pandas as pd
 import streamlit as st
+from st_aggrid import GridOptionsBuilder, AgGrid
+
+from utilidades.conexion import buscar_datos_personales
 
 st.set_page_config(layout="centered")
 
@@ -16,7 +19,7 @@ def limpiar():
         img = Image.open("ucuenca.png")
         st.image(img, width=200)
         st.header("Departamento de Bienestar Universitario")
-        st.subheader("Registro de nuevos pacientes")
+        st.subheader("Administración de pacientes")
 
 def connect():
     conn = psycopg2.connect(
@@ -49,8 +52,6 @@ def registrar(cedula,nombres,apellidos,fecha_nacimiento,ocupacion,sexo,estado_ci
 
 
 
-
-
 def registrar_paciente(base):
 
     with base:
@@ -78,15 +79,38 @@ def registrar_paciente(base):
 
 limpiar()
 
-base = st.empty()
-mensaje=registrar_paciente(base)
+registro, edicion = st.tabs(["Registrar paciente", "Editar paciente"])
 
-if mensaje == "Paciente registrado":
-    base.empty()
-    st.success(mensaje)
-    st.button("Aceptar")
-if mensaje == "El paciente ya se encuentra registrado":
-    base.empty()
-    st.error(mensaje)
-    st.button("Aceptar")
+with registro:
+    base = st.empty()
+    mensaje=registrar_paciente(base)
+
+    if mensaje == "Paciente registrado":
+        base.empty()
+        st.success(mensaje)
+        st.button("Aceptar")
+    if mensaje == "El paciente ya se encuentra registrado":
+        base.empty()
+        st.error(mensaje)
+        st.button("Aceptar")
+
+with edicion:
+    cedula=st.text_input("Buscar al paciente")
+    resultado_busqueda = buscar_datos_personales(cedula)
+
+    if (len(resultado_busqueda) == 0):
+        st.warning("No existen resultados. ¿Deseas registrar un nuevo paciente?")
+        link = '[Registrar](http://localhost:8501/Registar_nuevo_paciente)'
+        st.markdown(link, unsafe_allow_html=True)
+    else:
+        resultadosDataframe = pd.DataFrame(resultado_busqueda, columns=['Cédula', 'Nombre'], index=None)
+        builder = GridOptionsBuilder.from_dataframe(resultadosDataframe)
+        builder.configure_column("Nacimiento", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
+        builder.configure_selection(selection_mode='single', use_checkbox=True)
+        gridoptions = builder.build()
+        pacientes=AgGrid(resultadosDataframe, gridOptions=gridoptions, enable_enterprise_modules=False,
+                            fit_columns_on_grid_load=True)
+        paciente_seleccionado = pacientes["selected_rows"]
+        print(paciente_seleccionado)
+
 
