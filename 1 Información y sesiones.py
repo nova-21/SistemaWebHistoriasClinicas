@@ -125,7 +125,7 @@ def obtener_historial(buscar):
             placeholder = st.form(key="cita")
             with placeholder:
                 fecha = st.date_input("Fecha de cita", value=datetime.strptime(fecha_seleccionada, '%Y-%m-%d'))
-                encargado = st.text_input("Encargado", value="Juan Perez")
+                encargado = st.text_input("Tratante", value="Juan Perez")
                 asistencia = st.text_area("Asuntos tratados en la sesión", value=asuntos_tratados)
                 archivos = st.file_uploader("Adjuntar archivos:")
                 st.form_submit_button(label="Guardar")
@@ -134,28 +134,14 @@ def obtener_historial(buscar):
                 label="Información de la sesión",
                 color_name="red-50",
                 description="")
-            informacion, archivos_adjuntos, cuestionarios = st.tabs(
-                ["Información", "Archivos adjuntos", "Cuestionarios"])
+            informacion, cuestionarios,archivos_adjuntos  = st.tabs(
+                ["Información", "Cuestionarios", "Archivos adjuntos"])
             with informacion:
                 st.subheader("Fecha: " + str(fecha_seleccionada))
-                st.subheader("Encargado: Juan Perez")
+                st.subheader("Tratante: Juan Perez")
                 st.subheader("Asuntos tratados en la sesión")
                 st.write(resultado_sesion[0])
-                if cuestionarios_pendientes == "0" and (beck_depresion == None and beck_ansiedad == None):
-                    st.subheader("Resultados de Cuestionarios")
-                    st.write("No se han asignado cuestionarios en esta sesión")
-                else:
-                    st.subheader("Resultados de Cuestionarios")
-                    if beck_depresion == None:
-                        beck_depresion="Pendiente"
-                    if beck_ansiedad == None:
-                        beck_ansiedad="Pendiente"
-                    lista=pd.DataFrame(
-                        {
-                            "Cuestionario": ["Ansiedad de Beck", "Depresión de Beck"],
-                            "Resultado": [beck_ansiedad, beck_depresion]
-                        })
-                    st.dataframe(lista, use_container_width=True)
+
             # with archivos_adjuntos:
             #     st.checkbox("Mostrar archivos adjuntos")
             #     # displayPDF("https://www.orimi.com/pdf-test.pdf")
@@ -177,10 +163,23 @@ def obtener_historial(buscar):
             with cuestionarios:
                 st.subheader("Cuestionarios y Escalas")
                 st.markdown("**Seleccione los cuestionarios que desea aplicar al paciente:**")
-
-                print(beckA)
                 st.checkbox("Escala de Ansiedad de Beck | BAI", value=beckA, disabled=(not beckA or fecha_seleccionada != str(date.today().isoformat())))
                 st.checkbox("Escala de Depresión de Beck 2 | BDI-II", value=beckD, disabled=(not beckD or fecha_seleccionada != str(date.today().isoformat())))
+                if cuestionarios_pendientes == "0" and (beck_depresion == None and beck_ansiedad == None):
+                    st.subheader("Resultados de Cuestionarios")
+                    st.write("No se han asignado cuestionarios en esta sesión")
+                else:
+                    st.subheader("Resultados de Cuestionarios")
+                    if beck_depresion == None:
+                        beck_depresion = "Pendiente"
+                    if beck_ansiedad == None:
+                        beck_ansiedad = "Pendiente"
+                    lista = pd.DataFrame(
+                        {
+                            "Cuestionario": ["Ansiedad de Beck", "Depresión de Beck"],
+                            "Resultado": [beck_ansiedad, beck_depresion]
+                        })
+                    st.dataframe(lista, use_container_width=True)
 
     colored_header(
         label="Datos personales",
