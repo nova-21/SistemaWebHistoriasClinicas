@@ -71,9 +71,12 @@ def registrar_paciente(base):
 
             contacto_emergencia=st.text_input("Nombre del contacto de emergencia")
             telefono_emergencia=st.text_input("Teléfono del contacto de emergencia")
+            antecendentes_familiares=st.text_area("Antecedentes familiares")
+            antecendentes_personales = st.text_area("Antecedentes personales")
+            antecendentes_clinicos = st.text_area("Antecedentes clínicos")
             submit=st.form_submit_button("Submit")
             if submit:
-                mensaje=registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, sexo, estado_civil)
+                mensaje=registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, sexo, estado_civil, facultad, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
                 return mensaje
 
 

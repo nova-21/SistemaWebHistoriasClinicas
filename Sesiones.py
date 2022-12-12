@@ -83,7 +83,7 @@ def cambiar_pagina_editar():
 def obtener_historial(buscar):
     st.header("Historial de citas")
     paciente = buscar_datos_personales2(buscar)
-    cedula, nombre, fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos = paciente
+    cedula, nombre, fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos, lugar_residencia, nombre_preferido, contacto_emergencia, telefono_emergencia = paciente
     historial = buscar_historial(cedula)
     tabla = pd.DataFrame(historial, columns=["Fecha", "Descripción corta"], index=None)
     tabla["Descripción corta"].fillna("", inplace=True)
@@ -198,9 +198,12 @@ def obtener_historial(buscar):
             st.write("Cédula: " + cedula)
             st.write("Fecha de nacimiento: " + str(fecha_nacimiento))
             st.write("Facultad de dependencia: " + str(facultad))
+            st.write("Contacto de emergencia: "+ contacto_emergencia + " "+ telefono_emergencia)
         with col2:
+            st.write("Nombre preferido: " + nombre_preferido)
             st.write("Ocupación: " + ocupacion)
             st.write("Estado civil: " + estado_civil)
+            st.write("Residencia: "+ lugar_residencia)
 
     with st.expander("Antecedentes familiares"):
         st.write(antecedentes_familiares)

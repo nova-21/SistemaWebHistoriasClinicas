@@ -40,7 +40,7 @@ def buscar_datos_personales2(cedula):
     try:
         conn = connect()
         cur = conn.cursor()
-        query = "SELECT paciente.cedula, paciente.nombre,fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos FROM paciente WHERE cedula='{0}'".format(
+        query = "SELECT paciente.cedula, paciente.nombre,fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos, lugar_residencia, nombre_preferido, contacto_emergencia, telefono_emergencia FROM paciente WHERE cedula='{0}'".format(
             cedula)
         cur.execute(query)
         resultado_busqueda = cur.fetchone()
