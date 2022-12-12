@@ -83,7 +83,6 @@ def cambiar_pagina_editar():
 def obtener_historial(buscar):
     st.header("Historial de citas")
     paciente = buscar_datos_personales2(buscar)
-    print(paciente)
     cedula, nombre, fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos = paciente
     historial = buscar_historial(cedula)
     tabla = pd.DataFrame(historial, columns=["Fecha", "Descripción corta"], index=None)
@@ -134,7 +133,7 @@ def obtener_historial(buscar):
                 label="Información de la sesión",
                 color_name="red-50",
                 description="")
-            informacion, cuestionarios,archivos_adjuntos  = st.tabs(
+            informacion, cuestionarios, archivos_adjuntos  = st.tabs(
                 ["Información", "Cuestionarios", "Archivos adjuntos"])
             with informacion:
                 st.subheader("Fecha: " + str(fecha_seleccionada))
