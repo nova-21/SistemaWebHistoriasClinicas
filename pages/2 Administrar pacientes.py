@@ -35,7 +35,7 @@ def registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_ci
         conn = connect()
         cur = conn.cursor()
         nombre = nombres + " " + apellidos
-        query = "INSERT INTO paciente(cedula,nombre,fecha_nacimiento,ocupacion,estado_civil,facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecedentes_familiares, antecedentes_personales, antecedentes_cinicos) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}')".format(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
+        query = "INSERT INTO paciente(cedula,nombre,fecha_nacimiento,ocupacion,estado_civil,facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecedentes_familiares, antecedentes_personales, antecedentes_cinicos) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')".format(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
 
         cur.execute(query)
         conn.commit()
