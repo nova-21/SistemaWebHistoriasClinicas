@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 from st_aggrid import GridOptionsBuilder, AgGrid
 
-from utilidades.conexion import buscar_datos_personales
+from utilidades.conexion import buscar_datos_personales, connect
 
 st.set_page_config(layout="centered")
 
@@ -21,28 +21,19 @@ def limpiar():
         st.header("Departamento de Bienestar Universitario")
         st.subheader("Administración de pacientes")
 
-def connect():
-    conn = psycopg2.connect(
-        host="localhost",
-        database="bienestar",
-        user="postgres",
-        password="admin")
-    return conn
+
 
 def registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos):
-    conn = None
+
     try:
         conn = connect()
         cur = conn.cursor()
         nombre = nombres + " " + apellidos
-        query = "INSERT INTO paciente(cedula,nombre,fecha_nacimiento,ocupacion,estado_civil,facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecedentes_familiares, antecedentes_personales, antecedentes_cinicos) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')".format(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
-
+        query = "INSERT INTO paciente(cedula,nombre,fecha_nacimiento,ocupacion,estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}')".format(cedula, nombre, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
         cur.execute(query)
         conn.commit()
-
         return "Paciente registrado"
     except (Exception, errors.UniqueViolation) as error:
-        print(error)
         return("El paciente ya se encuentra registrado")
     finally:
         if conn is not None:
@@ -113,6 +104,5 @@ with edicion:
         pacientes=AgGrid(resultadosDataframe, gridOptions=gridoptions, enable_enterprise_modules=False,
                             fit_columns_on_grid_load=True)
         paciente_seleccionado = pacientes["selected_rows"]
-        print(paciente_seleccionado)
 
 
