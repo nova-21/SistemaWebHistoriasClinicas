@@ -29,13 +29,13 @@ def connect():
         password="admin")
     return conn
 
-def registrar(cedula,nombres,apellidos,fecha_nacimiento,ocupacion,sexo,estado_civil,carrera):
+def registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos):
     conn = None
     try:
         conn = connect()
         cur = conn.cursor()
         nombre = nombres + " " + apellidos
-        query = "INSERT INTO paciente(cedula,nombre,fecha_nacimiento,ocupacion,sexo,estado_civil) values('{0}','{1}','{2}','{3}','{4}','{5}')".format(cedula,nombre,fecha_nacimiento,ocupacion,"True",estado_civil)
+        query = "INSERT INTO paciente(cedula,nombre,fecha_nacimiento,ocupacion,estado_civil,facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecedentes_familiares, antecedentes_personales, antecedentes_cinicos values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}')".format(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
 
         cur.execute(query)
         conn.commit()
@@ -76,7 +76,7 @@ def registrar_paciente(base):
             antecendentes_clinicos = st.text_area("Antecedentes clínicos")
             submit=st.form_submit_button("Submit")
             if submit:
-                mensaje=registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, sexo, estado_civil, facultad, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
+                mensaje=registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, sexo, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
                 return mensaje
 
 
