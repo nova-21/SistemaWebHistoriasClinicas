@@ -94,7 +94,6 @@ def buscar_sesion(cedula,fecha):
             print('Database connection closed.')
         return sesion
 
-
 def registrar_sesion_db(fecha, paciente,asuntos_tratados,descripcion):
     try:
         conn = connect()
