@@ -216,27 +216,31 @@ def obtener_historial(buscar):
 def cambiar_pagina_historial_sin_cedula():
     st.session_state.pagina = "Historial"
     st.session_state.registrar = False
+    st.experimental_rerun()
+def cambiar_pagina_historial_sin_cedula_normal():
+    st.session_state.pagina = "Historial"
+    st.session_state.registrar = False
 
 
 def registrar_sesion():
     with st.sidebar:
-        cancelado = st.button("	← Cancelar y regresar al historial", on_click=cambiar_pagina_historial_sin_cedula)
+        cancelado = st.button("Cancelar y regresar al historial", on_click=cambiar_pagina_historial_sin_cedula)
 
     placeholder = st.form(key="cita", clear_on_submit=True)
     with placeholder:
         fecha = st.date_input("Fecha de cita")
-        comentarios = st.text_input("Comentarios")
-        asistencia = st.checkbox("Asistió a la cita")
+        descripcion = st.text_input("Descripción corta")
+        asistencia = st.checkbox("¿Asistió a la cita?")
         razon_inasistencia = st.text_input("En caso de no asistir indique la razón:")
-        encargado = st.text_area("Qué se abordó en la sesión:")
-        archivos = st.file_uploader("Adjuntar archivos:", accept_multiple_files=True)
-        guardar = st.form_submit_button(label="Guardar")
-        lista_datos = (fecha, comentarios, asistencia, razon_inasistencia, encargado)
-        registrar_sesion_db(lista_datos)
-        guardar_archivos(archivos)
-        cambiar_pagina_historial_sin_cedula()
-        st.session_state.registrar = "Done"
+        asuntos_tratados = st.text_area("Indique qué se abordó en la sesión:")
+        guardar=st.form_submit_button("Guardar")
 
+        if guardar:
+            llamar_registro(fecha, st.session_state.cedula, asuntos_tratados, descripcion)
+            cambiar_pagina_historial_sin_cedula()
+
+def llamar_registro(fecha, cedula, asuntos_tratados,descripcion):
+    registrar_sesion_db(fecha, cedula,asuntos_tratados,descripcion)
 
 limpiar()
 
@@ -320,14 +324,8 @@ if st.session_state.pagina == "Busqueda":
 #         but2.button("Revisar historial", on_click=cambiar_pagina_historial)
 #         but3.button("Regresar al Inicio", on_click=inicio)
 
-if st.session_state.pagina == "Nueva cita":
-    contenedor_general.empty()
-    time.sleep(0.01)
-    with contenedor_general.container():
-        st.header("Registrar nueva cita")
-        cedula = st.session_state.cedula
-        st.subheader(cedula)
-        registrar_sesion()
+
+
 
 if st.session_state.pagina == "Historial":
     contenedor_general.empty()

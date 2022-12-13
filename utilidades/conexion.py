@@ -3,6 +3,9 @@ import streamlit as st
 import sqlite3
 from sqlite3 import Error
 
+from psycopg2 import errors
+
+
 def connect():
     conn = sqlite3.connect(r"./utilidades/bienestar.db")
     return conn
@@ -91,9 +94,24 @@ def buscar_sesion(cedula,fecha):
             print('Database connection closed.')
         return sesion
 
-def registrar_sesion_db(lista_datos):
-    ##TODO conexion a la base de datos
-    print("exito")
+
+
+def registrar_sesion_db(fecha, paciente,asuntos_tratados,descripcion):
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        print(paciente)
+        query = "INSERT INTO cita(fecha,paciente,asuntos_tratados,descripcion) values('{0}','{1}','{2}','{3}')".format(fecha, paciente, asuntos_tratados,descripcion)
+        cur.execute(query)
+        conn.commit()
+        conn.close()
+        return "Sesion registrada"
+    except (Exception, errors.UniqueViolation) as error:
+        return ("Ya existe una sesion")
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
 
 def guardar_archivos(archivos):
     ##TODO crear funcion para serializar archivos en disco
