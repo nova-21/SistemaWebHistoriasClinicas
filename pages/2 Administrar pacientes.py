@@ -64,7 +64,7 @@ def registrar_paciente(base):
             antecendentes_familiares=st.text_area("Antecedentes familiares")
             antecendentes_personales = st.text_area("Antecedentes personales")
             antecendentes_clinicos = st.text_area("Antecedentes clínicos")
-            submit=st.form_submit_button("Submit")
+            submit=st.form_submit_button("Registrar")
             if submit:
                 mensaje=registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
                 return mensaje

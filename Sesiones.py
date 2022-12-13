@@ -81,7 +81,7 @@ def cambiar_pagina_editar():
 
 
 def obtener_historial(buscar):
-    st.header("Historial de citas")
+    # st.header("Historial de sesiones")
     paciente = buscar_datos_personales2(buscar)
     cedula, nombre, fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos, lugar_residencia, nombre_preferido, contacto_emergencia, telefono_emergencia = paciente
     historial = buscar_historial(cedula)
@@ -94,9 +94,9 @@ def obtener_historial(buscar):
     gridoptions = builder.build()
 
     with st.sidebar:
-        st.button("Regresar a la búsqueda", key="dos", on_click=inicio)
+        st.button("Regresar a la búsqueda de pacientes", key="dos", on_click=inicio)
         colored_header(
-            label="Lista de sesiones previas",
+            label="Historial de sesiones",
             color_name="red-50",
             description="")
         st.button("Registrar nueva sesión", on_click=tab_registrar)
@@ -146,6 +146,7 @@ def obtener_historial(buscar):
             #     # displayPDF("https://www.orimi.com/pdf-test.pdf")
             beckA = ""
             beckD = ""
+
             if cuestionarios_pendientes == "0":
                 beckA = False
                 beckD = False
@@ -158,12 +159,17 @@ def obtener_historial(buscar):
             if cuestionarios_pendientes == "3":
                 beckA = True
                 beckD = True
-
             with cuestionarios:
                 st.subheader("Cuestionarios y Escalas")
                 st.markdown("**Seleccione los cuestionarios que desea aplicar al paciente:**")
-                st.checkbox("Escala de Ansiedad de Beck | BAI", value=beckA, disabled=(not beckA or fecha_seleccionada != str(date.today().isoformat())))
-                st.checkbox("Escala de Depresión de Beck 2 | BDI-II", value=beckD, disabled=(not beckD or fecha_seleccionada != str(date.today().isoformat())))
+                if cuestionarios_pendientes is not None:
+                    st.checkbox("Escala de Ansiedad de Beck | BAI", value=beckA, disabled=(not beckA or fecha_seleccionada != str(date.today().isoformat())))
+                    st.checkbox("Escala de Depresión de Beck 2 | BDI-II", value=beckD, disabled=(not beckD or fecha_seleccionada != str(date.today().isoformat())))
+                else:
+                    st.checkbox("Escala de Ansiedad de Beck | BAI", value=beckA,
+                                disabled=(beckA or fecha_seleccionada != str(date.today().isoformat())))
+                    st.checkbox("Escala de Depresión de Beck 2 | BDI-II", value=beckD,
+                                disabled=(beckD or fecha_seleccionada != str(date.today().isoformat())))
                 if cuestionarios_pendientes == "0" and (beck_depresion == None and beck_ansiedad == None):
                     st.subheader("Resultados de Cuestionarios")
                     st.write("No se han asignado cuestionarios en esta sesión")
@@ -224,7 +230,7 @@ def cambiar_pagina_historial_sin_cedula_normal():
 
 def registrar_sesion():
     with st.sidebar:
-        cancelado = st.button("Cancelar y regresar al historial", on_click=cambiar_pagina_historial_sin_cedula)
+        cancelado = st.button("Cancelar registro y regresar al historial", on_click=cambiar_pagina_historial_sin_cedula)
 
     placeholder = st.form(key="cita", clear_on_submit=True)
     with placeholder:
