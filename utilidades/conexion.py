@@ -19,7 +19,7 @@ def connect():
 #     return conn
 
 
-
+@st.cache
 def buscar_datos_personales(datos_personales):
     conn = None
     resultado_busqueda=""
@@ -38,6 +38,7 @@ def buscar_datos_personales(datos_personales):
             print('Database connection closed.')
         return resultado_busqueda
 
+@st.cache
 def buscar_datos_personales2(cedula):
     conn = None
     try:
@@ -55,7 +56,7 @@ def buscar_datos_personales2(cedula):
             print('Database connection closed.')
         return resultado_busqueda
 
-
+@st.cache
 def buscar_historial(cedula):
     historial=""
     try:
@@ -76,7 +77,7 @@ def buscar_historial(cedula):
             print('Database connection closed.')
         return historial
 
-
+@st.cache
 def buscar_sesion(cedula,fecha):
     sesion = ""
     try:
