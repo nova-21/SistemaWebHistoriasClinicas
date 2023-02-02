@@ -66,12 +66,14 @@ for cita in tabla:
             lista_personas.append("in"+nombre.replace(" ", ""))
 
 seleccionada=""
+
 for persona in lista_personas:
     if st.session_state[persona]==True:
         seleccionada=persona
         st.session_state.pagina = "Historial"
         st.session_state.cedula = "123456789"
         st.session_state.sesion_seleccionada = ""
+        st.session_state[persona]=False
         switch_page("Información pacientes")
 
 
