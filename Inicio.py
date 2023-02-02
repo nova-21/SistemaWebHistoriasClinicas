@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 from st_aggrid import GridOptionsBuilder, AgGrid
-from st_btn_select import st_btn_select
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.switch_page_button import switch_page
 
