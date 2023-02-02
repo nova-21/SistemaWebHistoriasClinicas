@@ -1,5 +1,6 @@
 import base64
 import datetime
+import select
 import time
 import urllib
 from datetime import datetime, date
@@ -25,9 +26,14 @@ if 'cedula' not in st.session_state:
 if 'registrar' not in st.session_state:
     st.session_state.registrar = " "
 
+if 'sesion_seleccionada' not in st.session_state:
+    st.session_state.sesion_seleccionada=" "
+
 membrete = st.empty()
 contenedor_general = st.empty()
-contenedor_historial = st.empty()
+with st.sidebar:
+    contenedor_controles = st.empty()
+    contenedor_sesiones = st.empty()
 
 
 def displayPDF(file):
@@ -47,7 +53,7 @@ def limpiar():
     with membrete.container():
         img = Image.open("resources/ucuenca.png")
         st.image(img, width=200)
-        st.header("Departamento de Bienestar Universitario")
+        st.header("Dirección de Bienestar Universitario")
 
 
 def inicio():
@@ -89,38 +95,54 @@ def obtener_historial(buscar):
     tabla["Descripción corta"].fillna("", inplace=True)
     builder = GridOptionsBuilder.from_dataframe(tabla)
     builder.configure_column("Fecha", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
-
+    if st.session_state.sesion_seleccionada!=" ":
+        builder.configure_selection(pre_selected_rows=[0])
     builder.configure_selection(selection_mode='single', use_checkbox=True)
     gridoptions = builder.build()
 
-    with st.sidebar:
-        st.button("Regresar a la búsqueda de pacientes", key="dos", on_click=inicio)
+    with contenedor_sesiones.container():
         colored_header(
             label="Historial de sesiones",
             color_name="red-50",
             description="")
-        st.button("Registrar nueva sesión", on_click=tab_registrar)
+
         st.write("Seleccione la sesión que desea visualizar")
         sesion = AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
 
     sesion_seleccionada = sesion["selected_rows"]
 
-    with st.sidebar:
+
+    with contenedor_controles.container():
+        colored_header(
+            label="Controles",
+            color_name="red-50",
+            description="")
+        st.button("🏠 Regresar a la búsqueda de pacientes", type='primary',key="dos", on_click=inicio)
+        st.button("Registrar nueva sesión", on_click=tab_registrar)
         if sesion_seleccionada:
             editar_sesion = st.button("Editar datos de la sesión")
-            # st.subheader("Archivos adjuntos a la sesión")
-            # archivo_seleccionado = st.selectbox(label="Seleccione el archivo a visualizar",
-            #                                     options=("Seleccionar", "Test 1", "Test 2"))
+
 
     if st.session_state.registrar == True:
         st.header("Registrar nueva cita")
         registrar_sesion()
+    st.subheader("Nombre completo: " + nombre)
 
     if sesion_seleccionada:
         fecha_seleccionada = sesion_seleccionada[0]["Fecha"]
         resultado_sesion = buscar_sesion(cedula, fecha_seleccionada)
         asuntos_tratados, cuestionarios_pendientes, beck_ansiedad, beck_depresion = resultado_sesion
         if editar_sesion:
+
+            contenedor_controles.empty()
+            with contenedor_controles.container():
+                colored_header(
+                    label="Controles",
+                    color_name="red-50",
+                    description="")
+                cancelado = st.button("❌ Cancelar edición", type='primary', on_click=cambiar_pagina_historial_sin_cedula)
+                st.write("")
+                st.write("")
             placeholder = st.form(key="cita")
             with placeholder:
                 fecha = st.date_input("Fecha de cita", value=datetime.strptime(fecha_seleccionada, '%Y-%m-%d'))
@@ -133,10 +155,10 @@ def obtener_historial(buscar):
                 label="Información de la sesión",
                 color_name="red-50",
                 description="")
+            st.subheader("Fecha: " + str(fecha_seleccionada))
             informacion, cuestionarios, archivos_adjuntos  = st.tabs(
                 ["Información", "Cuestionarios", "Archivos adjuntos"])
             with informacion:
-                st.subheader("Fecha: " + str(fecha_seleccionada))
                 st.subheader("Tratante: Juan Perez")
                 st.subheader("Asuntos tratados en la sesión")
                 st.write(resultado_sesion[0])
@@ -185,6 +207,11 @@ def obtener_historial(buscar):
                             "Resultado": [beck_ansiedad, beck_depresion]
                         })
                     st.dataframe(lista, use_container_width=True)
+            with archivos_adjuntos:
+                st.file_uploader("Subir nuevos archivos adjuntos")
+                st.subheader("Archivos en memoria")
+                st.download_button("Archivo 1", data="Archivo de prueba")
+                st.download_button("Archivo 2", data="Archivo de prueba")
 
     colored_header(
         label="Datos personales",
@@ -192,32 +219,56 @@ def obtener_historial(buscar):
         description=""
     )
 
-    st.subheader("Nombre completo: " + nombre)
+
 
     with st.expander("Datos Personales"):
         col1, col2 = st.columns([1, 1])
-        with col1:
-            # if (sexo == False):
-            #     st.subheader("Masculino")
-            # else:
-            #     st.subheader("Femenino")
-            st.write("Cédula: " + cedula)
-            st.write("Fecha de nacimiento: " + str(fecha_nacimiento))
-            st.write("Facultad de dependencia: " + str(facultad))
-            st.write("Contacto de emergencia: "+ contacto_emergencia + " "+ telefono_emergencia)
-        with col2:
-            st.write("Nombre preferido: " + nombre_preferido)
-            st.write("Ocupación: " + ocupacion)
-            st.write("Estado civil: " + estado_civil)
-            st.write("Residencia: "+ lugar_residencia)
+
+        editar_datos=st.button("Editar", key="editar_datos")
+        editar_datos = False
+        if editar_datos:
+            # with col1:
+            #     with st.form(key="editar datos"):
+            #         st.text_input("Este")
+            #         st.form_submit_button("Guardar")
+            print("Hi")
+        else:
+            with col1:
+                # if (sexo == False):
+                #     st.subheader("Masculino")
+                # else:
+                #     st.subheader("Femenino")
+                st.write("Cédula: " + cedula)
+                st.write("Género:")
+                st.write("Fecha de nacimiento: " + str(fecha_nacimiento))
+                st.write("E-mail:")
+                st.write("Facultad de dependencia: " + str(facultad))
+                st.write("Contacto de emergencia: "+ contacto_emergencia + " "+ telefono_emergencia)
+                st.write("Parentezco: Padrastro")
+                st.write("Personas con las que vive:")
+
+            with col2:
+                st.write("Nombre preferido: " + nombre_preferido)
+                st.write("Ocupación: " + ocupacion)
+                st.write("Estado civil: " + estado_civil)
+                st.write("Ciudad de nacimiento: Cuenca")
+                st.write("Ciudad de residencia: "+ lugar_residencia)
+                st.write("Hijos: 0")
+                st.write("Dirección:")
+
+
+
 
     with st.expander("Antecedentes familiares"):
         st.write(antecedentes_familiares)
+        st.button("Editar", key="editar_familiares")
+
     with st.expander("Antecedentes personales"):
         st.write(antecedentes_personales)
+        st.button("Editar", key="editar_personales")
     with st.expander("Antecedentes clínicos"):
         st.write(antecedentes_clinicos)
-
+        st.button("Editar", key="editar_clinicos")
 
 def cambiar_pagina_historial_sin_cedula():
     st.session_state.pagina = "Historial"
@@ -229,8 +280,17 @@ def cambiar_pagina_historial_sin_cedula_normal():
 
 
 def registrar_sesion():
-    with st.sidebar:
-        cancelado = st.button("Cancelar registro y regresar al historial", on_click=cambiar_pagina_historial_sin_cedula)
+    contenedor_controles.empty()
+    with contenedor_controles.container():
+
+        colored_header(
+            label="Controles",
+            color_name="red-50",
+            description="")
+
+        cancelado = st.button("❌ Cancelar registro", type='primary', on_click=cambiar_pagina_historial_sin_cedula)
+        st.write("")
+        st.write("")
 
     placeholder = st.form(key="cita", clear_on_submit=True)
     with placeholder:
@@ -262,7 +322,7 @@ if st.session_state.pagina == "Busqueda":
 
             if (len(resultado_busqueda) == 0):
                 st.warning("No existen resultados. ¿Deseas registrar un nuevo paciente?")
-                link = '[Registrar](http://localhost:8501/Registar_nuevo_paciente)'
+                link = '[Registrar](/Registrar_pacientes)'
                 st.markdown(link, unsafe_allow_html=True)
             else:
                 resultadosDataframe = pd.DataFrame(resultado_busqueda, columns=['Cédula', 'Nombre'], index=None)

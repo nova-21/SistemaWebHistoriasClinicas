@@ -1,49 +1,125 @@
-
+import pandas as pd
 import streamlit as st
-from PIL import Image
-
+from st_aggrid import GridOptionsBuilder, AgGrid
+from st_btn_select import st_btn_select
 from streamlit_extras.colored_header import colored_header
+from streamlit_extras.switch_page_button import switch_page
 
-membrete = st.empty()
+if "registrar_cita" not in st.session_state:
+    st.session_state.registrar_cita = False
 
-def limpiar():
-    membrete.empty()
-    with membrete.container():
-        img = Image.open("ucuenca.png")
-        st.image(img, width=200)
-        st.header("Departamento de Bienestar Universitario")
+cont= st.container()
+st.title("Universidad de Cuenca")
+st.subheader("Dirección de Bienestar Universitario")
+st.subheader("Citas del día de hoy")
 
-limpiar()
+historial = [["21 Enero 2023", "10:00", "Juan Idrovo"], ["21 Enero 2023", "11:00", "Sofia Segarra"], ["21 Enero 2023", "12:00", "Juan Cardenas"], ["21 Enero 2023", "13:00", "Camila Quito"], ["21 Enero 2023", "14:00", "Damian Yapa"]]
 
-st.subheader("Bienvenido al sistema de gestión de historia clínica psicológica")
+tabla = pd.DataFrame(historial, columns=["Fecha", "Hora","Paciente"], index=None)
+builder = GridOptionsBuilder.from_dataframe(tabla)
+builder.configure_column("Fecha", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
 
-with st.container():
-    informacion, archivos_adjuntos, cuestionarios = st.tabs(
-                        ["Información", "Archivos adjuntos", "Cuestionarios"])
-    with informacion:
-        colored_header(
-            label="Información de la sesión",
-            color_name="red-50",
-            description="")
-        st.subheader("Fecha: ")
-        st.subheader("Encargado: Juan Perez")
-        st.subheader("Asuntos tratados en la sesión")
-        st.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")
-        st.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")
-        st.write("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")
+builder.configure_selection(selection_mode='single', use_checkbox=True)
+gridoptions = builder.build()
+#
+# sesion = AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
+#
+# sesion_seleccionada = sesion["selected_rows"]
+lista_personas=[]
 
-    # with archivos_adjuntos:
-    #     st.checkbox("Mostrar archivos adjuntos")
-    #     # displayPDF("https://www.orimi.com/pdf-test.pdf")
-    with cuestionarios:
-        st.subheader("Cuestionarios y Escalas")
-        st.write(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")
-        st.write(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")
-        st.write(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")
+tabla=tabla.values.tolist()
+contador=0
+for cita in tabla:
+    hora = cita[1]
+    nombre = cita[2]
+    label = ":red[" + hora + "]" + " " + nombre
+    label=f"**{hora}** {nombre}"
+    with st.expander(label=label):
+        st.write("Tareas previas:")
+        st.write("Ejercicios de respiración. Lista de actividades.")
 
-        st.markdown("**Seleccione los cuestionarios que desea aplicar al paciente:**")
-        st.checkbox("Escala de Ansiedad de Beck | BAI")
-        st.checkbox("Escala de Depresión de Beck 2 | BDI-II")
+        # iniciar, ver, reagendar, ausentismo, cancelar = st.columns(5)
+        # with iniciar:
+        #     st.button("Iniciar sesión",type="primary", key=label+"iniciar")
+        # with ver:
+        #     st.button("Ver paciente", type="secondary", key=label+"ver")
+        # with reagendar:
+        #     st.button("Reagendar cita", key=label+"reagendar")
+        # with ausentismo:
+        #     st.button("Marcar ausentismo", key=label+"ausentismo")
+        # with cancelar:
+        #     st.button("Cancelar cita", key=label+"cancelar")
+        with st.container():
+            # page = st_btn_select(
+            #     # The different pages
+            #     ('Iniciar sesión', 'Ver paciente', 'Reagendar cita', 'Marcar ausentismo', 'Cancelar cita'),
+            #
+            #     # You can pass a formatting function. Here we capitalize the options
+            #     format_func=lambda name: name.capitalize(),
+            #     key=label,
+            # )
+            col1, col2, col3, col4, col5 = st.columns(5,gap="small")
+            col1.button("Iniciar sesión",  type="primary", key="in"+nombre.replace(" ", ""))
+            col2.button("Ver paciente",key="ver"+nombre)
+            col3.button("Reagendar",key="rea"+nombre)
+            col4.button("No asistió",key="falta"+nombre)
+            col5.button("Cancelar",key="can"+nombre)
+            lista_personas.append("in"+nombre.replace(" ", ""))
+
+seleccionada=""
+for persona in lista_personas:
+    if st.session_state[persona]==True:
+        seleccionada=persona
+        st.session_state.pagina = "Historial"
+        st.session_state.cedula = "123456789"
+        st.session_state.sesion_seleccionada = ""
+        switch_page("Información pacientes")
+
+
+
+# if len(sesion_seleccionada) > 0:
+#     page = st_btn_select(
+#         # The different pages
+#         ('Iniciar sesión', 'Ver paciente', 'Reagendar cita', 'Marcar ausentismo', 'Cancelar cita'),
+#
+#         # You can pass a formatting function. Here we capitalize the options
+#         format_func=lambda name: name.capitalize(),
+#     )
+#     with st.sidebar:
+#         st.button("Iniciar sesión")
+#         st.button("Ver paciente")
+#         st.button("Reagendar cita")
+#         st.button("Marcar ausentismo")
+#         st.button("Cancelar cita")
+
+
+# iniciar, ver, reagendar, ausentismo, cancelar = st.columns(5)
+# with iniciar:
+#     st.button("Iniciar sesión")
+# with ver:
+#     st.button("Ver paciente")
+# with reagendar:
+#     st.button("Reagendar cita")
+# with ausentismo:
+#     st.button("Marcar ausentismo")
+# with cancelar:
+#     st.button("Cancelar cita")
+
+# with st.sidebar:
+#     registar=st.button("Registrar nueva cita")
+
+# if registar:
+#     st.session_state.registrar_cita = True
+
+# if st.session_state.registrar_cita:
+#     with st.form(key="cita"):
+#         paciente = st.text_input("Paciente")
+#         fecha = st.date_input("Fecha")
+#         hora = st.time_input("Hora")
+#         guardar = st.form_submit_button(label="Guardar")
+#
+#     if guardar:
+#         st.session_state.registrar_cita = False
+#         print("La cita con el paciente "+paciente+" se generó para el ", fecha, hora)
+#         st.experimental_rerun()
+

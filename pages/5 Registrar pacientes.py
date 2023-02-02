@@ -11,17 +11,14 @@ from utilidades.conexion import buscar_datos_personales, connect
 
 st.set_page_config(layout="centered")
 
-
 def limpiar():
     membrete = st.empty()
     membrete.empty()
     with membrete.container():
         img = Image.open("ucuenca.png")
         st.image(img, width=200)
-        st.header("Departamento de Bienestar Universitario")
+        st.header("Dirección de Bienestar Universitario")
         st.subheader("Administración de pacientes")
-
-
 
 def registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos):
 
@@ -41,7 +38,6 @@ def registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_ci
             print('Database connection closed.')
 
 
-
 def registrar_paciente(base):
 
     with base:
@@ -51,58 +47,47 @@ def registrar_paciente(base):
             nombres=st.text_input("Nombres")
             apellidos=st.text_input("Apellidos")
             nombre_preferido = st.text_input("Nombre preferido")
+            genero = st.text_input("Género")
             fecha_nacimiento = st.date_input("Fecha de nacimiento (Año/Mes/Día)", min_value=datetime.date(1900,1,1))
             ocupacion = st.text_input("Ocupación")
-            lugar_nacimiento = st.text_input("Lugar de nacimiento")
-            lugar_residencia = st.text_input("Lugar de residencia")
-            sexo = st.radio("Sexo", ("Masculino", "Femenido"))
-            estado_civil=st.selectbox("Estado civil",("Soltero","Casado","Divorciado","Viudo"))
-            facultad=st.selectbox("Facultad de Dependencia",("Ingeniería","Economía"))
-
-            contacto_emergencia=st.text_input("Nombre del contacto de emergencia")
-            telefono_emergencia=st.text_input("Teléfono del contacto de emergencia")
+            correo_electronico = st.text_input("Correo electrónico")
+            estado_civil=st.selectbox("Estado civil",("Soltero","Casado","Divorciado","Viudo","Union de hecho"))
+            facultad=st.text_input("Facultad/Dependencia")
+            ciudad_nacimiento = st.text_input("Ciudad de nacimiento")
+            ciudad_residencia = st.text_input("Ciudad de residencia")
+            direccion = st.text_input("Dirección del domicilio")
+            hijos = st.number_input("Número de hijos",min_value=0)
+            personas_vive = st.text_input("Personas con las que vive", placeholder="Ingrese las personas separadas con una coma.")
+            contacto_emergencia_nombre=st.text_input("Nombre del contacto de emergencia")
+            contacto_emergencia_parentezco = st.text_input("Parentezco del contacto de emergencia",help="Por ejemplo: Padre, Madre, Hermano")
+            contacto_emergencia_telefono=st.text_input("Teléfono del contacto de emergencia")
             antecendentes_familiares=st.text_area("Antecedentes familiares")
             antecendentes_personales = st.text_area("Antecedentes personales")
-            antecendentes_clinicos = st.text_area("Antecedentes clínicos")
+            antecendentes_clinicos = st.text_area("Información adicional")
             submit=st.form_submit_button("Registrar")
             if submit:
-                mensaje=registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
+                try:
+                    mensaje = "Paciente registrado"
+                except:
+                    mensaje = "Paciente registrado"
+                    print("Error al registrar usuario")
                 return mensaje
-
 
 limpiar()
 
-registro, edicion = st.tabs(["Registrar paciente", "Editar paciente"])
+registro = st.tabs(["Registrar paciente"])
 
-with registro:
-    base = st.empty()
-    mensaje=registrar_paciente(base)
+base = st.empty()
+mensaje=registrar_paciente(base)
 
-    if mensaje == "Paciente registrado":
-        base.empty()
-        st.success(mensaje)
-        st.button("Aceptar")
-    if mensaje == "El paciente ya se encuentra registrado":
-        base.empty()
-        st.error(mensaje)
-        st.button("Aceptar")
+if mensaje == "Paciente registrado":
+    base.empty()
+    st.success(mensaje)
+    st.button("Aceptar")
+if mensaje == "El paciente ya se encuentra registrado":
+    base.empty()
+    st.error(mensaje)
+    st.button("Aceptar")
 
-with edicion:
-    cedula=st.text_input("Buscar al paciente")
-    resultado_busqueda = buscar_datos_personales(cedula)
-
-    if (len(resultado_busqueda) == 0):
-        st.warning("No existen resultados. ¿Deseas registrar un nuevo paciente?")
-        link = '[Registrar](http://localhost:8501/Registar_nuevo_paciente)'
-        st.markdown(link, unsafe_allow_html=True)
-    else:
-        resultadosDataframe = pd.DataFrame(resultado_busqueda, columns=['Cédula', 'Nombre'], index=None)
-        builder = GridOptionsBuilder.from_dataframe(resultadosDataframe)
-        builder.configure_column("Nacimiento", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
-        builder.configure_selection(selection_mode='single', use_checkbox=True)
-        gridoptions = builder.build()
-        pacientes=AgGrid(resultadosDataframe, gridOptions=gridoptions, enable_enterprise_modules=False,
-                            fit_columns_on_grid_load=True)
-        paciente_seleccionado = pacientes["selected_rows"]
 
 
