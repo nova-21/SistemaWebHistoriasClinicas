@@ -10,7 +10,13 @@ contenedor_form = st.empty()
 
 with contenedor_form:
     with st.form(key="cita"):
-        primera=st.radio("Seleccione el tipo de cita",("Cita regular: para pacientes registrados","Primera cita: para pacientes no registrados"))
+        primera = st.radio(
+            "Seleccione el tipo de cita",
+            (
+                "Cita regular: para pacientes registrados",
+                "Primera cita: para pacientes no registrados",
+            ),
+        )
         paciente = st.text_input("Cédula del paciente")
         fecha = st.date_input("Fecha de la cita")
         hora = st.time_input("Hora de la cita")

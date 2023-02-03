@@ -1,13 +1,12 @@
 import psycopg2
-import streamlit as st
 import sqlite3
-from sqlite3 import Error
+
 
 from psycopg2 import errors
 
 
 def connect():
-    conn = sqlite3.connect(r"./utilidades/bienestar.db")
+    conn = sqlite3.connect(r"./base_de_datos/bienestar.db")
     return conn
 
 # def connect():
@@ -19,7 +18,6 @@ def connect():
 #     return conn
 
 
-@st.cache
 def buscar_datos_personales(datos_personales):
     conn = None
     resultado_busqueda=""
@@ -38,7 +36,7 @@ def buscar_datos_personales(datos_personales):
             print('Database connection closed.')
         return resultado_busqueda
 
-@st.cache
+
 def buscar_datos_personales2(cedula):
     conn = None
     try:
@@ -56,14 +54,13 @@ def buscar_datos_personales2(cedula):
             print('Database connection closed.')
         return resultado_busqueda
 
-@st.cache
 def buscar_historial(cedula):
     historial=""
     try:
         conn = connect()
         cur = conn.cursor()
         #to_char "YYYY-MM-DD"
-        query = "SELECT fecha as date,descripcion from cita where paciente='{0}' order by date desc".format(
+        query = "SELECT fecha as date, descripcion from cita where paciente='{0}' order by date desc".format(
             cedula)
 
         cur.execute(query)
@@ -77,7 +74,7 @@ def buscar_historial(cedula):
             print('Database connection closed.')
         return historial
 
-@st.cache
+
 def buscar_sesion(cedula,fecha):
     sesion = ""
     try:
