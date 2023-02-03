@@ -1,41 +1,9 @@
 import datetime
 
-import psycopg2
-from psycopg2 import errors
-from PIL import Image
-import pandas as pd
+
 import streamlit as st
-from st_aggrid import GridOptionsBuilder, AgGrid
-
-from utilidades.conexion import buscar_datos_personales, connect
-
+from utilidades.otros import limpiar
 st.set_page_config(layout="centered")
-
-def limpiar():
-    membrete = st.empty()
-    membrete.empty()
-    with membrete.container():
-        img = Image.open("ucuenca.png")
-        st.image(img, width=200)
-        st.header("Dirección de Bienestar Universitario")
-        st.subheader("Administración de pacientes")
-
-def registrar(cedula, nombres, apellidos, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos):
-
-    try:
-        conn = connect()
-        cur = conn.cursor()
-        nombre = nombres + " " + apellidos
-        query = "INSERT INTO paciente(cedula,nombre,fecha_nacimiento,ocupacion,estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos) values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}')".format(cedula, nombre, fecha_nacimiento, ocupacion, estado_civil, facultad, nombre_preferido, lugar_nacimiento, lugar_residencia, contacto_emergencia, telefono_emergencia, antecendentes_familiares, antecendentes_personales, antecendentes_clinicos)
-        cur.execute(query)
-        conn.commit()
-        return "Paciente registrado"
-    except (Exception, errors.UniqueViolation) as error:
-        return("El paciente ya se encuentra registrado")
-    finally:
-        if conn is not None:
-            conn.close()
-            print('Database connection closed.')
 
 
 def registrar_paciente(base):
@@ -73,7 +41,7 @@ def registrar_paciente(base):
                     print("Error al registrar usuario")
                 return mensaje
 
-limpiar()
+limpiar("Registro de pacientes")
 
 registro = st.tabs(["Registrar paciente"])
 

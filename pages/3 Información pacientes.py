@@ -1,16 +1,14 @@
 import base64
 import datetime
-import select
 import time
 import urllib
 from datetime import datetime, date
-import psycopg2
 import streamlit as st
 from PIL import Image
 import pandas as pd
 
 from streamlit_extras.colored_header import colored_header
-from st_aggrid import AgGrid, GridOptionsBuilder, DataReturnMode
+from st_aggrid import AgGrid, GridOptionsBuilder, DataReturnMode, GridUpdateMode
 
 from utilidades.conexion import connect, buscar_datos_personales, registrar_sesion_db, guardar_archivos, \
     buscar_historial, buscar_sesion, buscar_datos_personales2
@@ -27,7 +25,7 @@ if 'registrar' not in st.session_state:
     st.session_state.registrar = " "
 
 if 'sesion_seleccionada' not in st.session_state:
-    st.session_state.sesion_seleccionada=" "
+    st.session_state.sesion_seleccionada = " "
 
 membrete = st.empty()
 contenedor_general = st.empty()
@@ -86,7 +84,7 @@ def cambiar_pagina_editar():
     st.session_state.pagina = "Editar datos"
 
 
-def obtener_historial(buscar):
+def obtener_historial(buscar, sesion_seleccionada=None):
     # st.header("Historial de sesiones")
     paciente = buscar_datos_personales2(buscar)
     cedula, nombre, fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos, lugar_residencia, nombre_preferido, contacto_emergencia, telefono_emergencia = paciente
@@ -95,22 +93,11 @@ def obtener_historial(buscar):
     tabla["Descripción corta"].fillna("", inplace=True)
     builder = GridOptionsBuilder.from_dataframe(tabla)
     builder.configure_column("Fecha", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
+    builder.configure_selection(selection_mode='multiple', use_checkbox=False)
+    builder.configure_side_bar(filters_panel=False)
     if st.session_state.sesion_seleccionada!=" ":
         builder.configure_selection(pre_selected_rows=[0])
-    builder.configure_selection(selection_mode='single', use_checkbox=True)
     gridoptions = builder.build()
-
-    with contenedor_sesiones.container():
-        colored_header(
-            label="Historial de sesiones",
-            color_name="red-50",
-            description="")
-
-        st.write("Seleccione la sesión que desea visualizar")
-        sesion = AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
-
-    sesion_seleccionada = sesion["selected_rows"]
-
 
     with contenedor_controles.container():
         colored_header(
@@ -119,8 +106,25 @@ def obtener_historial(buscar):
             description="")
         st.button("🏠 Regresar a la búsqueda de pacientes", type='primary',key="dos", on_click=inicio)
         st.button("Registrar nueva sesión", on_click=tab_registrar)
-        if sesion_seleccionada:
-            editar_sesion = st.button("Editar datos de la sesión")
+        editar_sesion = st.button("Editar datos de la sesión")
+
+    with st.sidebar:
+        colored_header(
+            label="Historial de sesiones",
+            color_name="red-50",
+            description="")
+
+        st.write("Seleccione la sesión que desea visualizar")
+
+        sesion = AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True,
+                            enable_enterprise_modules=False, update_mode=GridUpdateMode.SELECTION_CHANGED)
+
+    sesion_seleccionada = sesion["selected_rows"]
+    print(sesion_seleccionada)
+
+
+
+
 
 
     if st.session_state.registrar == True:
@@ -148,9 +152,11 @@ def obtener_historial(buscar):
                 fecha = st.date_input("Fecha de cita", value=datetime.strptime(fecha_seleccionada, '%Y-%m-%d'))
                 encargado = st.text_input("Tratante", value="Juan Perez")
                 asistencia = st.text_area("Asuntos tratados en la sesión", value=asuntos_tratados)
+                tareas = st.text_input("Tareas enviadas", value="Lorem ipsum")
                 archivos = st.file_uploader("Adjuntar archivos:")
                 st.form_submit_button(label="Guardar")
         else:
+
             colored_header(
                 label="Información de la sesión",
                 color_name="red-50",
@@ -162,6 +168,8 @@ def obtener_historial(buscar):
                 st.subheader("Tratante: Juan Perez")
                 st.subheader("Asuntos tratados en la sesión")
                 st.write(resultado_sesion[0])
+                st.subheader("Tareas enviadas")
+                st.write("Lorem ipsum")
 
             # with archivos_adjuntos:
             #     st.checkbox("Mostrar archivos adjuntos")
@@ -256,9 +264,6 @@ def obtener_historial(buscar):
                 st.write("Hijos: 0")
                 st.write("Dirección:")
 
-
-
-
     with st.expander("Antecedentes familiares"):
         st.write(antecedentes_familiares)
         st.button("Editar", key="editar_familiares")
@@ -350,56 +355,9 @@ if st.session_state.pagina == "Busqueda":
                     if do_action:
                         cambiar_pagina_historial(resultadosDataframe['Cédula'][x])
                         break
-        # if cita and len(paciente_seleccionado)>0:
-        #
-        #     cedula_seleccion = paciente_seleccionado[0]["Cédula"]
-        #     st.session_state.cedula=cedula_seleccion
-        #     seleccionar_nueva_cita()
-        #
-        # if historial and len(paciente_seleccionado)>0:
-        #     cedula_seleccion = paciente_seleccionado[0]["Cédula"]
-        #     st.session_state.cedula=cedula_seleccion
-        #     seleccionar_historial()
-
-# if st.session_state.pagina == "Paciente":
-#     contenedor_general.empty()
-#     time.sleep(0.01)
-#
-#     cedula_busqueda = st.session_state.cedula
-#     cedula, nombre = buscar_datos_personales(cedula_busqueda)[0]
-#
-#     with contenedor_general.container():
-#         st.subheader(nombre)
-#         # col1, col2 = st.columns([1, 1])
-#         # with col1:
-#         #     st.subheader(cedula)
-#             # if (sexo == False):
-#             #     st.subheader("Masculino")
-#             # else:
-#             #     st.subheader("Femenino")
-#             # st.subheader(estado_civil)
-#         # with col2:
-#
-#             # st.subheader(fecha_nacimiento)
-#             # st.subheader(ocupacion)
-#
-#
-#         st.subheader("¿Qué desea realizar con el paciente?")
-#         but1, but2, but3 = st.columns([1, 1, 1])
-#         but1.button("Registrar sesión", on_click=cambiar_pagina_cita)
-#         but2.button("Revisar historial", on_click=cambiar_pagina_historial)
-#         but3.button("Regresar al Inicio", on_click=inicio)
-
-
 
 
 if st.session_state.pagina == "Historial":
     contenedor_general.empty()
     with st.container():
         obtener_historial(st.session_state.cedula)
-
-# if st.session_state.pagina == "Modificar datos":
-#     st.header("Modificar datos")
-#     paciente = st.session_state.paciente
-#     cedula, nombre, sexo, fecha_nacimiento, ocupacion, estado_civil = paciente
-#     st.text(nombre)

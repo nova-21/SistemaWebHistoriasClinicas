@@ -1,14 +1,11 @@
-import pandas as pd
 import streamlit as st
-from PIL import Image
 
-membrete = st.empty()
-membrete.empty()
+from utilidades.otros import limpiar
+
+
+limpiar("Registro de citas")
+
 contenedor_form = st.empty()
-with membrete.container():
-    img = Image.open("resources/ucuenca.png")
-    st.image(img, width=200)
-    st.header("Dirección de Bienestar Universitario")
 
 
 with contenedor_form:
@@ -24,5 +21,4 @@ if guardar:
     contenedor_form.empty()
     st.success("La cita fue creata con éxito")
     st.button("Aceptar")
-    # print("La cita con el paciente "+paciente+" se generó para el ", fecha, hora)
     # st.experimental_rerun()
