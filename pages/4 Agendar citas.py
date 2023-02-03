@@ -18,7 +18,7 @@ with contenedor_form:
             ),
         )
         paciente = st.text_input("Cédula del paciente")
-        fecha = st.date_input("Fecha de la cita")
+        fecha = st.date_input("Fecha de la cita (Año/Mes/Día)")
         hora = st.time_input("Hora de la cita")
         guardar = st.form_submit_button(label="Guardar")
 

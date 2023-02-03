@@ -399,6 +399,7 @@ if st.session_state.pagina == "Busqueda":
                 link = "[Registrar](/Registrar_pacientes)"
                 st.markdown(link, unsafe_allow_html=True)
             else:
+                st.markdown("##### Seleccione el paciente a visualizar")
                 resultadosDataframe = pd.DataFrame(
                     resultado_busqueda, columns=["Cédula", "Nombre"], index=None
                 )
