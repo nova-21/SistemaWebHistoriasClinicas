@@ -4,7 +4,7 @@ from PIL import Image
 
 @st.experimental_memo
 def cargar_imagen():
-    img = Image.open("resources/ucuenca-min.png")
+    img = Image.open("./resources/ucuenca-min.png")
     return img
 
 
@@ -17,7 +17,6 @@ def limpiar(subtitulo):
         st.header("Dirección de Bienestar Universitario")
         st.subheader(subtitulo)
 
-
 def logo_titulo():
-    img = Image.open("resources/favicon.png")
+    img = Image.open("./resources/favicon.png")
     st.set_page_config(page_title="Ucuenca - Manejo de pacientes", page_icon=img)
