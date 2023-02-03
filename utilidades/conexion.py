@@ -96,8 +96,24 @@ def registrar_sesion_db(fecha, paciente,asuntos_tratados,descripcion):
     try:
         conn = connect()
         cur = conn.cursor()
-        print(paciente)
         query = "INSERT INTO cita(fecha,paciente,asuntos_tratados,descripcion) values('{0}','{1}','{2}','{3}')".format(fecha, paciente, asuntos_tratados,descripcion)
+        cur.execute(query)
+        conn.commit()
+        conn.close()
+        return "Sesion registrada"
+    except (Exception, errors.UniqueViolation) as error:
+        return ("Ya existe una sesion")
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
+
+def actualizar_sesion_db(fecha, paciente, asuntos_tratados,descripcion):
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        print(fecha,paciente,asuntos_tratados,descripcion)
+        query = "UPDATE cita SET asuntos_tratados = '{0}', descripcion ='{1}' where paciente='{2}' and fecha= '2023-02-03'".format(asuntos_tratados,descripcion, paciente, fecha)
         cur.execute(query)
         conn.commit()
         conn.close()

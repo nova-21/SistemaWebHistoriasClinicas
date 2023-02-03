@@ -14,8 +14,8 @@ def limpiar(subtitulo):
     with membrete.container():
         img = cargar_imagen()
         st.image(img, width=200)
-        st.header("Dirección de Bienestar Universitario")
-        st.subheader(subtitulo)
+        st.subheader("Dirección de Bienestar Universitario")
+        st.markdown("#### "+subtitulo)
 
 def logo_titulo():
     img = Image.open("./resources/favicon.png")

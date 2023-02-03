@@ -2,7 +2,7 @@ import datetime
 import streamlit as st
 from utilidades.otros import limpiar, logo_titulo
 
-st.set_page_config(layout="centered")
+
 logo_titulo()
 
 

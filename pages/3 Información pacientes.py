@@ -151,7 +151,7 @@ def obtener_historial(buscar, sesion_seleccionada=None):
     if st.session_state.registrar == True:
         st.header("Registrar nueva cita")
         registrar_sesion()
-    st.subheader("Nombre completo: " + nombre)
+    st.subheader("_Paciente: " + nombre+"_")
 
     if sesion_seleccionada:
         fecha_seleccionada = sesion_seleccionada[0]["Fecha"]
@@ -180,25 +180,29 @@ def obtener_historial(buscar, sesion_seleccionada=None):
                     value=datetime.strptime(fecha_seleccionada, "%Y-%m-%d"),
                 )
                 encargado = st.text_input("Tratante", value="Juan Perez")
+                descripcion = st.text_input("Descripción corta de la sesión")
                 asistencia = st.text_area(
                     "Asuntos tratados en la sesión", value=asuntos_tratados
                 )
+
                 tareas = st.text_input("Tareas enviadas", value="Lorem ipsum")
                 archivos = st.file_uploader("Adjuntar archivos:")
-                st.form_submit_button(label="Guardar")
+                guardar=st.form_submit_button(label="Guardar")
+
         else:
             colored_header(
                 label="Información de la sesión", color_name="red-50", description=""
             )
-            st.subheader("Fecha: " + str(fecha_seleccionada))
+            st.markdown("#### Fecha de la sesión: " + str(fecha_seleccionada))
+
             informacion, cuestionarios, archivos_adjuntos = st.tabs(
                 ["Información", "Cuestionarios", "Archivos adjuntos"]
             )
             with informacion:
-                st.subheader("Tratante: Juan Perez")
-                st.subheader("Asuntos tratados en la sesión")
+                st.markdown("#### Tratante: Juan Perez")
+                st.markdown("#### Asuntos tratados en la sesión")
                 st.write(resultado_sesion[0])
-                st.subheader("Tareas enviadas")
+                st.markdown("#### Tareas enviadas")
                 st.write("Lorem ipsum")
 
             # with archivos_adjuntos:
@@ -220,7 +224,7 @@ def obtener_historial(buscar, sesion_seleccionada=None):
                 beckA = True
                 beckD = True
             with cuestionarios:
-                st.subheader("Cuestionarios y Escalas")
+                st.markdown("#### Cuestionarios y Escalas")
                 st.markdown(
                     "**Seleccione los cuestionarios que desea aplicar al paciente:**"
                 )
@@ -259,10 +263,10 @@ def obtener_historial(buscar, sesion_seleccionada=None):
                 if cuestionarios_pendientes == "0" and (
                     beck_depresion == None and beck_ansiedad == None
                 ):
-                    st.subheader("Resultados de Cuestionarios")
+                    st.markdown("#### Resultados de Cuestionarios")
                     st.write("No se han asignado cuestionarios en esta sesión")
                 else:
-                    st.subheader("Resultados de Cuestionarios")
+                    st.markdown("#### Resultados de Cuestionarios")
                     if beck_depresion == None:
                         beck_depresion = "Pendiente"
                     if beck_ansiedad == None:
@@ -275,14 +279,15 @@ def obtener_historial(buscar, sesion_seleccionada=None):
                     )
                     st.dataframe(lista, use_container_width=True)
             with archivos_adjuntos:
+                st.markdown("#### Cargar archivos")
                 st.file_uploader("Subir nuevos archivos adjuntos")
-                st.subheader("Archivos en memoria")
+                st.markdown("#### Descargar archivos guardados")
                 st.download_button("Archivo 1", data="Archivo de prueba")
                 st.download_button("Archivo 2", data="Archivo de prueba")
 
     colored_header(label="Datos personales", color_name="red-50", description="")
 
-    with st.expander("Datos Personales"):
+    with st.expander("**Datos personales**"):
         col1, col2 = st.columns([1, 1])
 
         editar_datos = st.button("Editar", key="editar_datos")
@@ -295,41 +300,36 @@ def obtener_historial(buscar, sesion_seleccionada=None):
             print("Hi")
         else:
             with col1:
-                # if (sexo == False):
-                #     st.subheader("Masculino")
-                # else:
-                #     st.subheader("Femenino")
-                st.write("Cédula: " + cedula)
+                st.write("Cédula: ")
                 st.write("Género:")
-                st.write("Fecha de nacimiento: " + str(fecha_nacimiento))
+                st.write("Fecha de nacimiento: ")
                 st.write("E-mail:")
-                st.write("Facultad de dependencia: " + str(facultad))
+                st.write("Facultad de dependencia: ")
                 st.write(
                     "Contacto de emergencia: "
-                    + contacto_emergencia
                     + " "
-                    + telefono_emergencia
+                    + " "
+                    + " "
                 )
-                st.write("Parentezco: Padrastro")
+                st.write("Parentezco: ")
                 st.write("Personas con las que vive:")
 
             with col2:
-                st.write("Nombre preferido: " + nombre_preferido)
-                st.write("Ocupación: " + ocupacion)
-                st.write("Estado civil: " + estado_civil)
+                st.write("Nombre preferido: " )
+                st.write("Ocupación: " )
+                st.write("Estado civil: " )
                 st.write("Ciudad de nacimiento: Cuenca")
-                st.write("Ciudad de residencia: " + lugar_residencia)
-                st.write("Hijos: 0")
+                st.write("Ciudad de residencia: ")
+                st.write("Hijos: ")
                 st.write("Dirección:")
 
-    with st.expander("Antecedentes familiares"):
+    with st.expander("**Antecedentes familiares**"):
         st.write(antecedentes_familiares)
         st.button("Editar", key="editar_familiares")
-
-    with st.expander("Antecedentes personales"):
+    with st.expander("**Antecedentes personales**"):
         st.write(antecedentes_personales)
         st.button("Editar", key="editar_personales")
-    with st.expander("Antecedentes clínicos"):
+    with st.expander("**Antecedentes clínicos**"):
         st.write(antecedentes_clinicos)
         st.button("Editar", key="editar_clinicos")
 
@@ -337,7 +337,7 @@ def obtener_historial(buscar, sesion_seleccionada=None):
 def cambiar_pagina_historial_sin_cedula():
     st.session_state.pagina = "Historial"
     st.session_state.registrar = False
-    st.experimental_rerun()
+    # st.experimental_rerun()
 
 
 def cambiar_pagina_historial_sin_cedula_normal():
