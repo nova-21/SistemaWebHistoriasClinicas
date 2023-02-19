@@ -5,8 +5,8 @@ from streamlit_extras.switch_page_button import switch_page
 
 from base_de_datos.read import buscar_citas_hoy
 from utilidades.otros import limpiar, logo_titulo
-
 logo_titulo()
+
 
 if "registrar_cita" not in st.session_state:
     st.session_state.registrar_cita = False
@@ -26,8 +26,7 @@ historial=buscar_citas_hoy()
 #     ["13:00", "Camila Quito"],
 #     ["14:00", "Damian Yapa"],
 # ]
-tabla=historial[['hora','cedula_paciente','nombres','apellidos','telefono']]
-
+tabla=historial[['hora','nombres','apellidos','telefono','facultad_dependencia','carrera']]
 # tabla = pd.DataFrame(historial, columns=["Hora", "Cédula", "Nombres", "Apellidos"], index=None)
 builder = GridOptionsBuilder.from_dataframe(tabla)
 
@@ -60,14 +59,15 @@ tabla = tabla.values.tolist()
 
 for cita in tabla:
     hora = cita[0]
-    print(cita[0],cita[2],cita[3])
-    nombre = cita[2] + " " +cita[3]
+    nombre = cita[1] + " " +cita[2]
+    telefono = cita[3]
     # label = ":red[" + str(hora) + "]" + " " + nombre
-    label = f"**{hora}** {nombre}"
+    label = f"**{hora}** {nombre} **{telefono}**"
     with st.expander(label=label):
+        tabla_detalles = historial[['telefono', 'facultad_dependencia', 'carrera']]
+        st.dataframe(tabla_detalles)
         st.markdown("###### Tareas enviadas en la sesión anterior:")
         st.write("Ejercicios de respiración. Realizar una lista de actividades.")
-        st.markdown(" **Teléfono:** "+ cita[4])
 
         # iniciar, ver, reagendar, ausentismo, cancelar = st.columns(5)
         # with iniciar:

@@ -14,7 +14,7 @@ def crear_session():
 
 def buscar_citas_hoy():
     session=crear_session()
-    citas_hoy = pd.read_sql(session.query(Cita.hora, Cita.cedula_paciente, Paciente.nombres, Paciente.apellidos, Paciente.telefono).filter_by(fecha=date.today()).join(Paciente, Paciente.cedula==Cita.cedula_paciente).statement, session.bind)
+    citas_hoy = pd.read_sql(session.query(Cita.hora, Cita.cedula_paciente, Paciente.nombres, Paciente.apellidos, Paciente.telefono, Paciente.facultad_dependencia, Paciente.carrera).filter_by(fecha=date.today()).join(Paciente, Paciente.cedula==Cita.cedula_paciente).statement, session.bind)
     return citas_hoy
 
 def buscar_sesion(cedula,fecha):

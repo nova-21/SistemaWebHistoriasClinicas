@@ -180,7 +180,7 @@ def obtener_historial(buscar, sesion_seleccionada=None):
                     value=datetime.strptime(fecha_seleccionada, "%Y-%m-%d"),
                 )
                 encargado = st.text_input("Tratante", value="Juan Perez")
-                descripcion = st.text_input("Descripción corta de la sesión")
+                descripcion = st.text_input("Tipo de atención")
                 asistencia = st.text_area(
                     "Asuntos tratados en la sesión", value=asuntos_tratados
                 )
@@ -195,8 +195,8 @@ def obtener_historial(buscar, sesion_seleccionada=None):
             )
             st.markdown("#### Fecha de la sesión: " + str(fecha_seleccionada))
 
-            informacion, cuestionarios, archivos_adjuntos = st.tabs(
-                ["Información", "Cuestionarios", "Archivos adjuntos"]
+            informacion, cuestionarios, archivos_adjuntos, diagnosticos = st.tabs(
+                ["Información", "Cuestionarios", "Archivos adjuntos", "Diagnósticos"]
             )
             with informacion:
                 st.markdown("#### Tratante: Juan Perez")
@@ -205,9 +205,6 @@ def obtener_historial(buscar, sesion_seleccionada=None):
                 st.markdown("#### Tareas enviadas")
                 st.write("Lorem ipsum")
 
-            # with archivos_adjuntos:
-            #     st.checkbox("Mostrar archivos adjuntos")
-            #     # displayPDF("https://www.orimi.com/pdf-test.pdf")
             beckA = ""
             beckD = ""
 
@@ -223,6 +220,7 @@ def obtener_historial(buscar, sesion_seleccionada=None):
             if cuestionarios_pendientes == "3":
                 beckA = True
                 beckD = True
+
             with cuestionarios:
                 st.markdown("#### Cuestionarios y Escalas")
                 st.markdown(
@@ -284,44 +282,49 @@ def obtener_historial(buscar, sesion_seleccionada=None):
                 st.markdown("#### Descargar archivos guardados")
                 st.download_button("Archivo 1", data="Archivo de prueba")
                 st.download_button("Archivo 2", data="Archivo de prueba")
+            with diagnosticos:
+                diag = ["Trastorno obsesivo compulsivo","Ansiedad moderada"]
+                st.dataframe(diag, )
 
     colored_header(label="Datos personales", color_name="red-50", description="")
 
     with st.expander("**Datos personales**"):
-        col1, col2 = st.columns([1, 1])
 
+        dataframe_inicial=[["Cédula", "0106785215"],
+                           ["Nombre preferido", "Karen"],
+                           ["Sexo","Femenino"],
+                           ["Género", "Mujer"],
+                           ["Orientación sexual", "Heterosexual"],
+                           ["Fecha de nacimiento", "01-07-1997"],
+                           ["Teléfono", "0996334336"],
+                           ["E-mail", "karen.coronel@ucuenca.edu.ec"],
+                           ["Ocupación", "Student"],
+                           ["Estado civil","Soltero"],
+                           ["Rol universitario","Estudiante"],
+                           ["Facultad/Dependencia","Ingeniería"],
+                           ["Carrera","Civil"],
+                           ["Ciclo","5"],
+                           ["Ciudad de nacimiento", "Cuenca"],
+                           ["Ciudad de residencia", "Cuenca"],
+                           ["Dirección del domicilio", "Guatemala y Honduras Condominio El Alamo"],
+                           ["Número de hijos",0],
+                           ["Personas con las que vive","Padre, Madre, Hermano"],
+                           ["Nombre del contado de emergencia","Pedro Coronel"],
+                           ["Parentezco del contacto de emergencia","Padre"],
+                           ["Teléfono del contacto de emergencia", "09546165165"]]
+        contenedor_datos_personales=st.empty()
         editar_datos = st.button("Editar", key="editar_datos")
-        editar_datos = False
         if editar_datos:
-            # with col1:
-            #     with st.form(key="editar datos"):
-            #         st.text_input("Este")
-            #         st.form_submit_button("Guardar")
+            #TODO agregar vista de edicion
             print("Hi")
         else:
-            with col1:
-                st.write("Cédula: ")
-                st.write("Género:")
-                st.write("Fecha de nacimiento: ")
-                st.write("E-mail:")
-                st.write("Facultad de dependencia: ")
-                st.write(
-                    "Contacto de emergencia: "
-                    + " "
-                    + " "
-                    + " "
-                )
-                st.write("Parentezco: ")
-                st.write("Personas con las que vive:")
+            with contenedor_datos_personales:
+                tabla = pd.DataFrame(dataframe_inicial, columns=["Campo", "Valor"])
 
-            with col2:
-                st.write("Nombre preferido: " )
-                st.write("Ocupación: " )
-                st.write("Estado civil: " )
-                st.write("Ciudad de nacimiento: Cuenca")
-                st.write("Ciudad de residencia: ")
-                st.write("Hijos: ")
-                st.write("Dirección:")
+                builder = GridOptionsBuilder.from_dataframe(tabla)
+                gridoptions = builder.build()
+                # AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
+                st.table(tabla)
 
     with st.expander("**Antecedentes familiares**"):
         st.write(antecedentes_familiares)

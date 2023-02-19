@@ -14,12 +14,15 @@ def registrar_paciente(base):
             nombres = st.text_input("Nombres")
             apellidos = st.text_input("Apellidos")
             nombre_preferido = st.text_input("Nombre preferido")
+            sexo = st.text_input("Sexo")
             genero = st.text_input("Género")
+            orientacion_sexual = st.text_input("Orientación sexual")
             fecha_nacimiento = st.date_input(
                 "Fecha de nacimiento (Año/Mes/Día)", min_value=datetime.date(1900, 1, 1)
             )
+            telefono = st.text_input("Teléfono")
+            correo_electronico = st.text_input("E-mail")
             ocupacion = st.text_input("Ocupación")
-            correo_electronico = st.text_input("Correo electrónico")
             estado_civil = st.selectbox(
                 "Estado civil",
                 ("Soltero", "Casado", "Divorciado", "Viudo", "Union de hecho"),
@@ -30,6 +33,7 @@ def registrar_paciente(base):
             )
             facultad = st.text_input("Facultad/Dependencia", help="Facultad para estudiantes, docentes, personal administrativo. Dependencia para otros trabajaores.")
             carrera = st.text_input("Carrera", help="Unicamente en caso de ser estudiante")
+            ciclo = st.text_input("Ciclo", help="Actualizar cada semestre")
             ciudad_nacimiento = st.text_input("Ciudad de nacimiento")
             ciudad_residencia = st.text_input("Ciudad de residencia")
             direccion = st.text_input("Dirección del domicilio")

@@ -19,4 +19,4 @@ def limpiar(subtitulo):
 
 def logo_titulo():
     img = Image.open("./resources/favicon.png")
-    st.set_page_config(page_title="Ucuenca - Manejo de pacientes", page_icon=img)
+    st.set_page_config(page_title="Ucuenca - Manejo de pacientes", page_icon=img, layout="wide")

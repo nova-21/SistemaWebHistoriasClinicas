@@ -13,8 +13,9 @@ with contenedor_form:
         primera = st.radio(
             "Seleccione el tipo de cita",
             (
-                "Cita regular: para pacientes registrados",
-                "Primera cita: para pacientes no registrados",
+                "Primera vez",
+                "Subsecuente",
+
             ),
         )
         paciente = st.text_input("Cédula del paciente")
