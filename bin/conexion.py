@@ -17,7 +17,6 @@ def connect():
 #         password="admin")
 #     return conn
 
-
 def buscar_datos_personales(datos_personales):
     conn = None
     resultado_busqueda=""

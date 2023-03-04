@@ -3,10 +3,10 @@ import streamlit as st
 from st_aggrid import GridOptionsBuilder, AgGrid
 from streamlit_extras.colored_header import colored_header
 import time
-from utilidades.otros import limpiar
+from utilidades.vies_utilities import clean
 from streamlit_extras.switch_page_button import switch_page
 
-limpiar("Búsqueda de pacientes")
+clean("Búsqueda de pacientes")
 
 # Definición de contadores
 contenedor_busqueda = st.empty()
@@ -36,7 +36,7 @@ def cambiar_a_vista_perfil():
     st.experimental_rerun()
 
 def cambiar_a_vista_inicio():
-    st.session_state.pagina = "busqueda"
+    st.session_state.current_view = "busqueda"
 
 def vista_busqueda():
     with contenedor_busqueda:
@@ -72,7 +72,7 @@ def vista_busqueda():
 def get_data():
     return [("2022-12-12", "Test"),("2022-12-12", "Test"),("2022-12-12", "Test"),("2022-12-12", "Test")]
 
-@st.experimental_memo
+@st.cache_data
 def get_table():
     historial = [("2022-12-12", "Test"), ("2022-12-12", "Test"), ("2022-12-12", "Test"), ("2022-12-12", "Test")]
     tabla = pd.DataFrame(historial, columns=["Fecha", "Descripción corta"], index=None)
