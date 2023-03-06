@@ -1,11 +1,11 @@
 import datetime
 
 import pandas as pd
-from sqlalchemy import cast, String
+from sqlalchemy import cast, String, desc, and_, extract, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from data.create_database import Encounter, Practitioner
+from data.create_database import Encounter, Practitioner, Patient
 
 
 def add_encounter(
@@ -17,6 +17,7 @@ def add_encounter(
     attachments,
     patient_id,
     practitioner_id,
+    diagnostics
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -31,6 +32,7 @@ def add_encounter(
         attachments=attachments,
         patient_id=patient_id,
         practitioner_id=practitioner_id,
+        diagnostics=diagnostics
     )
 
     try:
@@ -71,7 +73,7 @@ def get_encounter_history(db_engine, patient_id):
     Session = sessionmaker(bind=db_engine)
     session = Session()
     try:
-        query = session.query(Encounter).filter(Encounter.patient_id == patient_id)
+        query = session.query(Encounter).filter(Encounter.patient_id == patient_id).order_by(desc(Encounter.date))
         encounter_history = pd.read_sql_query(query.statement, db_engine)
         # select and order desired columns
         encounter_history = encounter_history.loc[:, ["date", "encounter_type"]]
@@ -80,6 +82,54 @@ def get_encounter_history(db_engine, patient_id):
             columns={"date": "Fecha", "encounter_type": "Tipo de atención"}
         )
         return encounter_history
+    finally:
+        # Close the session
+        session.close()
+
+def get_encounter_complete_history(db_engine, month,year):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+    try:
+        # retrieve encounters of a particular type that occurred within the specified month and year
+        encounters = session.query(
+            Encounter.encounter_type,
+            Patient.id,
+            Patient.faculty_dependence,
+            Patient.career,
+            Patient.sex,
+            func.floor((func.julianday(func.datetime('now', 'localtime')) - func.julianday(
+                Patient.birth_date)) / 365.25).label('age'),
+            Patient.marital_status,
+            Patient.patient_type,
+            Patient.profession_occupation,
+        ).join(Patient).filter(
+            func.strftime('%m', Encounter.date) == f'{month:02}',
+            func.strftime('%Y', Encounter.date) == str(year)
+        ).all()
+
+        # convert the results into a pandas DataFrame
+        df = pd.DataFrame(encounters, columns=[
+            'encounter_type', 'id', 'faculty_dependence', 'career', 'sex', 'age', 'marital_status', 'patient_type',
+            'profession_occupation'
+        ])
+        return df
+    finally:
+        # Close the session
+        session.close()
+
+def get_encounters_month(db_engine, month, year):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+    try:
+        encounters_in_month = session.query(Encounter).filter(
+            and_(
+                extract('year', Encounter.date) == year,
+                extract('month', Encounter.date) == month
+            )
+        ).all()
+        return encounters_in_month
     finally:
         # Close the session
         session.close()
@@ -103,6 +153,28 @@ def get_encounter(db_engine, patient_id, date):
 
         session.close()
 
+def get_diagnostics(db_engine, patient_id, date):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+    try:
+        encounter = (
+            session.query(Encounter.diagnostics)
+            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+            .first()
+        )
+        if encounter.diagnostics != None:
+            encounter_list = encounter[0].split(";")
+            return encounter_list
+        else:
+            return list([])
+
+
+    finally:
+        # Close the session
+
+        session.close()
+
 
 def update_encounter(
     db_engine,
@@ -114,6 +186,7 @@ def update_encounter(
     attachments,
     patient_id,
     practitioner_id,
+        diagnostics
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -122,7 +195,7 @@ def update_encounter(
     try:
         # Update the Encounter in the session and commit
         encounter = (
-            session.query(Encounter).filter(Encounter.id == encounter_id).first()
+            session.query(Encounter).filter(Encounter.patient_id == patient_id, Encounter.date == date).first()
         )
         if encounter:
             encounter.encounter_type = encounter_type
@@ -132,6 +205,32 @@ def update_encounter(
             encounter.attachments = attachments
             encounter.patient_id = patient_id
             encounter.practitioner_id = practitioner_id
+            encounter.diagnostics = ';'.join(diagnostics)
+            session.commit()
+            print("Encounter updated successfully")
+        else:
+            print("Error: Encounter not found")
+    finally:
+        # Close the session
+        session.close()
+
+def update_encounter_diagnostics(
+    db_engine,
+    date,
+    patient_id,
+    diagnostics
+):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+
+    try:
+        # Update the Encounter in the session and commit
+        encounter = (
+            session.query(Encounter).filter(Encounter.patient_id == patient_id, Encounter.date == date).first()
+        )
+        if encounter:
+            encounter.diagnostics = ';'.join(diagnostics)
             session.commit()
             print("Encounter updated successfully")
         else:

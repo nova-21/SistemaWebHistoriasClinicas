@@ -2,10 +2,10 @@ import datetime
 from sqlite3 import IntegrityError
 
 import pandas as pd
-from sqlalchemy import cast, String
+from sqlalchemy import cast, String, desc, asc, and_, extract, func
 from sqlalchemy.orm import sessionmaker
 
-from data.create_database import Appointment, Patient, Practitioner
+from data.create_database import Appointment, Patient, Practitioner, Encounter
 
 
 def add_appointment(
@@ -64,6 +64,67 @@ def get_todays_appointments(engine):
         )
         .join(Patient, Appointment.patient_id == Patient.id)
         .join(Practitioner, Appointment.practitioner_id == Practitioner.id)
+        .filter(cast(Appointment.date, String) == today_str).order_by(asc(Appointment.time))
+        .all()
+    )
+
+    # create a dataframe from the query results
+    # citas_hoy = pd.read_sql(session.query(Cita.hora, Cita.cedula_paciente, Paciente.nombres, Paciente.apellidos, Paciente.telefono, Paciente.facultad_dependencia, Paciente.carrera).filter_by(fecha=date.today()).join(Paciente, Paciente.cedula==Cita.cedula_paciente).statement, session.bind)
+
+    df = pd.DataFrame(
+        appointments,
+        columns=[
+            "Hora",
+            "Cédula",
+            "Nombre",
+            "Apellido",
+            "Facultad/Dependencia",
+            "Carrera",
+            "Teléfono",
+        ],
+    )
+    # close the session
+    session.close()
+
+    return df
+
+def get_appointment_report(engine,month,year):
+    # create the session
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    appointments = session.query(Appointment).filter(
+            func.strftime('%m', Appointment.date) == f'{month:02}',
+            func.strftime('%Y', Appointment.date) == str(year)
+        ).all()
+
+
+    # close the session
+    session.close()
+
+    return appointments
+
+def get_appointment(engine,patient_id,date):
+    # create the session
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # get today's date as a string in the format YYYY-MM-DD
+    today_str = datetime.date.today().strftime("%Y-%m-%d")
+
+    # query the appointments and join with the related patient and practitioner
+    appointments = (
+        session.query(
+            Appointment.time,
+            Patient.id,
+            Patient.first_name,
+            Patient.first_family_name,
+            Patient.faculty_dependence,
+            Patient.career,
+            Patient.phone_number,
+        )
+        .join(Patient, Appointment.patient_id == Patient.id)
+        .join(Practitioner, Appointment.practitioner_id == Practitioner.id)
         .filter(cast(Appointment.date, String) == today_str)
         .all()
     )
@@ -87,6 +148,7 @@ def get_todays_appointments(engine):
     session.close()
 
     return df
+
 
 
 def update_appointment(

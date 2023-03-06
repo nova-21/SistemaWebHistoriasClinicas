@@ -23,3 +23,10 @@ def clean(subheader, instructions=""):
 def load_logo():
     img = Image.open("./resources/favicon.png")
     return img
+
+def show_header(header_container):
+    header_container.empty()
+    with header_container.container():
+        img = Image.open("resources/ucuenca.png")
+        st.image(img, width=200)
+        st.subheader("Perfil e historial del paciente")

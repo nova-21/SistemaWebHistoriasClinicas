@@ -19,3 +19,12 @@ list_encounter_types = (
     "Atención de necesidades educativas especiales",
     "Orientación vocacional y profesional",
 )
+
+tipos_de_paciente =  (
+                        "Estudiante",
+                        "Egresado",
+                        "Trabajador",
+                        "Docente",
+                        "Jubilado",
+                        "Familiar",
+                    )

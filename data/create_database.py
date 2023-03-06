@@ -1,9 +1,8 @@
-from datetime import date
-
+import os
 from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
-engine = create_engine("sqlite:///./bienestar.db")
+engine = create_engine(os.environ.get("DATABASE"))
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -66,7 +65,8 @@ class Encounter(Base):
     topics_boarded = Column(String())
     date = Column(Date)
     activities_sent = Column(String(50))
-    attachments = Column(String(50))
+    attachments = Column(String())
+    diagnostics = Column(String())
     patient_id = Column(String(10), ForeignKey("patient.id"))
     patient = relationship("Patient", back_populates="encounter")
     practitioner_id = Column(String(50), ForeignKey("practitioner.id"))

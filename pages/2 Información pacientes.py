@@ -10,15 +10,20 @@ import pandas as pd
 from sqlalchemy import create_engine
 from streamlit_extras.colored_header import colored_header
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+from streamlit_extras.switch_page_button import switch_page
+
 from data.actions.encounter_actions import (
     add_encounter,
     get_encounter_history,
-    get_encounter,
+    get_encounter, update_encounter, get_diagnostics, update_encounter_diagnostics,
 )
 from data.actions.patient_actions import get_patient_search, get_patient
 from data.create_database import Encounter
 
 from utilidades.lists import list_encounter_types
+from utilidades.vies_utilities import show_header
+
+
 
 if "db_engine" not in st.session_state:
     st.session_state.db_engine = create_engine(os.environ.get("DATABASE"))
@@ -32,14 +37,18 @@ if "patient_id" not in st.session_state:
 if "register_encounter_page" not in st.session_state:
     st.session_state.register_encounter_page = " "
 
-if "sesion_seleccionada" not in st.session_state:
+if "encounter_row_selected" not in st.session_state:
     st.session_state.encounter_row_selected = " "
 
-membrete = st.empty()
+if "previous_page" not in st.session_state:
+    st.session_state.previous_page = ""
+
+
+header_container = st.empty()
 main_patient_info_view = st.empty()
 with st.sidebar:
     controls_container = st.empty()
-    contenedor_sesiones = st.empty()
+    encounters_container = st.empty()
 
 
 # def displayPDF(file):
@@ -54,21 +63,19 @@ with st.sidebar:
 #     st.markdown(pdf_display, unsafe_allow_html=True)
 
 
-def show_header():
-    membrete.empty()
-    with membrete.container():
-        img = Image.open("resources/ucuenca.png")
-        st.image(img, width=200)
-        st.header("Dirección de Bienestar Universitario")
-
-
 def inicio():
-    st.session_state.current_view = "Busqueda"
+    if st.session_state.previous_page == "inicio":
+        st.session_state.current_view = "inicio"
+        st.session_state.encounter_row_selected = " "
 
+    else:
+        if st.session_state.previous_page == "Busqueda":
+            st.session_state.current_view = "Busqueda"
+            st.session_state.encounter_row_selected = " "
+    # st.session_state.current_view = "Busqueda"
 
 def atras():
     st.session_state.current_view = "Paciente"
-
 
 def cambiar_pagina_historial(patient_id):
     st.session_state.patient_id = patient_id
@@ -107,6 +114,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
         encounter_history_list, columns=["Fecha", "Tipo de atención"], index=None
     ).astype(str)
     df_encounter_list["Tipo de atención"].fillna("", inplace=True)
+
     builder = GridOptionsBuilder.from_dataframe(df_encounter_list)
     builder.configure_column(
         "Fecha", type=["customDateTimeFormat"], custom_format_string="yyyy-MM-dd"
@@ -168,12 +176,6 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
         encounter_selected, practitioner_name = get_encounter(
             st.session_state.db_engine, patient.id, date_from_selected_encounter
         )
-        # (
-        #     topics_boarded,
-        #     cuestionarios_pendientes,
-        #     beck_ansiedad,
-        #     beck_depresion,
-        # ) = encounter_selected
 
         if edit_encounter:  # TODO add update connection
             controls_container.empty()
@@ -228,8 +230,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                 df_encounter_list = pd.DataFrame(
                     dataframe_inicial, columns=["Campo", "Valor"]
                 ).astype(str)
-
-                st.table(df_encounter_list)
+                st.experimental_data_editor(df_encounter_list, use_container_width=True)
 
             # beckA = ""
             # beckD = ""
@@ -305,20 +306,40 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
 
             with archivos_adjuntos:
                 st.markdown("#### Cargar archivos")
-                st.file_uploader("Subir nuevos archivos adjuntos")
+                with st.form(key="upload_file", clear_on_submit=True):
+                    uploaded_files = st.file_uploader("Subir nuevos archivos adjuntos", accept_multiple_files=True)
+                    submit = st.form_submit_button("Guardar archivos")
+                if submit:
+                    for uploaded_file in uploaded_files:
+                        bytes_data = uploaded_file.read()
+                        path = r"bin/"+uploaded_file.name
+                        with open(path, "wb") as binary_file:
+                            # Write bytes to file
+                            binary_file.write(bytes_data)
                 st.markdown("#### Descargar archivos guardados")
+
                 st.download_button("Archivo 1", data="Archivo de prueba")
                 st.download_button("Archivo 2", data="Archivo de prueba")
 
             with diagnosticos:  # TODO add diagnostic list to encounter table
-                diag = ["Trastorno obsesivo compulsivo", "Ansiedad moderada"]
-                st.dataframe(
-                    diag,
-                )
+
+                diagnostics_list = get_diagnostics(st.session_state.db_engine,st.session_state.patient_id, encounter_selected.date)
+                with st.form(key="new_diagnostic", clear_on_submit=False):
+                    st.markdown("###### Agrege o elimine diagnósticos a la tabla y presione guardar")
+                    result = st.experimental_data_editor(diagnostics_list, num_rows="dynamic", use_container_width=True)
+                    submit = st.form_submit_button("Guardar")
+                if submit:
+                    update_encounter_diagnostics(st.session_state.db_engine, date=encounter_selected.date,
+                                                 patient_id=st.session_state.patient_id, diagnostics=result)
+                    st.success("Diágnosticos guardados con éxito")
+                    time.sleep(0.5)
+                    st.experimental_rerun()
+
+
 
     colored_header(label="Datos personales", color_name="red-50", description="")
-
     with st.expander("**Datos personales**"):
+
         dataframe_inicial = [
             ["Cédula", patient.id],
             ["Nombre preferido", patient.preferred_name],
@@ -363,16 +384,13 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                 )  # TODO clean this code, choose aggrid or table
                 # AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
                 st.table(df_encounter_list)
-    with st.expander("**Antecedentes personales**"):
-        st.write(patient.personal_history)
+    with st.expander("**Antecedentes**"):
+        st.write("**Personales:** ", patient.personal_history)
+        st.write("**Familiares:**", patient.family_history)
         st.button("Editar", key="editar_personales")
-    with st.expander("**Antecedentes familiares**"):
-        st.write(patient.family_history)
-        st.button("Editar", key="editar_familiares")
     with st.expander("**Información adicional**"):
         st.write(patient.extra_information)
         st.button("Editar", key="editar_adicional")
-
 
 def change_view_encounter_history_no_id_with_rerun():
     st.session_state.current_view = "Historial"
@@ -427,7 +445,8 @@ def show_register_encounter_view(register_encounter_container):
                 "Busque o arrastre archivos a subir"
             )
             encounter.patient_id = st.session_state.patient_id
-            encounter.practitioner_id = "0106785223"
+            encounter.practitioner_id = st.session_state.practitioner_login_id
+            encounter.diagnostics = ""
             submit = st.form_submit_button("Guardar")
 
     if submit:
@@ -440,84 +459,78 @@ def show_register_encounter_view(register_encounter_container):
         change_view_encounter_history_no_id_with_rerun()
 
 
-show_header()
+show_header(header_container)
 
 if (
     st.session_state.current_view == "Busqueda"
 ):  # TODO Change patient search to also direct to the user individual report
     main_patient_info_view.empty()
     time.sleep(0.001)
+    show_results = False
+
+    previous_search_value = ""
     with main_patient_info_view.container():
-        previous_search_value = ""
-        search_value = st.text_input("Ingrese la cédula o los apellidos del paciente:")
-        if (
-            previous_search_value != search_value
-        ):  # To avoid patient search running again if text typed by the user hasn't changed
-            previous_search_value = search_value
-            patient_search_results = get_patient_search(
-                st.session_state.db_engine, search_value
+        search_value = st.text_input("Ingrese la cédula o el apellido del paciente:")
+    if (
+        previous_search_value != search_value
+    ):  # To avoid patient search running again if text typed by the user hasn't changed
+        previous_search_value = search_value
+        patient_search_results = get_patient_search(
+            st.session_state.db_engine, search_value
+        )
+
+        if len(patient_search_results) == 0:
+            st.warning(
+                "No existen resultados. ¿Deseas registrar un nuevo paciente?"
             )
+            if st.button("Registrar nuevo paciente", type="primary"):
+                switch_page("Registrar_pacientes")
+        else:
+            st.markdown("##### Seleccione el paciente a visualizar")
+            col1, col2 = st.columns([4, 1])
+            df_patient_search_results = pd.DataFrame(
+                patient_search_results,
+                columns=["Cédula", "Nombre1", "Nombre2", "Apellido1", "Apellido2", "Facultad/Dependencia"],
+                index=None
+            ).astype(str)
+            df_patient_search_results["Nombre"] = df_patient_search_results[
+                ["Nombre1", "Nombre2", "Apellido1", "Apellido2"]].apply(" ".join, axis=1)
+            df_patient_search_results = df_patient_search_results[["Cédula", "Nombre", "Facultad/Dependencia"]]
+            builder = GridOptionsBuilder.from_dataframe(df_patient_search_results)
+            builder.configure_selection(selection_mode="single", use_checkbox=False)
+            builder.configure_side_bar(filters_panel=False)
+            gridoptions = builder.build()
+            with col1:
 
-            if len(patient_search_results) == 0:
-                st.warning(
-                    "No existen resultados. ¿Deseas registrar un nuevo paciente?"
-                )
-                link = "[Registrar](/Registrar_pacientes)"
-                st.markdown(link, unsafe_allow_html=True)
-            else:
-                st.markdown("##### Seleccione el paciente a visualizar")
+                if st.session_state.current_view != "Historial":
+                    patients_found = AgGrid(
+                        df_patient_search_results,
+                        gridOptions=gridoptions,
+                        fit_columns_on_grid_load=True,
+                        enable_enterprise_modules=False,
+                        update_mode=GridUpdateMode.SELECTION_CHANGED,
+                    )
 
-                df_patient_search_results = pd.DataFrame(
-                    patient_search_results,
-                    columns=["Cédula", "Nombre1", "Nombre2", "Apellido1", "Apellido2"],
-                    index=None,
-                )
-                # builder = GridOptionsBuilder.from_dataframe(tabla)
-                # builder.configure_column("Nacimiento", type=["customDateTimeFormat"], custom_format_string='yyyy-MM-dd')
-                # builder.configure_selection(selection_mode='single', use_checkbox=True)
-                # gridoptions = builder.build()
-                # with contenedor_general:
-                #     AgGrid(tabla, gridOptions=gridoptions, enable_enterprise_modules=False,
-                #                     fit_columns_on_grid_load=True)
-                # paciente_seleccionado = pacientes["selected_rows"]
+                selected_patient = patients_found["selected_rows"]
+            col2.write("")
+            col2.write("")
+            if col2.button("Ver paciente"):
+                st.session_state.current_view = "Historial"
+                st.session_state.patient_id = selected_patient[0]["Cédula"]
+                st.session_state.previous_page = "Busqueda"
+                st.experimental_rerun()
 
-                # # Mostrar tabla de resultados
-                colms = st.columns(
-                    (1, 2, 2)
-                )  # start : these few lines shows the header names under the search bar for the clients
-                fields = ["Cédula", "Nombre"]
-                for col, field_name in zip(colms, fields):
-                    col.write(field_name)  # end
-
-                for x, email in enumerate(
-                    df_patient_search_results["Cédula"]
-                ):  # Prints the id and name of the patients under the search bar and headers
-                    col1, col2, col3 = st.columns((1, 2, 2))
-                    col1.write(
-                        df_patient_search_results["Cédula"][x]
-                    )  # Prints the patient id
-                    col2.write(
-                        df_patient_search_results["Nombre1"][x]
-                        + " "
-                        + df_patient_search_results["Nombre2"][x]
-                        + " "
-                        + df_patient_search_results["Apellido1"][x]
-                        + " "
-                        + df_patient_search_results["Apellido2"][x]
-                    )  # Prints the full name
-
-                    # Creates buttons placeholders
-                    # TODO check why placeholder
-                    button_phold = (
-                        col3.empty()
-                    )  # Renders select buttons next to the patients names, and onclick switches views to the patient information view
-                    do_action = button_phold.button("Seleccionar", key=x)
-                    if do_action:
-                        cambiar_pagina_historial(df_patient_search_results["Cédula"][x])
-                        break
+            if col2.button("Generar reporte"):
+                st.session_state.current_view = "generate_report"
+                st.write("Reporte")
+                st.experimental_rerun()
 
 
 if st.session_state.current_view == "Historial":
     main_patient_info_view.empty()
     with st.container():
         show_encounter_history_view(st.session_state.patient_id)
+
+if st.session_state.current_view == "inicio":
+    st.session_state.current_view = "Busqueda"
+    switch_page("inicio")
