@@ -26,10 +26,10 @@ if st.session_state.logged_in == True:
     with st.sidebar:
         login_info = login(
         client_id=os.environ.get("client_id"),
-        client_secret=os.environ.get("client_id"),
-        redirect_uri=os.environ.get("client_id"),
-        login_button_text=os.environ.get("client_id"),
-        logout_button_text=os.environ.get("client_id"),
+        client_secret=os.environ.get("client_secret"),
+        redirect_uri=os.environ.get("redirect_uri"),
+        login_button_text=os.environ.get("login_button_text"),
+        logout_button_text=os.environ.get("logout_button_text"),
         )
     if "appointment_selected" not in st.session_state:
         st.session_state.appointment_selected = " "
