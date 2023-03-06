@@ -26,11 +26,11 @@ if "logged_in" not in st.session_state:
 if st.session_state.logged_in == True:
     with st.sidebar:
         login_info = login(
-        client_id="418217949250-26re6hs241ls4v3eu3l73i433v53v6mo.apps.googleusercontent.com",
-        client_secret="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",
-        redirect_uri="http://localhost:8501",
-        login_button_text="Iniciar sesión",
-        logout_button_text="Cerrar sesión",
+        client_id=os.environ.get("client_id"),
+        client_secret=os.environ.get("client_id"),
+        redirect_uri=os.environ.get("client_id"),
+        login_button_text=os.environ.get("client_id"),
+        logout_button_text=os.environ.get("client_id"),
         )
     if "appointment_selected" not in st.session_state:
         st.session_state.appointment_selected = " "
@@ -95,11 +95,11 @@ else:
     clean("Bienvenido al sistema de gestión de historias clínicas")
 
     login_info = login(
-        client_id="418217949250-26re6hs241ls4v3eu3l73i433v53v6mo.apps.googleusercontent.com",
-        client_secret="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",
-        redirect_uri="http://localhost:8501",
-        login_button_text="Iniciar sesión",
-        logout_button_text="Logout",
+        client_id=os.environ.get("client_id"),
+        client_secret=os.environ.get("client_id"),
+        redirect_uri=os.environ.get("client_id"),
+        login_button_text=os.environ.get("client_id"),
+        logout_button_text=os.environ.get("client_id"),
     )
 
     practitioners = get_practitioner(st.session_state.db_engine)
