@@ -1,6 +1,4 @@
 import os
-
-import streamlit as st
 from sqlalchemy import create_engine
 from st_aggrid import GridOptionsBuilder, AgGrid
 from streamlit_extras.switch_page_button import switch_page
@@ -25,11 +23,11 @@ if "logged_in" not in st.session_state:
 if st.session_state.logged_in == True:
     with st.sidebar:
         login_info = login(
-        client_id=os.environ.get("client_id"),
-        client_secret=os.environ.get("client_secret"),
-        redirect_uri=os.environ.get("redirect_uri"),
-        login_button_text=os.environ.get("login_button_text"),
-        logout_button_text=os.environ.get("logout_button_text"),
+        client_id=st.secrets("client_id"),
+        client_secret=st.secrets("client_secret"),
+        redirect_uri=st.secrets("redirect_uri"),
+        login_button_text=st.secrets("login_button_text"),
+        logout_button_text=st.secrets("logout_button_text"),
         )
     if "appointment_selected" not in st.session_state:
         st.session_state.appointment_selected = " "
