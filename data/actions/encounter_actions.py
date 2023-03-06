@@ -1,7 +1,7 @@
 import datetime
 
 import pandas as pd
-from sqlalchemy import cast, String, desc, and_, extract, func
+from sqlalchemy import cast, String, desc, and_, extract
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
@@ -86,10 +86,11 @@ def get_encounter_history(db_engine, patient_id):
         # Close the session
         session.close()
 
-def get_encounter_complete_history(db_engine, month,year):
+def get_encounter_complete_history(db_engine, month, year):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
+
     try:
         # retrieve encounters of a particular type that occurred within the specified month and year
         encounters = session.query(
@@ -98,14 +99,13 @@ def get_encounter_complete_history(db_engine, month,year):
             Patient.faculty_dependence,
             Patient.career,
             Patient.sex,
-            func.floor((func.julianday(func.datetime('now', 'localtime')) - func.julianday(
-                Patient.birth_date)) / 365.25).label('age'),
+            Patient.birth_date,
             Patient.marital_status,
             Patient.patient_type,
             Patient.profession_occupation,
         ).join(Patient).filter(
-            func.strftime('%m', Encounter.date) == f'{month:02}',
-            func.strftime('%Y', Encounter.date) == str(year)
+            extract('month', Encounter.date) == month,
+            extract('year', Encounter.date) == year
         ).all()
 
         # convert the results into a pandas DataFrame
