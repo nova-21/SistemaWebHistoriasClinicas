@@ -92,11 +92,11 @@ else:
     clean("Bienvenido al sistema de gestión de historias clínicas")
 
     login_info = login(
-        client_id=os.environ.get("client_id"),
-        client_secret=os.environ.get("client_id"),
-        redirect_uri=os.environ.get("client_id"),
-        login_button_text=os.environ.get("client_id"),
-        logout_button_text=os.environ.get("client_id"),
+        client_id=st.secrets("client_id"),
+        client_secret=st.secrets("client_secret"),
+        redirect_uri=st.secrets("redirect_uri"),
+        login_button_text=st.secrets("login_button_text"),
+        logout_button_text=st.secrets("logout_button_text"),
     )
 
     practitioners = get_practitioner(st.session_state.db_engine)
