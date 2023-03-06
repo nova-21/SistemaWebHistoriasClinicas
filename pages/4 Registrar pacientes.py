@@ -5,6 +5,7 @@ import streamlit as st
 from sqlalchemy import create_engine
 
 from data.actions.patient_actions import add_patient
+from data.conection import create_engine_conection
 from data.create_database import Patient
 from utilidades.lists import tipos_de_paciente
 from utilidades.vies_utilities import clean, load_logo
@@ -15,7 +16,7 @@ if "logged_in" not in st.session_state:
 
 if st.session_state.logged_in ==True:
     if "db_engine" not in st.session_state:
-        st.session_state.db_engine = create_engine(os.environ.get("DATABASE"))
+        st.session_state.db_engine = create_engine_conection()
 
 
     def registrar_paciente(base):

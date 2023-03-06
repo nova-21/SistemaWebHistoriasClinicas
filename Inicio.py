@@ -14,6 +14,7 @@ import streamlit as st
 st.set_page_config(
     page_title="Ucuenca - Manejo de pacientes", page_icon=load_logo(), layout="wide"
 )
+
 if "db_engine" not in st.session_state:
     st.session_state.db_engine = create_engine(os.environ.get("DATABASE"))
 
@@ -70,13 +71,18 @@ if st.session_state.logged_in == True:
         if col2.button("Ver paciente", key="ver" + patients_name):
             st.session_state.current_view = "Historial"
             st.session_state.patient_id = appointment_selected[0]["Cédula"]
-            switch_page("Información pacientes")
             st.session_state.previous_page = "inicio"
+            switch_page("Información pacientes")
             st.stop()
         if col3.button("Reagendar", key="rea" + patients_name):
             pass
-        if col4.button("No asistió", key="falta" + patients_name):
-            pass
+        if col4.button("No se realizó", key="falta" + patients_name):
+            with st.form(key="cancel_appointment"):
+                reason_cancellation = st.selectbox("Seleccione el motivo",options=("Ausentismo","Reagendamiento por el paciente", "Reagendamiento por el tratante"))
+                submit = st.form_submit_button("Guardar", type="primary")
+            if submit:
+                print("update appointment")
+                # TODO update_appointment(reason=reason_cancellation)
         if col5.button("Cancelar", key="can" + patients_name):
             with st.form(key="cancel_appointment"):
                 reason_cancellation = st.text_input("Razón para cancelar la cita")
@@ -87,8 +93,8 @@ if st.session_state.logged_in == True:
 
 else:
     clean("Bienvenido al sistema de gestión de historias clínicas")
-    with st.sidebar:
-        login_info = login(
+
+    login_info = login(
         client_id="418217949250-26re6hs241ls4v3eu3l73i433v53v6mo.apps.googleusercontent.com",
         client_secret="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",
         redirect_uri="http://localhost:8501",

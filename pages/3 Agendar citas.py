@@ -4,6 +4,7 @@ import streamlit as st
 from sqlalchemy import create_engine
 
 from data.actions.appointment_actions import add_appointment
+from data.conection import create_engine_conection
 from utilidades.vies_utilities import clean, load_logo
 
 load_logo()
@@ -11,8 +12,9 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if st.session_state.logged_in ==True:
+
     if "db_engine" not in st.session_state:
-        st.session_state.db_engine = create_engine(os.environ.get("DATABASE"))
+        st.session_state.db_engine = create_engine_conection()
 
 
     def create_appointment(base):
