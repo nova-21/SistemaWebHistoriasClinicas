@@ -7,7 +7,6 @@ from streamlit_extras.switch_page_button import switch_page
 from data.actions.appointment_actions import get_todays_appointments, update_appointment
 from data.actions.practitioner_actions import get_practitioner, get_practitioner_by_email
 from utilidades.vies_utilities import clean, load_logo
-import streamlit_google_oauth as oauth
 from utilidades.authentication import login
 import streamlit as st
 
