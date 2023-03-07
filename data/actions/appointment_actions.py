@@ -47,9 +47,12 @@ def get_todays_appointments(engine):
     # create the session
     Session = sessionmaker(bind=engine)
     session = Session()
+    from datetime import datetime, timezone, timedelta
+    timezone_offset = -5.0  # Pacific Standard Time (UTC−08:00)
+    tzinfo = timezone(timedelta(hours=timezone_offset))
 
     # get today's date as a string in the format YYYY-MM-DD
-    today_str = datetime.date.today().strftime("%Y-%m-%d")
+    today_str = datetime.date.today(tzinfo).strftime("%Y-%m-%d")
 
     # query the appointments and join with the related patient and practitioner
     appointments = (
