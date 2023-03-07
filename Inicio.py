@@ -31,11 +31,11 @@ if st.session_state.logged_in == True:
         #     logout_button_text=st.secrets["logout_button_text"],
         # )
         login_info = login(
-            client_id="418217949250-26re6hs241ls4v3eu3l73i433v53v6mo.apps.googleusercontent.com",
-        client_secret = "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",
-        redirect_uri = "https://nova-21-sistemawebhistoriasclinicas-inicio-google-oauth-waz1ct.streamlit.app/",
-        login_button_text = "Iniciar sesión",
-        logout_button_text = "Cerrar sesión",
+            client_id=st.secrets["client_id"],
+            client_secret=st.secrets["client_secret"],
+            redirect_uri=st.secrets["redirect_uri"],
+            login_button_text=st.secrets["login_button_text"],
+            logout_button_text=st.secrets["logout_button_text"],
         )
     if "appointment_selected" not in st.session_state:
         st.session_state.appointment_selected = " "
@@ -100,11 +100,11 @@ else:
     clean("Bienvenido al sistema de gestión de historias clínicas")
 
     login_info = login(
-        client_id="418217949250-26re6hs241ls4v3eu3l73i433v53v6mo.apps.googleusercontent.com",
-        client_secret="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",
-        redirect_uri="https://nova-21-sistemawebhistoriasclinicas-inicio-google-oauth-waz1ct.streamlit.app/",
-        login_button_text="Iniciar sesión",
-        logout_button_text="Cerrar sesión",
+        client_id=st.secrets["client_id"],
+        client_secret=st.secrets["client_secret"],
+        redirect_uri=st.secrets["redirect_uri"],
+        login_button_text=st.secrets["login_button_text"],
+        logout_button_text=st.secrets["logout_button_text"],
     )
 
     practitioners = get_practitioner(st.session_state.db_engine)
