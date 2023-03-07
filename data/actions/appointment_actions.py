@@ -52,7 +52,7 @@ def get_todays_appointments(engine):
     tzinfo = timezone(timedelta(hours=timezone_offset))
 
     # get today's date as a string in the format YYYY-MM-DD
-    today_str = datetime.date.today(tzinfo).strftime("%Y-%m-%d")
+    today_str = datetime.date.now(tzinfo).strftime("%Y-%m-%d")
 
     # query the appointments and join with the related patient and practitioner
     appointments = (
