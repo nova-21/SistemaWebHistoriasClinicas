@@ -9,7 +9,7 @@ from utilidades.vies_utilities import clean, load_logo
 
 load_logo()
 if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+    st.session_state.logged_in = True
 
 if st.session_state.logged_in ==True:
 

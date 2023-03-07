@@ -28,7 +28,7 @@ if "db_engine" not in st.session_state:
     st.session_state.db_engine = create_engine_conection()
 
 if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+    st.session_state.logged_in = True
 
 if st.session_state.logged_in == True:
 
