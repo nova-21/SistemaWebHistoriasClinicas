@@ -43,6 +43,7 @@ if st.session_state.logged_in == True:
     clean("Citas del día de hoy")
 
     appointments_history = get_todays_appointments(st.session_state.db_engine)
+    st.write(appointments_history)
     builder = GridOptionsBuilder.from_dataframe(appointments_history)
     builder.configure_selection(selection_mode="single", use_checkbox=False)
     gridoptions = builder.build()
