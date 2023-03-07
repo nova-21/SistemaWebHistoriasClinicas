@@ -21,7 +21,7 @@ if "logged_in" not in st.session_state:
 
 
 
-if st.session_state.logged_in == True:
+
     with st.sidebar:
         # login_info = login(
         #     client_id=st.secrets["client_id"],
@@ -96,25 +96,4 @@ if st.session_state.logged_in == True:
                 print("update appointment")
                 # TODO update_appointment(reason=reason_cancellation)
 
-else:
-    clean("Bienvenido al sistema de gestión de historias clínicas")
-    #
-    # login_info = login(
-    #     client_id=st.secrets["client_id"],
-    #     client_secret=st.secrets["client_secret"],
-    #     redirect_uri=st.secrets["redirect_uri"],
-    #     login_button_text=st.secrets["login_button_text"],
-    #     logout_button_text=st.secrets["logout_button_text"],
-    # )
-    #
-    # practitioners = get_practitioner(st.session_state.db_engine)
-    # first_elements_list = [t.email for t in practitioners]
-    # if login_info and str(login_info[1]) in first_elements_list:
-    #     st.session_state.logged_in = True
-    #     practitioner_id = get_practitioner_by_email(st.session_state.db_engine, login_info[1])
-    #     st.session_state.logged_in = True = practitioner_id[0]
-    #     print(practitioner_id[0])
-    #     st.experimental_rerun()
-    st.session_state.logged_in = True
-    st.session_state.logged_in = "0106785215"
 
