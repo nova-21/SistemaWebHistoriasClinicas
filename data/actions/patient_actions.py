@@ -120,7 +120,7 @@ def get_patient_search(db_engine, id_or_lastname):
                 Patient.second_name,
                 Patient.first_family_name,
                 Patient.second_family_name,
-                Patient.faculty_dependence
+                Patient.faculty_dependence,
             )
             .filter(
                 or_(

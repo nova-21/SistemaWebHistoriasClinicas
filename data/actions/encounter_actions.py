@@ -17,7 +17,7 @@ def add_encounter(
     attachments,
     patient_id,
     practitioner_id,
-    diagnostics
+    diagnostics,
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -32,7 +32,7 @@ def add_encounter(
         attachments=attachments,
         patient_id=patient_id,
         practitioner_id=practitioner_id,
-        diagnostics=diagnostics
+        diagnostics=diagnostics,
     )
 
     try:
@@ -73,7 +73,11 @@ def get_encounter_history(db_engine, patient_id):
     Session = sessionmaker(bind=db_engine)
     session = Session()
     try:
-        query = session.query(Encounter).filter(Encounter.patient_id == patient_id).order_by(desc(Encounter.date))
+        query = (
+            session.query(Encounter)
+            .filter(Encounter.patient_id == patient_id)
+            .order_by(desc(Encounter.date))
+        )
         encounter_history = pd.read_sql_query(query.statement, db_engine)
         # select and order desired columns
         encounter_history = encounter_history.loc[:, ["date", "encounter_type"]]
@@ -86,6 +90,7 @@ def get_encounter_history(db_engine, patient_id):
         # Close the session
         session.close()
 
+
 def get_encounter_complete_history(db_engine, month, year):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -93,42 +98,62 @@ def get_encounter_complete_history(db_engine, month, year):
 
     try:
         # retrieve encounters of a particular type that occurred within the specified month and year
-        encounters = session.query(
-            Encounter.encounter_type,
-            Patient.id,
-            Patient.faculty_dependence,
-            Patient.career,
-            Patient.sex,
-            Patient.birth_date,
-            Patient.marital_status,
-            Patient.patient_type,
-            Patient.profession_occupation,
-        ).join(Patient).filter(
-            extract('month', Encounter.date) == month,
-            extract('year', Encounter.date) == year
-        ).all()
+        encounters = (
+            session.query(
+                Encounter.encounter_type,
+                Patient.id,
+                Patient.faculty_dependence,
+                Patient.career,
+                Patient.sex,
+                Patient.birth_date,
+                Patient.marital_status,
+                Patient.patient_type,
+                Patient.profession_occupation,
+            )
+            .join(Patient)
+            .filter(
+                extract("month", Encounter.date) == month,
+                extract("year", Encounter.date) == year,
+            )
+            .all()
+        )
 
         # convert the results into a pandas DataFrame
-        df = pd.DataFrame(encounters, columns=[
-            'encounter_type', 'id', 'faculty_dependence', 'career', 'sex', 'age', 'marital_status', 'patient_type',
-            'profession_occupation'
-        ])
+        df = pd.DataFrame(
+            encounters,
+            columns=[
+                "encounter_type",
+                "id",
+                "faculty_dependence",
+                "career",
+                "sex",
+                "age",
+                "marital_status",
+                "patient_type",
+                "profession_occupation",
+            ],
+        )
         return df
     finally:
         # Close the session
         session.close()
+
 
 def get_encounters_month(db_engine, month, year):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
     try:
-        encounters_in_month = session.query(Encounter).filter(
-            and_(
-                extract('year', Encounter.date) == year,
-                extract('month', Encounter.date) == month
+        encounters_in_month = (
+            session.query(Encounter)
+            .filter(
+                and_(
+                    extract("year", Encounter.date) == year,
+                    extract("month", Encounter.date) == month,
+                )
             )
-        ).all()
+            .all()
+        )
         return encounters_in_month
     finally:
         # Close the session
@@ -153,6 +178,27 @@ def get_encounter(db_engine, patient_id, date):
 
         session.close()
 
+def get_encounter_activities(db_engine, patient_id):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+    try:
+        latest_encounter = (
+            session.query(Encounter.activities_sent)
+                .filter(Encounter.patient_id == patient_id)
+                .order_by(desc(Encounter.date))
+                .first()
+        )
+        if latest_encounter is not None:
+            return latest_encounter
+        else:
+            list()
+    finally:
+        # Close the session
+
+        session.close()
+
+
 def get_diagnostics(db_engine, patient_id, date):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -165,11 +211,10 @@ def get_diagnostics(db_engine, patient_id, date):
         )
         if encounter.diagnostics != None:
             encounter_list = encounter[0].split(";")
-            return encounter_list
+            df = pd.DataFrame(encounter_list, columns=["Diagnósticos"])
+            return df
         else:
             return list([])
-
-
     finally:
         # Close the session
 
@@ -186,7 +231,7 @@ def update_encounter(
     attachments,
     patient_id,
     practitioner_id,
-        diagnostics
+    diagnostics,
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -195,7 +240,9 @@ def update_encounter(
     try:
         # Update the Encounter in the session and commit
         encounter = (
-            session.query(Encounter).filter(Encounter.patient_id == patient_id, Encounter.date == date).first()
+            session.query(Encounter)
+            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+            .first()
         )
         if encounter:
             encounter.encounter_type = encounter_type
@@ -205,7 +252,7 @@ def update_encounter(
             encounter.attachments = attachments
             encounter.patient_id = patient_id
             encounter.practitioner_id = practitioner_id
-            encounter.diagnostics = ';'.join(diagnostics)
+            encounter.diagnostics = ";".join(diagnostics)
             session.commit()
             print("Encounter updated successfully")
         else:
@@ -214,12 +261,8 @@ def update_encounter(
         # Close the session
         session.close()
 
-def update_encounter_diagnostics(
-    db_engine,
-    date,
-    patient_id,
-    diagnostics
-):
+
+def update_encounter_diagnostics(db_engine, date, patient_id, diagnostics):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
@@ -227,10 +270,12 @@ def update_encounter_diagnostics(
     try:
         # Update the Encounter in the session and commit
         encounter = (
-            session.query(Encounter).filter(Encounter.patient_id == patient_id, Encounter.date == date).first()
+            session.query(Encounter)
+            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+            .first()
         )
         if encounter:
-            encounter.diagnostics = ';'.join(diagnostics)
+            encounter.diagnostics = ";".join(diagnostics)
             session.commit()
             print("Encounter updated successfully")
         else:

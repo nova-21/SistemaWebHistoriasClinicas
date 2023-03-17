@@ -20,11 +20,11 @@ list_encounter_types = (
     "Orientación vocacional y profesional",
 )
 
-tipos_de_paciente =  (
-                        "Estudiante",
-                        "Egresado",
-                        "Trabajador",
-                        "Docente",
-                        "Jubilado",
-                        "Familiar",
-                    )
+tipos_de_paciente = (
+    "Estudiante",
+    "Egresado",
+    "Trabajador",
+    "Docente",
+    "Jubilado",
+    "Familiar",
+)

@@ -33,13 +33,14 @@ def add_practitioner(db_engine, id, full_name, position, email, phone_number, ac
         # Close the session
         session.close()
 
+
 def get_practitioner(db_engine):
     Session = sessionmaker(db_engine)
     session = Session()
 
     try:
         # Retrieve cedula and nombre columns from paciente table
-        practitioners = session.query(Practitioner.email,Practitioner.id).all()
+        practitioners = session.query(Practitioner.email, Practitioner.id).all()
         return practitioners
     except SQLAlchemyError as e:
         print("Error retrieving patient data:", str(e))
@@ -47,6 +48,7 @@ def get_practitioner(db_engine):
     finally:
         # Close the session
         session.close()
+
 
 def get_practitioner_by_email(db_engine, email):
     Session = sessionmaker(db_engine)
@@ -62,6 +64,7 @@ def get_practitioner_by_email(db_engine, email):
     finally:
         # Close the session
         session.close()
+
 
 def update_practitioner(
     db_engine,

@@ -16,7 +16,7 @@ class Patient(Base):
     first_name = Column(String(50))
     second_name = Column(String(50))
     first_family_name = Column(String(50))
-    second_family_name = Column(Integer)
+    second_family_name = Column(String(50))
     preferred_name = Column(String(50))
     birth_date = Column(Date)
     sex = Column(String(50))
@@ -76,7 +76,8 @@ class Encounter(Base):
 class Appointment(Base):
     __tablename__ = "appointment"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    appointment_type = Column(String(15))
+    appointment_type = Column(String(50))
+    encounter_type = Column(String(50))
     status = Column(String(15))
     reason = Column(String(15))
     date = Column(Date)
@@ -89,12 +90,23 @@ class Appointment(Base):
 
 class Questionnaire(Base):
     __tablename__ = "questionnaire"
-    cedula = Column(String(10), primary_key=True)
-    fecha = Column(Date, primary_key=True)
-    nombre = Column(String(20))
-    resultado = Column(Integer)
-    respuestas = Column(String())
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String())
+    title = Column(String())
+    questions = Column(String())
 
+
+
+class QuestionnaireResponse(Base):
+    __tablename__ = "questionnaireresponse"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    date = Column(Date)
+    patient_id = Column(String(10), ForeignKey("patient.id"))
+    state = Column(String(10))
+    questionnaire_id = Column(Integer)
+    result = Column(String())
+    answers = Column(String())
+    points = Column(Integer)
 
 #
 # Base.metadata.create_all(engine)

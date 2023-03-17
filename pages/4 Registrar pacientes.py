@@ -45,8 +45,8 @@ def registrar_paciente(base):
                 "Estado civil",
                 ("Soltero", "Casado", "Divorciado", "Viudo", "Union de hecho"),
             )
-            patient.patient_type = st.selectbox("Tipo de paciente",
-                options=tipos_de_paciente
+            patient.patient_type = st.selectbox(
+                "Tipo de paciente", options=tipos_de_paciente
             )
             patient.faculty_dependence = st.text_input(
                 "Facultad/Dependencia",

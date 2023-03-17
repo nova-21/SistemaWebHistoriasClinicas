@@ -40,10 +40,9 @@ if st.session_state.current_view == "search_patient_view":
     main_patient_info_view = st.container()
 
     with main_patient_info_view:
-
         search_value = st.text_input("Ingrese la cédula o los apellidos del paciente:")
     if (
-            previous_search_value != search_value and search_value != ""
+        previous_search_value != search_value and search_value != ""
     ):  # To avoid patient search running again if text typed by the user hasn't changed
         previous_search_value = search_value
         patient_search_results = get_patient_search(
@@ -51,20 +50,31 @@ if st.session_state.current_view == "search_patient_view":
         )
 
         if len(patient_search_results) == 0:
-            st.warning(
-                "No existen resultados. ¿Deseas registrar un nuevo paciente?"
-            )
+            st.warning("No existen resultados. ¿Deseas registrar un nuevo paciente?")
             if st.button("Registrar nuevo paciente", type="primary"):
                 switch_page("Registrar_pacientes")
         else:
             st.markdown("##### Seleccione el paciente a visualizar")
-            col1, col2 = st.columns([4,1])
+            col1, col2 = st.columns([4, 1])
             with col1:
                 df_patient_search_results = pd.DataFrame(
-                    patient_search_results, columns=["Cédula", "Nombre1", "Nombre2", "Apellido1", "Apellido2", "Facultad/Dependencia"], index=None
+                    patient_search_results,
+                    columns=[
+                        "Cédula",
+                        "Nombre1",
+                        "Nombre2",
+                        "Apellido1",
+                        "Apellido2",
+                        "Facultad/Dependencia",
+                    ],
+                    index=None,
                 ).astype(str)
-                df_patient_search_results["Nombre"] = df_patient_search_results[["Nombre1", "Nombre2", "Apellido1", "Apellido2"]].apply(" ".join,axis=1)
-                df_patient_search_results = df_patient_search_results[["Cédula","Nombre","Facultad/Dependencia"]]
+                df_patient_search_results["Nombre"] = df_patient_search_results[
+                    ["Nombre1", "Nombre2", "Apellido1", "Apellido2"]
+                ].apply(" ".join, axis=1)
+                df_patient_search_results = df_patient_search_results[
+                    ["Cédula", "Nombre", "Facultad/Dependencia"]
+                ]
                 builder = GridOptionsBuilder.from_dataframe(df_patient_search_results)
                 builder.configure_selection(selection_mode="single", use_checkbox=False)
                 builder.configure_side_bar(filters_panel=False)
@@ -124,9 +134,7 @@ if st.session_state.current_view == "profile_history_view":
         ["Teléfono del contacto de emergencia", patient.emergency_contact_phone],
     ]
 
-    df_personal_data = pd.DataFrame(
-        personal_data, columns=["Campo", "Valor"]
-    ).astype(
+    df_personal_data = pd.DataFrame(personal_data, columns=["Campo", "Valor"]).astype(
         str
     )  # astype because dataframes datatypes have issues being cast to be rendered
 
@@ -149,9 +157,7 @@ if st.session_state.current_view == "profile_history_view":
     with controls_container.container():
         colored_header(label="Controles", color_name="red-50", description="")
         if st.button(
-            "🏠 Regresar a la búsqueda de pacientes",
-            type="primary",
-            key="dos"
+            "🏠 Regresar a la búsqueda de pacientes", type="primary", key="dos"
         ):
             if st.session_state.previous_page == "inicio":
                 st.session_state.current_view = "inicio"
@@ -163,7 +169,6 @@ if st.session_state.current_view == "profile_history_view":
         edit_encounter = st.button("Editar datos de la sesión")
         colored_header(
             label="Historial de atención", color_name="red-50", description=""
-
         )
         st.write("Seleccione la sesión que desea visualizar")
 
@@ -185,25 +190,27 @@ if st.session_state.current_view == "profile_history_view":
                 patient.second_family_name,
             )
         )
-        colored_header(label="Información del paciente", color_name="red-50", description="")
+        colored_header(
+            label="Información del paciente", color_name="red-50", description=""
+        )
 
         with st.expander("**Datos personales**"):
             st.table(df_personal_data)
         with st.expander("**Antecedentes**"):
-            st.write("**Personales:** ",patient.personal_history)
-            st.write("**Familiares:**",patient.family_history)
+            st.write("**Personales:** ", patient.personal_history)
+            st.write("**Familiares:**", patient.family_history)
             st.button("Editar", key="editar_personales")
         with st.expander("**Información adicional**"):
             st.write(patient.extra_information)
             st.button("Editar", key="editar_adicional")
 
 
+st.session_state.is_encounter_selected = True
 
-
-
-st.session_state.is_encounter_selected=True
-
-if st.session_state.current_view == "profile_history_view" and st.session_state.is_encounter_selected == True:
+if (
+    st.session_state.current_view == "profile_history_view"
+    and st.session_state.is_encounter_selected == True
+):
     encounter_row_selected = encounter_history_table["selected_rows"]
     if encounter_row_selected:
         # Converts date formats here because the query has issues transforming dates

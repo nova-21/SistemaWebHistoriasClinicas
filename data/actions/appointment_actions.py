@@ -1,15 +1,16 @@
-import datetime
+from datetime import datetime
+
 from sqlite3 import IntegrityError
 
 import pandas as pd
-from sqlalchemy import cast, String, desc, asc, and_, extract, func
+from sqlalchemy import cast, String, desc, asc, and_, extract
 from sqlalchemy.orm import sessionmaker
 
 from data.create_database import Appointment, Patient, Practitioner, Encounter
 
 
 def add_appointment(
-    db_engine, patient_id, practitioner_id, appointment_type, status, reason, date, time
+    db_engine, patient_id, practitioner_id, appointment_type, encounter_type,status, reason, date, time
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -24,6 +25,7 @@ def add_appointment(
     appointment.practitioner_id = practitioner_id
     appointment.date = date
     appointment.time = time
+    appointment.encounter_type=encounter_type
 
     try:
         # Add the new Appointment to the session and commit
@@ -50,18 +52,19 @@ def get_todays_appointments(engine):
     from datetime import datetime, timedelta
     import pytz
 
-    timezone = pytz.timezone('US/Eastern')
+    timezone = pytz.timezone("US/Eastern")
     utc_time = datetime.utcnow()
     local_time = utc_time + timedelta(hours=-5)
     local_time = timezone.localize(local_time)
 
     # format the date as Y-M-D
-    today_str = local_time.strftime('%Y-%m-%d')
+    today_str = local_time.strftime("%Y-%m-%d")
 
     # query the appointments and join with the related patient and practitioner
     appointments = (
         session.query(
             Appointment.time,
+            Appointment.encounter_type,
             Patient.id,
             Patient.first_name,
             Patient.first_family_name,
@@ -71,7 +74,9 @@ def get_todays_appointments(engine):
         )
         .join(Patient, Appointment.patient_id == Patient.id)
         .join(Practitioner, Appointment.practitioner_id == Practitioner.id)
-        .filter(cast(Appointment.date, String) == today_str).order_by(asc(Appointment.time))
+        .filter(cast(Appointment.date, String) == today_str,
+                Appointment.status == "booked")
+        .order_by(asc(Appointment.time))
         .all()
     )
 
@@ -82,42 +87,53 @@ def get_todays_appointments(engine):
         appointments,
         columns=[
             "Hora",
+            "Tipo de atención",
             "Cédula",
             "Nombre",
             "Apellido",
-            "Facultad/Dependencia",
+            "Dependencia",
             "Carrera",
             "Teléfono",
         ],
     )
+
+
+    # add a new column called "Nombre completo" by joining "first_name" and "first_family_name"
+    df["Paciente"] = df["Nombre"] + " " + df["Apellido"]
+    # drop the "Nombre" and "Apellido" columns
+    df.drop(columns=["Nombre", "Apellido"], inplace=True)
+    # move the "Nombre completo" column to the fourth position
+    cols = df.columns.tolist()
+    cols.insert(3, cols.pop(cols.index("Paciente")))
+    df = df.reindex(columns=cols)
+
     # close the session
     session.close()
 
     return df
 
-def get_appointment_report(engine,month,year):
+
+def get_appointment_report(engine, month, year):
     # create the session
     Session = sessionmaker(bind=engine)
     session = Session()
 
+    start_date = datetime(year=year, month=month, day=1)
+    end_date = datetime(year=year, month=month + 1, day=1) if month < 12 else datetime(year=year + 1, month=1, day=1)
     appointments = session.query(Appointment).filter(
-            func.strftime('%m', Appointment.date) == f'{month:02}',
-            func.strftime('%Y', Appointment.date) == str(year)
-        ).all()
-
+        and_(Appointment.date >= start_date, Appointment.date < end_date)
+    ).all()
 
     # close the session
     session.close()
 
     return appointments
 
-def get_appointment(engine,patient_id,date):
+
+def get_appointment(engine, patient_id, date):
     # create the session
     Session = sessionmaker(bind=engine)
     session = Session()
-
-    # get today's date as a string in the format YYYY-MM-DD
-    today_str = datetime.date.today().strftime("%Y-%m-%d")
 
     # query the appointments and join with the related patient and practitioner
     appointments = (
@@ -132,42 +148,23 @@ def get_appointment(engine,patient_id,date):
         )
         .join(Patient, Appointment.patient_id == Patient.id)
         .join(Practitioner, Appointment.practitioner_id == Practitioner.id)
-        .filter(cast(Appointment.date, String) == today_str)
-        .all()
+        .filter(cast(Appointment.date, String) == date,
+                Patient.id == patient_id)
+        .first()
     )
 
-    # create a dataframe from the query results
-    # citas_hoy = pd.read_sql(session.query(Cita.hora, Cita.cedula_paciente, Paciente.nombres, Paciente.apellidos, Paciente.telefono, Paciente.facultad_dependencia, Paciente.carrera).filter_by(fecha=date.today()).join(Paciente, Paciente.cedula==Cita.cedula_paciente).statement, session.bind)
-
-    df = pd.DataFrame(
-        appointments,
-        columns=[
-            "Hora",
-            "Cédula",
-            "Nombre",
-            "Apellido",
-            "Facultad/Dependencia",
-            "Carrera",
-            "Teléfono",
-        ],
-    )
     # close the session
     session.close()
 
-    return df
-
+    return appointments
 
 
 def update_appointment(
     db_engine,
-    appointment_id,
-    appointment_type,
     status,
     reason,
     date,
-    time,
     patient_id,
-    practitioner_id,
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -176,16 +173,13 @@ def update_appointment(
     try:
         # Update the Appointment in the session and commit
         appointment = (
-            session.query(Appointment).filter(Appointment.id == appointment_id).first()
+            session.query(Appointment).filter(Appointment.date == date,
+                                              Appointment.patient_id == patient_id).first()
         )
+        print(appointment)
         if appointment:
-            appointment.appointment_type = appointment_type
             appointment.status = status
             appointment.reason = reason
-            appointment.date = date
-            appointment.time = time
-            appointment.patient_id = patient_id
-            appointment.practitioner_id = practitioner_id
             session.commit()
             print("Appointment updated successfully")
         else:

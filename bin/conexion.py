@@ -9,6 +9,7 @@ def connect():
     conn = sqlite3.connect(r"./base_de_datos/bienestar.db")
     return conn
 
+
 # def connect():
 #     conn = psycopg2.connect(
 #         host="localhost",
@@ -17,14 +18,16 @@ def connect():
 #         password="admin")
 #     return conn
 
+
 def buscar_datos_personales(datos_personales):
     conn = None
-    resultado_busqueda=""
+    resultado_busqueda = ""
     try:
         conn = connect()
         cur = conn.cursor()
         query = "SELECT paciente.cedula, paciente.nombre FROM paciente WHERE cedula='{0}' OR UPPER(paciente.nombre) like UPPER('%{0}%')".format(
-            datos_personales)
+            datos_personales
+        )
         cur.execute(query)
         resultado_busqueda = cur.fetchall()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -32,7 +35,7 @@ def buscar_datos_personales(datos_personales):
     finally:
         if conn is not None:
             conn.close()
-            print('Database connection closed.')
+            print("Database connection closed.")
         return resultado_busqueda
 
 
@@ -42,7 +45,8 @@ def buscar_datos_personales2(cedula):
         conn = connect()
         cur = conn.cursor()
         query = "SELECT paciente.cedula, paciente.nombre,fecha_nacimiento, ocupacion, estado_civil, facultad, antecedentes_familiares, antecedentes_personales, antecedentes_clinicos, lugar_residencia, nombre_preferido, contacto_emergencia, telefono_emergencia FROM paciente WHERE cedula='{0}'".format(
-            cedula)
+            cedula
+        )
         cur.execute(query)
         resultado_busqueda = cur.fetchone()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -50,17 +54,19 @@ def buscar_datos_personales2(cedula):
     finally:
         if conn is not None:
             conn.close()
-            print('Database connection closed.')
+            print("Database connection closed.")
         return resultado_busqueda
 
+
 def buscar_historial(cedula):
-    historial=""
+    historial = ""
     try:
         conn = connect()
         cur = conn.cursor()
-        #to_char "YYYY-MM-DD"
+        # to_char "YYYY-MM-DD"
         query = "SELECT fecha as date, descripcion from cita where paciente='{0}' order by date desc".format(
-            cedula)
+            cedula
+        )
 
         cur.execute(query)
         historial = cur.fetchall()
@@ -70,16 +76,18 @@ def buscar_historial(cedula):
     finally:
         if conn is not None:
             conn.close()
-            print('Database connection closed.')
+            print("Database connection closed.")
         return historial
 
 
-def buscar_sesion(cedula,fecha):
+def buscar_sesion(cedula, fecha):
     sesion = ""
     try:
         conn = connect()
         cur = conn.cursor()
-        query = "SELECT asuntos_tratados, cuestionarios_pendientes, beck_ansiedad, beck_depresion from cita where paciente='{0}' and fecha='{1}'".format(cedula, fecha)
+        query = "SELECT asuntos_tratados, cuestionarios_pendientes, beck_ansiedad, beck_depresion from cita where paciente='{0}' and fecha='{1}'".format(
+            cedula, fecha
+        )
         cur.execute(query)
         sesion = cur.fetchone()
         conn.close()
@@ -88,41 +96,48 @@ def buscar_sesion(cedula,fecha):
     finally:
         if conn is not None:
             conn.close()
-            print('Database connection closed.')
+            print("Database connection closed.")
         return sesion
 
-def registrar_sesion_db(fecha, paciente,asuntos_tratados,descripcion):
-    try:
-        conn = connect()
-        cur = conn.cursor()
-        query = "INSERT INTO cita(fecha,paciente,asuntos_tratados,descripcion) values('{0}','{1}','{2}','{3}')".format(fecha, paciente, asuntos_tratados,descripcion)
-        cur.execute(query)
-        conn.commit()
-        conn.close()
-        return "Sesion registrada"
-    except (Exception, errors.UniqueViolation) as error:
-        return ("Ya existe una sesion")
-    finally:
-        if conn is not None:
-            conn.close()
-            print('Database connection closed.')
 
-def actualizar_sesion_db(fecha, paciente, asuntos_tratados,descripcion):
+def registrar_sesion_db(fecha, paciente, asuntos_tratados, descripcion):
     try:
         conn = connect()
         cur = conn.cursor()
-        print(fecha,paciente,asuntos_tratados,descripcion)
-        query = "UPDATE cita SET asuntos_tratados = '{0}', descripcion ='{1}' where paciente='{2}' and fecha= '2023-02-03'".format(asuntos_tratados,descripcion, paciente, fecha)
+        query = "INSERT INTO cita(fecha,paciente,asuntos_tratados,descripcion) values('{0}','{1}','{2}','{3}')".format(
+            fecha, paciente, asuntos_tratados, descripcion
+        )
         cur.execute(query)
         conn.commit()
         conn.close()
         return "Sesion registrada"
     except (Exception, errors.UniqueViolation) as error:
-        return ("Ya existe una sesion")
+        return "Ya existe una sesion"
     finally:
         if conn is not None:
             conn.close()
-            print('Database connection closed.')
+            print("Database connection closed.")
+
+
+def actualizar_sesion_db(fecha, paciente, asuntos_tratados, descripcion):
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        print(fecha, paciente, asuntos_tratados, descripcion)
+        query = "UPDATE cita SET asuntos_tratados = '{0}', descripcion ='{1}' where paciente='{2}' and fecha= '2023-02-03'".format(
+            asuntos_tratados, descripcion, paciente, fecha
+        )
+        cur.execute(query)
+        conn.commit()
+        conn.close()
+        return "Sesion registrada"
+    except (Exception, errors.UniqueViolation) as error:
+        return "Ya existe una sesion"
+    finally:
+        if conn is not None:
+            conn.close()
+            print("Database connection closed.")
+
 
 def guardar_archivos(archivos):
     ##TODO crear funcion para serializar archivos en disco

@@ -15,21 +15,8 @@ import streamlit.components.v1 as components
 #         st.write(f"Welcome {user_email}")
 # else:
 #         st.write("Please login")
-html_string = '''
+html_string = """
 <a href="javascript:window.open('','_self').close();">close</a>
-'''
+"""
 
 components.html(html_string)  # JavaScript works
-
-
-
-
-
-
-
-
-
-
-
-
-
