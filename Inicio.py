@@ -101,7 +101,7 @@ if appointment_selected:
         add_encounter(st.session_state.db_engine,new_encounter)
         update_appointment(
             st.session_state.db_engine,
-            status="atentida",
+            status="atendida",
             reason="",
             date=get_today(),
             patient_id=st.session_state.patient_id,

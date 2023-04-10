@@ -84,12 +84,15 @@ def show_appointment_metrics_fullfilled(month):
             columns=["Tipo de cita", "Estado", "Razón"],
         )
         appointment_counts = df_appointment_list["Estado"].value_counts()
-        citas_efectivas = appointment_counts["atendida"]
-        citas_no_efectivas = appointment_counts["no_atendida"]
-        cola, colb, colc = st.columns(3)
-        cola.metric("Citas agendadas", citas_efectivas + citas_no_efectivas)
-        colb.metric("Citas efectivas", citas_efectivas)
-        colc.metric("Citas no efectivas", citas_no_efectivas)
+        try:
+            citas_efectivas = appointment_counts["atendida"]
+            citas_no_efectivas = appointment_counts["no_atendida"]
+            cola, colb, colc = st.columns(3)
+            cola.metric("Citas agendadas", citas_efectivas + citas_no_efectivas)
+            colb.metric("Citas efectivas", citas_efectivas)
+            colc.metric("Citas no efectivas", citas_no_efectivas)
+        except:
+            st.write("No existen suficientes datos del mes para generar el reporte")
 
 
 def show_appointment_metrics_type(month):
@@ -102,15 +105,17 @@ def show_appointment_metrics_type(month):
             [(a.appointment_type, a.status, a.reason) for a in appointment_list],
             columns=["Tipo de cita", "Estado", "Razón"],
         )
-        appointment_counts = df_appointment_list["Tipo de cita"].value_counts()
-        primera_vez_count = appointment_counts["Primera vez"]
-        subsecuente_count = appointment_counts["Subsecuente"]
+        try:
+            appointment_counts = df_appointment_list["Tipo de cita"].value_counts()
+            primera_vez_count = appointment_counts["Primera vez"]
+            subsecuente_count = appointment_counts["Subsecuente"]
 
-        cola, colb, colc = st.columns(3)
-        cola.metric("Citas agendadas", primera_vez_count + subsecuente_count)
-        colb.metric("Primera vez", primera_vez_count)
-        colc.metric("Subsecuentes", subsecuente_count)
-
+            cola, colb, colc = st.columns(3)
+            cola.metric("Citas agendadas", primera_vez_count + subsecuente_count)
+            colb.metric("Primera vez", primera_vez_count)
+            colc.metric("Subsecuentes", subsecuente_count)
+        except:
+            st.write("No existen suficientes datos del mes para generar el reporte")
 
 def show_people_sex(month):
     colored_header(label="Personas atendidas", color_name="red-50", description="")
