@@ -15,7 +15,7 @@ from data.actions.encounter_actions import (
     update_encounter_diagnostics,
 )
 
-from data.actions.patient_actions import get_patient_search, get_patient
+from data.actions.patient_actions import get_patient_search, get_patient, get_all_patients
 from data.actions.questionnaire_actions import get_questionnaires
 from data.actions.questionnaire_response_actions import (
     get_pending_questionnaire_responses,
@@ -138,7 +138,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
     gridoptions = builder.build()
 
     with controls_container.container():
-        colored_header(label="Controles", color_name="red-50", description="")
+        colored_header(label="Opciones", color_name="red-50", description="")
         st.button(
             "🏠 Regresar",
             type="primary",
@@ -162,6 +162,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
             fit_columns_on_grid_load=True,
             enable_enterprise_modules=False,
             update_mode=GridUpdateMode.SELECTION_CHANGED,
+            enable_quicksearch=True
         )
 
     encounter_row_selected = encounter_history_table["selected_rows"]
@@ -474,65 +475,66 @@ if (
     show_results = False
 
     previous_search_value = ""
-    with main_patient_info_view.container():
-        search_value = st.text_input("Ingrese la cédula o el apellido del paciente:")
-    if (
-        previous_search_value != search_value
-    ):  # To avoid patient search running again if text typed by the user hasn't changed
-        previous_search_value = search_value
-        patient_search_results = get_patient_search(
-            st.session_state.db_engine, search_value
-        )
 
-        if len(patient_search_results) == 0:
-            st.warning("No existen resultados. ¿Deseas registrar un nuevo paciente?")
-            if st.button("Registrar nuevo paciente", type="primary"):
-                switch_page("Registrar_pacientes")
-        else:
-            st.markdown("##### Seleccione el paciente a visualizar")
-            col1, col2 = st.columns([4, 1])
-            df_patient_search_results = pd.DataFrame(
-                patient_search_results,
-                columns=[
-                    "Cédula",
-                    "Nombre1",
-                    "Nombre2",
-                    "Apellido1",
-                    "Apellido2",
-                    "Facultad/Dependencia",
-                ],
-                index=None,
-            ).astype(str)
-            df_patient_search_results["Nombre"] = df_patient_search_results[
-                ["Nombre1", "Nombre2", "Apellido1", "Apellido2"]
-            ].apply(" ".join, axis=1)
-            df_patient_search_results = df_patient_search_results[
-                ["Cédula", "Nombre", "Facultad/Dependencia"]
-            ]
-            builder = GridOptionsBuilder.from_dataframe(df_patient_search_results)
-            builder.configure_selection(selection_mode="single", use_checkbox=False)
-            builder.configure_side_bar(filters_panel=False)
-            gridoptions = builder.build()
-            with col1:
-                if st.session_state.current_view != "Historial":
-                    patients_found = AgGrid(
-                        df_patient_search_results,
-                        gridOptions=gridoptions,
-                        fit_columns_on_grid_load=True,
-                        enable_enterprise_modules=False,
-                        update_mode=GridUpdateMode.SELECTION_CHANGED,
-                    )
+    patient_search_results = get_all_patients(st.session_state.db_engine)
+    st.markdown("##### Seleccione el paciente a visualizar")
+    st.markdown("###### Puede buscar pacientes usando cualquiera de los campos")
+    col1, col2 = st.columns([4, 1])
+    df_patient_search_results = pd.DataFrame(
+        patient_search_results,
+        columns=[
+            "Cédula",
+            "Nombre1",
+            "Nombre2",
+            "Apellido1",
+            "Apellido2",
+            "Facultad/Dependencia",
+        ],
+        index=None,
+    ).astype(str)
+    df_patient_search_results["Nombre"] = df_patient_search_results[
+        ["Nombre1", "Nombre2", "Apellido1", "Apellido2"]
+    ].apply(" ".join, axis=1)
+    df_patient_search_results = df_patient_search_results[
+        ["Cédula", "Nombre", "Facultad/Dependencia"]
+    ]
+    builder = GridOptionsBuilder.from_dataframe(df_patient_search_results)
+    builder.configure_selection(selection_mode="single", use_checkbox=False)
+    builder.configure_side_bar(filters_panel=False)
+    builder.configure_pagination(enabled=True, paginationAutoPageSize=False, paginationPageSize=9)
+    gridoptions = builder.build()
+    with col1:
+        if st.session_state.current_view != "Historial":
+            patients_found = AgGrid(
+                df_patient_search_results,
+                gridOptions=gridoptions,
+                fit_columns_on_grid_load=True,
+                enable_enterprise_modules=False,
+                update_mode=GridUpdateMode.SELECTION_CHANGED,
+                enable_quicksearch=True
+            )
 
-                selected_patient = patients_found["selected_rows"]
-            col2.write("")
-            col2.write("")
-            if col2.button("Ver paciente"):
+        selected_patient = patients_found["selected_rows"]
+
+    col2.write("")
+    col2.write("")
+    if selected_patient != list():
+        with st.sidebar:
+
+            st.subheader(selected_patient[0]["Nombre"])
+            colored_header("Opciones","")
+            if st.button("Historia clínica"):
                 st.session_state.current_view = "Historial"
                 st.session_state.patient_id = selected_patient[0]["Cédula"]
                 st.session_state.previous_page = "Busqueda"
                 st.experimental_rerun()
 
-            if col2.button("Generar reporte"):
+            if st.button("Generar reporte"):
+                st.session_state.current_view = "generate_report"
+                st.write("Reporte")
+                st.experimental_rerun()
+
+            if st.button("Dar de baja"):
                 st.session_state.current_view = "generate_report"
                 st.write("Reporte")
                 st.experimental_rerun()

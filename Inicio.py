@@ -41,7 +41,7 @@ clean("Citas del día de hoy")
 
 appointments_history = get_todays_appointments(st.session_state.db_engine)
 if len(appointments_history) == 0:
-    st.success("No tiene citas pendientes")
+    st.success("No tiene citas pendientes el día de hoy")
 builder = GridOptionsBuilder.from_dataframe(appointments_history)
 builder.configure_selection(selection_mode="single", use_checkbox=False)
 builder.configure_default_column(columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW)
@@ -50,8 +50,7 @@ gridoptions = builder.build()
 sesion = AgGrid(
     appointments_history,
     gridOptions=gridoptions,
-
-    columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
+    columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW,
     enable_enterprise_modules=False,
 )
 

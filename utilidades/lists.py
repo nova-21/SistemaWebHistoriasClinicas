@@ -28,3 +28,18 @@ tipos_de_paciente = (
     "Jubilado",
     "Familiar",
 )
+
+facultades = {
+    "Arquitectura y urbanismo",
+    "Artes",
+    "Ciencias agropecuarias",
+    "Ciencias económicas y administrativas",
+    "Ciencias de la hospitalidad"
+    "Ciencias médicas",
+    "Ciencias químicas",
+    "Filosofía",
+    "Ingeniería",
+    "Jurisprudencia",
+    "Odontología",
+    "Psicología",
+}

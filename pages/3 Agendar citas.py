@@ -1,6 +1,6 @@
 import datetime
 import os
-
+import time
 import streamlit as st
 from sqlalchemy import create_engine
 
@@ -21,7 +21,7 @@ if "db_engine" not in st.session_state:
 def create_appointment(base):
     with base:
         with st.form(key="appointment_register"):
-            patient_id = st.text_input("Cédula del paciente")
+            patient_id = st.text_input("Cédula o identificación del paciente")
             appointment_type = st.radio(
                 "Seleccione el tipo de cita",
                 (
@@ -36,26 +36,35 @@ def create_appointment(base):
                 help="Puede escribir aquí para buscar un tipo de atención",
             )
             date = st.date_input("Fecha de la cita (Año/Mes/Día)")
-            time = st.time_input("Hora de la cita")
+            hour = st.time_input("Hora de la cita", step=1800) #1800 equals 30 minutes
             practitioner_id = st.session_state.practitioner_login_id
             submit = st.form_submit_button(label="Guardar")
         if submit:
-            # Convert the input to a datetime object
-            time_obj = datetime.datetime.combine(datetime.date.today(), time)
-            time_formatted = time_obj.strftime('%H:%M')
-            # Convert the datetime object to HH:MM format
-            message = add_appointment(
-                db_engine=st.session_state.db_engine,
-                patient_id=patient_id,
-                practitioner_id=practitioner_id,
-                appointment_type=appointment_type,
-                encounter_type=encounter_type,
-                status="booked",
-                reason="none",
-                date=date,
-                time=time_formatted,
-            )
-            return message
+            try:
+                if patient_id == "":
+                    raise ValueError("La identificación se encuentra vacía")
+                # Convert the input to a datetime object
+                time_obj = datetime.datetime.combine(datetime.date.today(), hour)
+                time_formatted = time_obj.strftime('%H:%M')
+                # Convert the datetime object to HH:MM format
+                message = add_appointment(
+                    db_engine=st.session_state.db_engine,
+                    patient_id=patient_id,
+                    practitioner_id=practitioner_id,
+                    appointment_type=appointment_type,
+                    encounter_type=encounter_type,
+                    status="booked",
+                    reason="none",
+                    date=date,
+                    time=time_formatted,
+                )
+                return message
+            except:
+                st.error("La identificación se encuentra vacía, revise los datos y vuelva a guardar.")
+                time.sleep(2)
+                st.experimental_rerun()
+
+
 
 
 clean("Registro de citas")

@@ -1,3 +1,4 @@
+import pandas as pd
 from sqlalchemy import or_, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -152,6 +153,37 @@ def get_patient(db_engine, patient_id):
         # Retrieve cedula and nombre columns from paciente table
         patient = session.query(Patient).filter_by(id=patient_id).first()
         return patient
+    except SQLAlchemyError as e:
+        print("Error retrieving patient data:", str(e))
+        return []
+    finally:
+        # Close the session
+        session.close()
+
+def get_all_patients(db_engine):
+    Session = sessionmaker(db_engine)
+    session = Session()
+
+    try:
+        patient = session.query(Patient.id,
+                Patient.first_name,
+                Patient.second_name,
+                Patient.first_family_name,
+                Patient.second_family_name,
+                Patient.faculty_dependence)
+        patient_df = pd.DataFrame(
+            patient,
+            columns=[
+                "Cédula",
+                "Nombre1",
+                "Nombre2",
+                "Apellido1",
+                "Apellido2",
+                "Facultad/Dependencia",
+            ],
+            index=None,
+        ).astype(str)
+        return patient_df
     except SQLAlchemyError as e:
         print("Error retrieving patient data:", str(e))
         return []
