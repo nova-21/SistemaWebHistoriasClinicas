@@ -42,6 +42,7 @@ class Patient(Base):
     personal_history = Column(String())
     extra_information = Column(String())
     encounter = relationship("Encounter", back_populates="patient")
+    diagnostic = relationship("Diagnostic", back_populates="patient")
     appointment = relationship("Appointment", back_populates="patient")
     active = Column(Boolean())
 
@@ -57,7 +58,6 @@ class Practitioner(Base):
     encounter = relationship("Encounter", back_populates="practitioner")
     active = Column(Boolean())
 
-
 class Encounter(Base):
     __tablename__ = "encounter"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -66,11 +66,19 @@ class Encounter(Base):
     date = Column(Date)
     activities_sent = Column(String(50))
     attachments = Column(String())
-    diagnostics = Column(String())
     patient_id = Column(String(10), ForeignKey("patient.id"))
     patient = relationship("Patient", back_populates="encounter")
     practitioner_id = Column(String(50), ForeignKey("practitioner.id"))
     practitioner = relationship("Practitioner", back_populates="encounter")
+
+class Diagnostic(Base):
+    __tablename__ = "diagnostic"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    result = Column(String(30))
+    status = Column(String())
+    date = Column(Date)
+    patient_id = Column(String(10), ForeignKey("patient.id"))
+    patient = relationship("Patient", back_populates="diagnostic")
 
 
 class Appointment(Base):
@@ -79,7 +87,7 @@ class Appointment(Base):
     appointment_type = Column(String(50))
     encounter_type = Column(String(50))
     status = Column(String(15))
-    reason = Column(String(15))
+    reason = Column(String(50))
     date = Column(Date)
     time = Column(String(5))
     patient_id = Column(String(10), ForeignKey("patient.id"))
@@ -109,4 +117,4 @@ class QuestionnaireResponse(Base):
     points = Column(Integer)
 
 #
-# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)

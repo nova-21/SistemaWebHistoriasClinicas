@@ -98,7 +98,7 @@ def add_patient(db_engine, patient):
         # Add the new Patient to the session and commit
         session.add(patient)
         session.commit()
-        return "Paciente registrado"
+        return "Paciente registrado con éxito"
     except IntegrityError:
         # Rollback the session in case of IntegrityError (e.g. duplicate primary key)
         session.rollback()

@@ -16,7 +16,7 @@ list_encounter_types = (
     "Cierre de proceso",
     "Terapia de juego",
     "Asesoría académica",
-    "Atención de necesidades educativas especiales",
+    "Necesidades educativas especiales",
     "Orientación vocacional y profesional",
 )
 

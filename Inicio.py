@@ -37,6 +37,9 @@ if "appointment_selected" not in st.session_state:
 if "submit_cita" not in st.session_state:
     st.session_state.submit_cita = False
 
+if "id_for_appointment" not in st.session_state:
+    st.session_state.id_for_appointment = ""
+
 clean("Citas del día de hoy")
 
 appointments_history = get_todays_appointments(st.session_state.db_engine)
@@ -55,17 +58,6 @@ sesion = AgGrid(
 )
 
 appointment_selected = sesion["selected_rows"]
-
-def mark_appointment():
-    update_appointment(
-        db_engine=st.session_state.db_engine,
-        status="no-atendida",
-        reason=reason_cancellation,
-        date=get_today(),
-        patient_id=appointment_selected[0]["Cédula"],
-    )
-    st.success("Se ha registrado el estado de la cita")
-    time.sleep(1)
 
 
 # Display appointment details and buttons if appointment is selected
@@ -133,8 +125,16 @@ if appointment_selected:
             )
 
             if st.form_submit_button("Guardar", type="primary"):
-                mark_appointment()
+                update_appointment(
+                    db_engine=st.session_state.db_engine,
+                    status="no-atendida",
+                    reason=reason_cancellation,
+                    date=get_today(),
+                    patient_id=appointment_selected[0]["Cédula"],
+                )
                 st.session_state.submit_cita = False
+                st.success("Se ha registrado el estado de la cita")
+                time.sleep(1)
                 st.experimental_rerun()
         with st.sidebar:
             if st.button("❌ Cancelar", type="primary"):

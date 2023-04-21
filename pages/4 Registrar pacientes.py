@@ -150,7 +150,7 @@ def registrar_paciente(base):
                 st.experimental_rerun()
 
 
-clean("Registro de pacientes", "Ingrese los datos personales del paciente a registrar, los campos con asteriscos (*) 0son obligatorios")
+clean("Registro de pacientes", "Ingrese los datos personales del paciente a registrar, los campos con asteriscos (*) son obligatorios")
 
 
 base = st.empty()

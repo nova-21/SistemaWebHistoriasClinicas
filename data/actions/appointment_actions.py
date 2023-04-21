@@ -28,6 +28,10 @@ def add_appointment(
     appointment.encounter_type=encounter_type
 
     try:
+        print(patient_id)
+        res = get_appointment(db_engine,patient_id,date)
+        # if len(res)0:
+        #     raise Exception("El paciente ya cuenta con una cita en el mismo día.")
         # Add the new Appointment to the session and commit
         session.add(appointment)
         session.commit()
@@ -40,6 +44,9 @@ def add_appointment(
         )
         print(message)
         return message
+    except:
+        session.rollback()
+        return "El paciente ya cuenta con una cita en esa fecha, seleccione una distinta."
     finally:
         # Close the session
         session.close()
@@ -131,8 +138,10 @@ def get_appointment_report(engine, month, year):
 
 
 def get_appointment(engine, patient_id, date):
+
     # create the session
     Session = sessionmaker(bind=engine)
+
     session = Session()
 
     # query the appointments and join with the related patient and practitioner
@@ -153,9 +162,10 @@ def get_appointment(engine, patient_id, date):
         .first()
     )
 
+
     # close the session
     session.close()
-
+    print(appointments)
     return appointments
 
 
@@ -176,7 +186,8 @@ def update_appointment(
             session.query(Appointment).filter(Appointment.date == date,
                                               Appointment.patient_id == patient_id).first()
         )
-        print(appointment)
+
+
         if appointment:
             appointment.status = status
             appointment.reason = reason

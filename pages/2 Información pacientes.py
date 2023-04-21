@@ -3,16 +3,16 @@ import time
 from datetime import datetime
 import streamlit as st
 import pandas as pd
+import streamlit_extras
 from streamlit_extras.colored_header import colored_header
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, ColumnsAutoSizeMode
 from streamlit_extras.switch_page_button import switch_page
+
+from data.actions.diagnostic_action import get_diagnostics, update_diagnostics, add_diagnostic
 from data.actions.encounter_actions import (
     add_encounter,
     get_encounter_history,
     get_encounter,
-    update_encounter,
-    get_diagnostics,
-    update_encounter_diagnostics,
 )
 
 from data.actions.patient_actions import get_patient_search, get_patient, get_all_patients
@@ -49,6 +49,7 @@ if "encounter_row_selected" not in st.session_state:
 
 if "previous_page" not in st.session_state:
     st.session_state.previous_page = ""
+
 
 
 header_container = st.empty()
@@ -122,7 +123,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
 
 
     df_encounter_list = pd.DataFrame(
-        encounter_history_list, columns=["Fecha", "Tipo de atención"], index=None
+        encounter_history_list, columns=["Tipo de atención","Fecha"], index=None
     ).astype(str) # astype because dataframes datatypes have issues being cast to be rendered
     df_encounter_list["Tipo de atención"].fillna("", inplace=True)
 
@@ -130,8 +131,10 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
     builder.configure_column(
         "Fecha", type=["customDateTimeFormat"], custom_format_string="yyyy-MM-dd"
     )
+    #TODO fix this table view
     builder.configure_selection(selection_mode="multiple", use_checkbox=False)
     builder.configure_side_bar(filters_panel=False)
+
 
     if st.session_state.encounter_row_selected != " ":
         builder.configure_selection(pre_selected_rows=[0])
@@ -155,14 +158,13 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
         )
 
         st.write("Seleccione la sesión que desea visualizar")
-
         encounter_history_table = AgGrid(
             df_encounter_list,
             gridOptions=gridoptions,
             fit_columns_on_grid_load=True,
             enable_enterprise_modules=False,
             update_mode=GridUpdateMode.SELECTION_CHANGED,
-            enable_quicksearch=True
+            enable_quicksearch=True,
         )
 
     encounter_row_selected = encounter_history_table["selected_rows"]
@@ -175,7 +177,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
         show_register_encounter_view(register_encounter_container)
 
     st.subheader(  # Apprears in all encounter's tabs
-        "_Paciente: {0} {1} {2} {3}_".format(
+        "Paciente: {0} {1} {2} {3}".format(
             patient.first_name,
             patient.second_name,
             patient.first_family_name,
@@ -246,8 +248,10 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                 st.experimental_data_editor(df_encounter_list, use_container_width=True)
 
             with cuestionarios:
+
                 questionnaires = get_questionnaires(st.session_state.db_engine)
                 dict_questionnaires = {}
+                st.markdown("##### Aplicar cuestionarios al paciente")
                 for questionnaire in questionnaires:
                     dict_questionnaires[questionnaire.name] = questionnaire.id
                 with st.form(key="questionnaires"):
@@ -272,11 +276,11 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                 )
 
                 if len(quest) > 0:
-                    st.caption("Cuestionarios pendientes")
+                    st.markdown("###### Cuestionarios pendientes")
                     st.dataframe(quest)
 
                 if len(answers) > 0:
-                    st.markdown("##### Cuestionarios resueltos")
+                    st.markdown("###### Cuestionarios resueltos")
                     builder = GridOptionsBuilder.from_dataframe(answers)
                     builder.configure_selection(
                         selection_mode="single", use_checkbox=True
@@ -289,6 +293,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                         fit_columns_on_grid_load=True,
                         enable_enterprise_modules=False,
                         update_mode=GridUpdateMode.SELECTION_CHANGED,
+
                     )
 
                     if len(questionnaire_response_select.selected_rows) > 0:
@@ -300,12 +305,14 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                         st.download_button("Descargar respuestas", a.to_string())
 
             with archivos_adjuntos:
-                st.markdown("#### Cargar archivos")
-                with st.form(key="upload_file", clear_on_submit=True):
-                    uploaded_files = st.file_uploader(
-                        "Subir nuevos archivos adjuntos", accept_multiple_files=True
-                    )
-                    submit = st.form_submit_button("Guardar archivos")
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    st.markdown("##### Cargar archivos")
+                    with st.form(key="upload_file", clear_on_submit=True):
+                        uploaded_files = st.file_uploader(
+                            "Subir nuevos archivos adjuntos", accept_multiple_files=True
+                        )
+                        submit = st.form_submit_button("Guardar archivos")
                 if submit:
                     for uploaded_file in uploaded_files:
                         bytes_data = uploaded_file.read()
@@ -313,10 +320,11 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                         with open(path, "wb") as binary_file:
                             # Write bytes to file
                             binary_file.write(bytes_data)
-                st.markdown("#### Descargar archivos guardados")
+                with col2:
+                    st.markdown("##### Lista de archivos")
 
-                st.download_button("Archivo 1", data="Archivo de prueba")
-                st.download_button("Archivo 2", data="Archivo de prueba")
+                    st.download_button("Archivo 1", data="Archivo de prueba")
+                    st.download_button("Archivo 2", data="Archivo de prueba")
 
             with diagnosticos:  # TODO add diagnostic list to encounter table
                 diagnostics_list = get_diagnostics(
@@ -324,24 +332,39 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                     st.session_state.patient_id,
                     encounter_selected.date,
                 )
-                with st.form(key="new_diagnostic", clear_on_submit=False):
-                    st.markdown(
-                        "###### Agrege o elimine diagnósticos a la tabla y presione guardar"
-                    )
-                    result = st.experimental_data_editor(
-                        diagnostics_list, num_rows="dynamic", use_container_width=True
-                    )
-                    submit = st.form_submit_button("Guardar")
+                col1, col2 = st.columns([1,1])
+                with col1:
+                    st.markdown("##### Agregar un diagnóstico")
+                    with st.form(key="new_diagnostic", clear_on_submit=True):
+                        diagnostic = st.text_input("###### Escriba un diagnóstico preliminar o final")
+                        type = st.radio("Select Exam Type", ('Preliminar', 'Final'))
+                        submit = st.form_submit_button("Guardar")
                 if submit:
-                    update_encounter_diagnostics(
-                        st.session_state.db_engine,
-                        date=encounter_selected.date,
-                        patient_id=st.session_state.patient_id,
-                        diagnostics=result["Diagnósticos"],
-                    )
-                    st.success("Diágnosticos guardados con éxito")
-                    time.sleep(0.5)
+                    try:
+                        if diagnostic == "":
+                            raise Exception("")
+                        add_diagnostic(
+                            st.session_state.db_engine,
+                            date=encounter_selected.date,
+                            patient_id=st.session_state.patient_id,
+                            diagnostic=diagnostic,
+                            type=type
+                        )
+                        st.success("Diágnostico agregado con éxito")
+                        time.sleep(0.7)
+
+                    except:
+                        st.error("El campo del diagnóstico no puede estar vacío")
+                        time.sleep(2)
+
                     st.experimental_rerun()
+
+                with col2:
+                    st.markdown("##### Lista de diagnósticos")
+                    st.experimental_data_editor(
+                        diagnostics_list.set_index(diagnostics_list.columns[0]),
+                        use_container_width=True
+                    )
 
     colored_header(label="Datos personales", color_name="red-50", description="")
     with st.expander("**Datos personales**"):
@@ -534,6 +557,10 @@ if (
                 st.write("Reporte")
                 st.experimental_rerun()
 
+            if st.button("Agendar cita"):
+                st.session_state.id_for_appointment = selected_patient[0]["Cédula"]
+                switch_page("Agendar_citas")
+
             if st.button("Dar de baja"):
                 st.session_state.current_view = "generate_report"
                 st.write("Reporte")
@@ -541,6 +568,16 @@ if (
 
 
 if st.session_state.current_view == "Historial":
+    st.markdown(
+        """
+       <style>
+       [data-testid="stSidebar"][aria-expanded="true"]{
+           min-width: 400px;
+           max-width: 400px;
+       }
+       """,
+        unsafe_allow_html=True,
+    )
     main_patient_info_view.empty()
     with st.container():
         show_encounter_history_view(st.session_state.patient_id)

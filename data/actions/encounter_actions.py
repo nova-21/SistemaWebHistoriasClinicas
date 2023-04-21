@@ -5,7 +5,7 @@ from sqlalchemy import cast, String, desc, and_, extract
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from data.create_database import Encounter, Practitioner, Patient
+from data.create_database import Encounter, Practitioner, Patient, Diagnostic
 
 
 def add_encounter(
@@ -199,27 +199,6 @@ def get_encounter_activities(db_engine, patient_id):
         session.close()
 
 
-def get_diagnostics(db_engine, patient_id, date):
-    # Create a Session
-    Session = sessionmaker(bind=db_engine)
-    session = Session()
-    try:
-        encounter = (
-            session.query(Encounter.diagnostics)
-            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
-            .first()
-        )
-        if encounter.diagnostics != None:
-            encounter_list = encounter[0].split(";")
-            df = pd.DataFrame(encounter_list, columns=["Diagnósticos"])
-            return df
-        else:
-            return list([])
-    finally:
-        # Close the session
-
-        session.close()
-
 
 def update_encounter(
     db_engine,
@@ -262,27 +241,7 @@ def update_encounter(
         session.close()
 
 
-def update_encounter_diagnostics(db_engine, date, patient_id, diagnostics):
-    # Create a Session
-    Session = sessionmaker(bind=db_engine)
-    session = Session()
 
-    try:
-        # Update the Encounter in the session and commit
-        encounter = (
-            session.query(Encounter)
-            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
-            .first()
-        )
-        if encounter:
-            encounter.diagnostics = ";".join(diagnostics)
-            session.commit()
-            print("Encounter updated successfully")
-        else:
-            print("Error: Encounter not found")
-    finally:
-        # Close the session
-        session.close()
 
 
 def delete_encounter(db_engine, encounter_id):
