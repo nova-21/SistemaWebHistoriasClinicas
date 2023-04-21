@@ -28,10 +28,11 @@ def add_appointment(
     appointment.encounter_type=encounter_type
 
     try:
-        print(patient_id)
+
         res = get_appointment(db_engine,patient_id,date)
-        # if len(res)0:
-        #     raise Exception("El paciente ya cuenta con una cita en el mismo día.")
+
+        if res is not None:
+            raise Exception("El paciente ya cuenta con una cita en el mismo día.")
         # Add the new Appointment to the session and commit
         session.add(appointment)
         session.commit()
@@ -42,7 +43,6 @@ def add_appointment(
         message = (
             "Error con el registro de la cita, revise los datos e intente nuevamente."
         )
-        print(message)
         return message
     except:
         session.rollback()
@@ -141,9 +141,7 @@ def get_appointment(engine, patient_id, date):
 
     # create the session
     Session = sessionmaker(bind=engine)
-
     session = Session()
-
     # query the appointments and join with the related patient and practitioner
     appointments = (
         session.query(
@@ -157,15 +155,13 @@ def get_appointment(engine, patient_id, date):
         )
         .join(Patient, Appointment.patient_id == Patient.id)
         .join(Practitioner, Appointment.practitioner_id == Practitioner.id)
-        .filter(cast(Appointment.date, String) == date,
+        .filter(cast(Appointment.date, String) == cast(date, String),
                 Patient.id == patient_id)
         .first()
     )
-
-
+    
     # close the session
     session.close()
-    print(appointments)
     return appointments
 
 
