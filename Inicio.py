@@ -48,6 +48,8 @@ if len(appointments_history) == 0:
 builder = GridOptionsBuilder.from_dataframe(appointments_history)
 builder.configure_selection(selection_mode="single", use_checkbox=False)
 builder.configure_default_column(columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW)
+other_options = {'suppressColumnVirtualisation': True}
+builder.configure_grid_options(**other_options)
 gridoptions = builder.build()
 
 sesion = AgGrid(

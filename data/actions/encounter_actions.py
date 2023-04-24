@@ -210,7 +210,6 @@ def update_encounter(
     attachments,
     patient_id,
     practitioner_id,
-    diagnostics,
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -231,7 +230,6 @@ def update_encounter(
             encounter.attachments = attachments
             encounter.patient_id = patient_id
             encounter.practitioner_id = practitioner_id
-            encounter.diagnostics = ";".join(diagnostics)
             session.commit()
             print("Encounter updated successfully")
         else:
@@ -240,8 +238,51 @@ def update_encounter(
         # Close the session
         session.close()
 
+def update_attachment(db_engine,patient_id,date, attachments):
+    print(attachments)
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
 
+    try:
+        # Update the Encounter with a new attachment, in the session and commit
+        encounter = (
+            session.query(Encounter)
+                .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+                .first()
+        )
+        import streamlit as st
+        st.write(encounter)
+        if encounter:
+            encounter.date = date
+            if not encounter.attachments: #Inserts the new attachment path separated by ; if it's not empty
+                encounter.attachments = attachments
+            else:
+                encounter.attachments += ";" + attachments
+            encounter.patient_id = patient_id
+            session.commit()
+            print("Encounter updated successfully")
+        else:
+            print("Error: Encounter not found")
+    finally:
+        # Close the session
+        session.close()
 
+def get_attachments_list(db_engine, patient_id, date):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+
+    try:
+        # Get list of the attachments paths
+        attachments = session.query(Encounter.attachments).filter(Encounter.patient_id == patient_id, Encounter.date == date).first()
+        if attachments[0] is not None:
+            return attachments[0].split(";")
+        else:
+            return list()
+    finally:
+        # Close the session
+        session.close()
 
 
 def delete_encounter(db_engine, encounter_id):

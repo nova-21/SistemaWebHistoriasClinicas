@@ -33,6 +33,12 @@ months_list = [
     "noviembre",
     "diciembre",
 ]
+
+year_list = [
+    "2023",
+    "2022",
+    "2021"
+]
 title_dict = {
     "encounter_type": "Tipo de atención",
     "faculty_dependence": "Facultad/Dependencia",
@@ -73,10 +79,10 @@ def count_encounter_instances(counts, type_column):
 clean("Reportes mensuales y anuales")
 
 
-def show_appointment_metrics_fullfilled(month):
+def show_appointment_metrics_fullfilled(month,year):
     colored_header(label="Citas por atención", color_name="red-50", description="")
     appointment_list = get_appointment_report(
-        st.session_state.db_engine, get_month_number(month), 2023
+        st.session_state.db_engine, get_month_number(month), int(year)
     )
     if appointment_list:
         df_appointment_list = pd.DataFrame(
@@ -95,10 +101,10 @@ def show_appointment_metrics_fullfilled(month):
             st.write("No existen suficientes datos del mes para generar el reporte")
 
 
-def show_appointment_metrics_type(month):
+def show_appointment_metrics_type(month,year):
     colored_header(label="Citas por tipo", color_name="red-50", description="")
     appointment_list = get_appointment_report(
-        st.session_state.db_engine, get_month_number(month), 2023
+        st.session_state.db_engine, get_month_number(month), int(year)
     )
     if appointment_list:
         df_appointment_list = pd.DataFrame(
@@ -117,10 +123,10 @@ def show_appointment_metrics_type(month):
         except:
             st.write("No existen suficientes datos del mes para generar el reporte")
 
-def show_people_sex(month):
+def show_people_sex(month,year):
     colored_header(label="Personas atendidas", color_name="red-50", description="")
     history_result = get_encounter_complete_history(
-        st.session_state.db_engine, get_month_number(month), 2023
+        st.session_state.db_engine, get_month_number(month), int(year)
     )
     gender_counts = history_result.groupby("sex")["id"].nunique()
     unique_ids_count = history_result["id"].nunique()
@@ -132,18 +138,18 @@ def show_people_sex(month):
     colc.metric("Hombres", hombres_count)
 
 
-def show_encounters(month):
+def show_encounters(month,year):
     colored_header(label="Sesiones atendidas", color_name="red-50", description="")
     history_result = get_encounter_complete_history(
-        st.session_state.db_engine, get_month_number(month), 2023
+        st.session_state.db_engine, get_month_number(month), int(year)
     )
     total_atenciones = history_result.count()
     st.metric("Total atenciones", total_atenciones[0])
 
 
-def show_graphs(month):
+def show_graphs(month,year):
     history_result = get_encounter_complete_history(
-        st.session_state.db_engine, get_month_number(month), 2023
+        st.session_state.db_engine, get_month_number(month), int(year)
     )
     col1, col2, col3 = st.columns(3)
     list_columns = list([col1, col2, col3])
@@ -163,9 +169,9 @@ def show_graphs(month):
             counter = counter + 1
 
 
-def show_table(month):
+def show_table(month,year):
     history_result = get_encounter_complete_history(
-        st.session_state.db_engine, get_month_number(month), 2023
+        st.session_state.db_engine, get_month_number(month), int(year)
     )
     # df_appointment_list = pd.DataFrame([(a.encounter_type, a.id, a.faculty_dependence, a.career, a.sex, a.age,a.marital_status, a.patient_type, a.profession_occupation) for a in history_result],
     #                                    columns=["Tipo de atención", "Cédula", "Facultad/Dependencia","Carrera","Sexo","Edad","Estado civil","Tipo de paciente","Ocupación"])
@@ -195,9 +201,10 @@ def show_table(month):
 col1, col2 = st.columns(2)
 with st.sidebar:
     month = st.selectbox("Mes", options=months_list)
-show_table(month)
-show_appointment_metrics_fullfilled(month)
-show_appointment_metrics_type(month)
-show_people_sex(month)
-show_encounters(month)
-show_graphs(month)
+    year = st.selectbox("Año", options=year_list)
+show_table(month,year)
+show_appointment_metrics_fullfilled(month,year)
+show_appointment_metrics_type(month,year)
+show_people_sex(month,year)
+show_encounters(month,year)
+show_graphs(month,year)

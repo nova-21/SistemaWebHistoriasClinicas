@@ -25,7 +25,7 @@ if "practitioner_login_id" not in st.session_state:
 
 def create_appointment(base):
     with base:
-        with st.form(key="appointment_register"):
+        with st.form(key="appointment_register", clear_on_submit=True):
             if st.session_state.id_for_appointment != "":
                 patient_id = st.text_input("Cédula o identificación del paciente", value=st.session_state.id_for_appointment)
             else:
@@ -84,11 +84,16 @@ message = create_appointment(base)
 if message == "Cita registrada con éxito":
     base.empty()
     st.success(message)
-    st.button("Aceptar")
+    st.session_state.id_for_appointment = ""
+    time.sleep(2)
+    st.experimental_rerun()
+
 if (
     message
     == "Error con el registro de la cita, revise los datos e intente nuevamente." or message == "El paciente ya cuenta con una cita en esa fecha, seleccione una distinta."
 ):
     base.empty()
     st.error(message)
-    st.button("Aceptar")
+    time.sleep(2)
+    st.experimental_rerun()
+

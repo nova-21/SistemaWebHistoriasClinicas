@@ -3,16 +3,15 @@ import time
 from datetime import datetime
 import streamlit as st
 import pandas as pd
-import streamlit_extras
 from streamlit_extras.colored_header import colored_header
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, ColumnsAutoSizeMode
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, ColumnsAutoSizeMode, AgGridTheme
 from streamlit_extras.switch_page_button import switch_page
 
-from data.actions.diagnostic_action import get_diagnostics, update_diagnostics, add_diagnostic
+from data.actions.diagnostic_action import get_diagnostics, add_diagnostic
 from data.actions.encounter_actions import (
     add_encounter,
     get_encounter_history,
-    get_encounter,
+    get_encounter, update_attachment, get_attachments_list,
 )
 
 from data.actions.patient_actions import get_patient_search, get_patient, get_all_patients
@@ -134,6 +133,8 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
     #TODO fix this table view
     builder.configure_selection(selection_mode="multiple", use_checkbox=False)
     builder.configure_side_bar(filters_panel=False)
+    other_options = {'suppressColumnVirtualisation': True}
+    builder.configure_grid_options(**other_options)
 
 
     if st.session_state.encounter_row_selected != " ":
@@ -148,7 +149,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
             key="dos",
             on_click=inicio,
         )
-        st.button("Registrar nueva sesión", on_click=tab_registrar)
+        # st.button("Registrar nueva sesión", on_click=tab_registrar)
         edit_encounter = st.button("Editar datos de la sesión")
         st.button("Recargar")
 
@@ -165,6 +166,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
             enable_enterprise_modules=False,
             update_mode=GridUpdateMode.SELECTION_CHANGED,
             enable_quicksearch=True,
+            columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS
         )
 
     encounter_row_selected = encounter_history_table["selected_rows"]
@@ -285,6 +287,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                     builder.configure_selection(
                         selection_mode="single", use_checkbox=True
                     )
+
                     gridoptions = builder.build()
 
                     questionnaire_response_select = AgGrid(
@@ -308,23 +311,62 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                 col1, col2 = st.columns([1, 1])
                 with col1:
                     st.markdown("##### Cargar archivos")
+                    st.write("")
+                    st.write("")
                     with st.form(key="upload_file", clear_on_submit=True):
+                        title = st.text_input("Nombre del archivo")
                         uploaded_files = st.file_uploader(
-                            "Subir nuevos archivos adjuntos", accept_multiple_files=True
+                            "Seleccione el archivo a subir", accept_multiple_files=True,
                         )
                         submit = st.form_submit_button("Guardar archivos")
                 if submit:
                     for uploaded_file in uploaded_files:
                         bytes_data = uploaded_file.read()
                         path = r"bin/" + uploaded_file.name
-                        with open(path, "wb") as binary_file:
-                            # Write bytes to file
-                            binary_file.write(bytes_data)
+                        try:
+                            with open(path, "wb") as binary_file:
+                                # Write bytes to file
+                                binary_file.write(bytes_data)
+                            update_attachment(st.session_state.db_engine,st.session_state.patient_id,date_from_selected_encounter,path)
+                            st.success("El archivo ha sido cargado con éxito")
+                            time.sleep(1)
+                        except InterruptedError:
+                            print(InterruptedError)
+                            st.error("Existió un error al cargar el archivo, intentelo nuevamente")
+                            time.sleep(2)
+                    st.experimental_rerun()
                 with col2:
                     st.markdown("##### Lista de archivos")
+                    attachments_list = get_attachments_list(st.session_state.db_engine,st.session_state.patient_id,date_from_selected_encounter)
+                    attachments_df = pd.DataFrame(attachments_list, columns=["Nombre"])
+                    builder = GridOptionsBuilder.from_dataframe(attachments_df)
+                    builder.configure_selection(
+                        selection_mode="single", use_checkbox=True
+                    )
 
-                    st.download_button("Archivo 1", data="Archivo de prueba")
-                    st.download_button("Archivo 2", data="Archivo de prueba")
+                    gridoptions = builder.build()
+
+                    attached_file_selected = AgGrid(
+                        attachments_df,
+                        gridOptions=gridoptions,
+                        fit_columns_on_grid_load=True,
+                        enable_enterprise_modules=False,
+                        update_mode=GridUpdateMode.SELECTION_CHANGED,
+
+                    )
+                    if len(attached_file_selected.selected_rows) > 0:
+                        file_path = attached_file_selected.selected_rows[0]["Nombre"]
+                        with open(file_path, 'rb') as f:
+                            data = f.read()
+
+                        st.download_button(
+                            label='Descargar archivo',
+                            data=data,
+                            file_name=file_path,
+                            mime='application/octet-stream'
+                        )
+
+
 
             with diagnosticos:  # TODO add diagnostic list to encounter table
                 diagnostics_list = get_diagnostics(
@@ -337,7 +379,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                     st.markdown("##### Agregar un diagnóstico")
                     with st.form(key="new_diagnostic", clear_on_submit=True):
                         diagnostic = st.text_input("###### Escriba un diagnóstico preliminar o final")
-                        type = st.radio("Select Exam Type", ('Preliminar', 'Final'))
+                        exam_type = st.radio("Select Exam Type", ('Preliminar', 'Final'))
                         submit = st.form_submit_button("Guardar")
                 if submit:
                     try:
@@ -348,7 +390,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                             date=encounter_selected.date,
                             patient_id=st.session_state.patient_id,
                             diagnostic=diagnostic,
-                            type=type
+                            type=exam_type
                         )
                         st.success("Diágnostico agregado con éxito")
                         time.sleep(0.7)
@@ -524,7 +566,9 @@ if (
     builder = GridOptionsBuilder.from_dataframe(df_patient_search_results)
     builder.configure_selection(selection_mode="single", use_checkbox=False)
     builder.configure_side_bar(filters_panel=False)
-    builder.configure_pagination(enabled=True, paginationAutoPageSize=False, paginationPageSize=9)
+    other_options = {'suppressColumnVirtualisation': True}
+    builder.configure_grid_options(**other_options)
+    builder.configure_pagination(enabled=True, paginationAutoPageSize=False, paginationPageSize=8)
     gridoptions = builder.build()
     with col1:
         if st.session_state.current_view != "Historial":
@@ -534,9 +578,10 @@ if (
                 fit_columns_on_grid_load=True,
                 enable_enterprise_modules=False,
                 update_mode=GridUpdateMode.SELECTION_CHANGED,
-                enable_quicksearch=True
+                enable_quicksearch=True,
+                theme=AgGridTheme.STREAMLIT,
+                columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS
             )
-
         selected_patient = patients_found["selected_rows"]
 
     col2.write("")

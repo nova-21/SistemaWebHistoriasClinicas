@@ -159,7 +159,7 @@ def get_appointment(engine, patient_id, date):
                 Patient.id == patient_id)
         .first()
     )
-    
+
     # close the session
     session.close()
     return appointments
