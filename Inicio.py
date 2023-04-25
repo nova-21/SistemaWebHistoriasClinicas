@@ -102,6 +102,7 @@ if appointment_selected:
         st.session_state.encounter_row_selected = (
             0  # Select the first encounter in the Informacion pacientes view
         )
+        st.session_state.edit_encounter = True
         st.session_state.previous_page = "inicio"
         switch_page("Información pacientes")
         st.stop()
@@ -129,7 +130,7 @@ if appointment_selected:
             if st.form_submit_button("Guardar", type="primary"):
                 update_appointment(
                     db_engine=st.session_state.db_engine,
-                    status="no-atendida",
+                    status="no_atendida",
                     reason=reason_cancellation,
                     date=get_today(),
                     patient_id=appointment_selected[0]["Cédula"],

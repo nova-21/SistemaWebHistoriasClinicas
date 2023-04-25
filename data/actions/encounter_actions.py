@@ -200,46 +200,62 @@ def get_encounter_activities(db_engine, patient_id):
 
 
 
+# def update_encounter(
+#     db_engine,
+#     encounter_id,
+#     encounter_type,
+#     topics_boarded,
+#     date,
+#     activities_sent,
+#     attachments,
+#     patient_id,
+#     practitioner_id,
+# ):
+#     # Create a Session
+#     Session = sessionmaker(bind=db_engine)
+#     session = Session()
+#
+#     try:
+#         # Update the Encounter in the session and commit
+#         encounter = (
+#             session.query(Encounter)
+#             .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+#             .first()
+#         )
+#         if encounter:
+#             encounter.encounter_type = encounter_type
+#             encounter.topics_boarded = topics_boarded
+#             encounter.date = date
+#             encounter.activities_sent = activities_sent
+#             encounter.attachments = attachments
+#             encounter.patient_id = patient_id
+#             encounter.practitioner_id = practitioner_id
+#             session.commit()
+#             print("Encounter updated successfully")
+#         else:
+#             print("Error: Encounter not found")
+#     finally:
+#         # Close the session
+#         session.close()
+
 def update_encounter(
     db_engine,
-    encounter_id,
-    encounter_type,
-    topics_boarded,
-    date,
-    activities_sent,
-    attachments,
-    patient_id,
-    practitioner_id,
+    encounter_edited
 ):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
 
     try:
-        # Update the Encounter in the session and commit
-        encounter = (
-            session.query(Encounter)
-            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
-            .first()
-        )
-        if encounter:
-            encounter.encounter_type = encounter_type
-            encounter.topics_boarded = topics_boarded
-            encounter.date = date
-            encounter.activities_sent = activities_sent
-            encounter.attachments = attachments
-            encounter.patient_id = patient_id
-            encounter.practitioner_id = practitioner_id
-            session.commit()
-            print("Encounter updated successfully")
-        else:
-            print("Error: Encounter not found")
+        session.add(encounter_edited)
+        session.commit()
+    except Exception as e:
+        raise e
     finally:
         # Close the session
         session.close()
 
 def update_attachment(db_engine,patient_id,date, attachments):
-    print(attachments)
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
@@ -251,8 +267,7 @@ def update_attachment(db_engine,patient_id,date, attachments):
                 .filter(Encounter.patient_id == patient_id, Encounter.date == date)
                 .first()
         )
-        import streamlit as st
-        st.write(encounter)
+
         if encounter:
             encounter.date = date
             if not encounter.attachments: #Inserts the new attachment path separated by ; if it's not empty

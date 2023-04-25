@@ -71,7 +71,7 @@ def create_appointment(base):
                 print(message)
                 return message
             except:
-                st.error("La identificación se encuentra vacía, revise los datos y vuelva a guardar.")
+                st.error("La identificación se encuentra vacía, revise los datos e intente nuevamente.")
                 time.sleep(2)
                 st.experimental_rerun()
 
@@ -90,7 +90,7 @@ if message == "Cita registrada con éxito":
 
 if (
     message
-    == "Error con el registro de la cita, revise los datos e intente nuevamente." or message == "El paciente ya cuenta con una cita en esa fecha, seleccione una distinta."
+    == "Error con el registro de la cita, revise los datos e intente nuevamente." or message == "El paciente ya cuenta con una cita en esa fecha, seleccione una distinta." or message== "El paciente no se encuentra registrado"
 ):
     base.empty()
     st.error(message)

@@ -6,6 +6,7 @@ import pandas as pd
 from sqlalchemy import cast, String, desc, asc, and_, extract
 from sqlalchemy.orm import sessionmaker
 
+from data.actions.patient_actions import get_patient
 from data.create_database import Appointment, Patient, Practitioner, Encounter
 
 
@@ -32,8 +33,12 @@ def add_appointment(
         res = get_appointment(db_engine,patient_id,date)
 
         if res is not None:
-            raise Exception("El paciente ya cuenta con una cita en el mismo día.")
+            raise Exception("El paciente ya cuenta con una cita en esa fecha, seleccione una distinta.")
         # Add the new Appointment to the session and commit
+        patient_search = get_patient(db_engine,patient_id)
+
+        if patient_search is None:
+            raise Exception("El paciente no se encuentra registrado")
         session.add(appointment)
         session.commit()
         return "Cita registrada con éxito"
@@ -44,9 +49,9 @@ def add_appointment(
             "Error con el registro de la cita, revise los datos e intente nuevamente."
         )
         return message
-    except:
+    except Exception as e:
         session.rollback()
-        return "El paciente ya cuenta con una cita en esa fecha, seleccione una distinta."
+        return str(e)
     finally:
         # Close the session
         session.close()

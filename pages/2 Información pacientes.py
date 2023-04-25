@@ -1,4 +1,5 @@
 import datetime
+import os
 import time
 from datetime import datetime
 import streamlit as st
@@ -11,7 +12,7 @@ from data.actions.diagnostic_action import get_diagnostics, add_diagnostic
 from data.actions.encounter_actions import (
     add_encounter,
     get_encounter_history,
-    get_encounter, update_attachment, get_attachments_list,
+    get_encounter, update_attachment, get_attachments_list, update_encounter,
 )
 
 from data.actions.patient_actions import get_patient_search, get_patient, get_all_patients
@@ -49,6 +50,8 @@ if "encounter_row_selected" not in st.session_state:
 if "previous_page" not in st.session_state:
     st.session_state.previous_page = ""
 
+if "edit_encounter" not in st.session_state:
+    st.session_state.edit_encounter = False
 
 
 header_container = st.empty()
@@ -151,6 +154,8 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
         )
         # st.button("Registrar nueva sesión", on_click=tab_registrar)
         edit_encounter = st.button("Editar datos de la sesión")
+        if edit_encounter:
+            st.session_state.edit_encounter = True
         st.button("Recargar")
 
     with st.sidebar:
@@ -188,13 +193,14 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
     )
 
     if encounter_row_selected:
+
         # Converts date formats here because the query has issues transforming dates
         date_from_selected_encounter = encounter_row_selected[0]["Fecha"]
         encounter_selected, practitioner_name = get_encounter(
             st.session_state.db_engine, patient.id, date_from_selected_encounter
         )
 
-        if edit_encounter:  # TODO add update connection
+        if st.session_state.edit_encounter:  # TODO add update connection
             controls_container.empty()
             with controls_container.container():
                 colored_header(label="Controles", color_name="red-50", description="")
@@ -205,26 +211,37 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                 )
                 st.write("")
                 st.write("")
+
             placeholder = st.form(key="cita")
             with placeholder:
-                fecha = st.date_input(
+
+                encounter_selected.date = st.date_input(
                     "Fecha de cita",
                     value=datetime.strptime(date_from_selected_encounter, "%Y-%m-%d"),
                 )
-                encargado = st.text_input("Tratante", value="Juan Perez")
-                descripcion = st.selectbox(
+                encounter_selected.practitioner_name = st.text_input("Tratante", value=practitioner_name)
+                encounter_selected.encounter_type = st.selectbox(
                     "Tipo de atención",
                     list_encounter_types,
                     help="Puede escribir aquí para buscar un tipo de atención",
                 )
-                asistencia = st.text_area(
-                    "Información pertinente a la atención",
+                encounter_selected.topics_boarded = st.text_area(
+                    "Evolución del paciente:",
                     value=encounter_selected.topics_boarded,
                 )
 
-                tareas = st.text_input("Tareas enviadas", value="Lorem ipsum")
-                archivos = st.file_uploader("Adjuntar archivos:")
+                encounter_selected.activities_sent = st.text_input("Tareas enviadas", value=encounter_selected.activities_sent)
                 guardar = st.form_submit_button(label="Guardar")
+
+            if guardar:
+                update_encounter(st.session_state.db_engine, encounter_selected)
+                st.success("Se ha guardado los cambios")
+                time.sleep(1)
+                st.session_state.edit_encounter = False
+                st.session_state.encounter_row_selected = 0
+                st.experimental_rerun()
+
+
 
         else:
             colored_header(
@@ -314,20 +331,25 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                     st.write("")
                     st.write("")
                     with st.form(key="upload_file", clear_on_submit=True):
-                        title = st.text_input("Nombre del archivo")
+
                         uploaded_files = st.file_uploader(
                             "Seleccione el archivo a subir", accept_multiple_files=True,
                         )
-                        submit = st.form_submit_button("Guardar archivos")
+                        submit = st.form_submit_button("Cargar archivo")
                 if submit:
                     for uploaded_file in uploaded_files:
                         bytes_data = uploaded_file.read()
-                        path = r"bin/" + uploaded_file.name
+                        folder_name = str(st.session_state.patient_id) + '_' + str(date_from_selected_encounter)
+                        folder_path = os.path.join("bin", folder_name)
+                        if not os.path.exists(folder_path):
+                            os.makedirs(folder_path)
+                        file_path = os.path.join(folder_path, uploaded_file.name)
                         try:
-                            with open(path, "wb") as binary_file:
+                            with open(file_path, "wb") as binary_file:
                                 # Write bytes to file
                                 binary_file.write(bytes_data)
-                            update_attachment(st.session_state.db_engine,st.session_state.patient_id,date_from_selected_encounter,path)
+                            update_attachment(st.session_state.db_engine, st.session_state.patient_id,
+                                              date_from_selected_encounter, file_path)
                             st.success("El archivo ha sido cargado con éxito")
                             time.sleep(1)
                         except InterruptedError:
@@ -337,7 +359,8 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                     st.experimental_rerun()
                 with col2:
                     st.markdown("##### Lista de archivos")
-                    attachments_list = get_attachments_list(st.session_state.db_engine,st.session_state.patient_id,date_from_selected_encounter)
+                    attachments_list = get_attachments_list(st.session_state.db_engine, st.session_state.patient_id,
+                                                            date_from_selected_encounter)
                     attachments_df = pd.DataFrame(attachments_list, columns=["Nombre"])
                     builder = GridOptionsBuilder.from_dataframe(attachments_df)
                     builder.configure_selection(
@@ -350,6 +373,7 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                         attachments_df,
                         gridOptions=gridoptions,
                         fit_columns_on_grid_load=True,
+                        columns_auto_size_mode=True,
                         enable_enterprise_modules=False,
                         update_mode=GridUpdateMode.SELECTION_CHANGED,
 
@@ -365,8 +389,6 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
                             file_name=file_path,
                             mime='application/octet-stream'
                         )
-
-
 
             with diagnosticos:  # TODO add diagnostic list to encounter table
                 diagnostics_list = get_diagnostics(
@@ -435,9 +457,9 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
             ["Teléfono del contacto de emergencia", patient.emergency_contact_phone],
         ]
         personal_information_container = st.empty()
-        edit_personal_info = st.button("Editar", key="editar_datos")
+        # edit_personal_info = st.button("Editar", key="editar_datos")
 
-        if edit_personal_info:
+        if False:
             # TODO add edit personal info view
             print("Hi")
         else:
@@ -457,14 +479,13 @@ def show_encounter_history_view(id_to_search, encounter_row_selected=None):
     with st.expander("**Antecedentes**"):
         st.write("**Personales:** ", patient.personal_history)
         st.write("**Familiares:**", patient.family_history)
-        st.button("Editar", key="editar_personales")
     with st.expander("**Información adicional**"):
         st.write(patient.extra_information)
-        st.button("Editar", key="editar_adicional")
 
 
 def change_view_encounter_history_no_id_with_rerun():
     st.session_state.current_view = "Historial"
+    st.session_state.edit_encounter = False
     st.session_state.register_encounter_page = False
     st.experimental_rerun()
 
@@ -597,19 +618,19 @@ if (
                 st.session_state.previous_page = "Busqueda"
                 st.experimental_rerun()
 
-            if st.button("Generar reporte"):
-                st.session_state.current_view = "generate_report"
-                st.write("Reporte")
-                st.experimental_rerun()
+            # if st.button("Generar reporte"): TODO create reports
+            #     st.session_state.current_view = "generate_report"
+            #     st.write("Reporte")
+            #     st.experimental_rerun()
 
             if st.button("Agendar cita"):
                 st.session_state.id_for_appointment = selected_patient[0]["Cédula"]
                 switch_page("Agendar_citas")
 
-            if st.button("Dar de baja"):
-                st.session_state.current_view = "generate_report"
-                st.write("Reporte")
-                st.experimental_rerun()
+            # if st.button("Dar de baja"):
+            #     st.session_state.current_view = "generate_report"
+            #     st.write("Reporte")
+            #     st.experimental_rerun()
 
 
 if st.session_state.current_view == "Historial":
