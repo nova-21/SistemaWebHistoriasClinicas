@@ -36,6 +36,7 @@ def add_practitioner(db_engine, id, full_name, position, email, phone_number, ac
 
 def verify_practitioner(db_engine, email):
     if any(p["email"] == email for p in get_practitioner(db_engine)):
+
         practitioner_id = get_practitioner_by_email(db_engine, email)[0]
         return "Access permitted", practitioner_id
     else:
@@ -49,7 +50,9 @@ def get_practitioner(db_engine):
 
     try:
         # Retrieve cedula and nombre columns from paciente table
+        print("start")
         practitioners = session.query(Practitioner.email, Practitioner.id).all()
+        print("end")
         return practitioners
     except SQLAlchemyError as e:
         print("Error retrieving patient data:", str(e))

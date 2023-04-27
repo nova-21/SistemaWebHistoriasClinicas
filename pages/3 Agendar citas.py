@@ -1,8 +1,6 @@
 import datetime
-import os
 import time
 import streamlit as st
-from sqlalchemy import create_engine
 
 from data.actions.appointment_actions import add_appointment
 from data.conection import create_engine_conection

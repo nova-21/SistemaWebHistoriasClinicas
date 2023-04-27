@@ -1,22 +1,17 @@
 import datetime
-import os
 import time
-
 from auth0_component import login_button
-from sqlalchemy import create_engine
 from st_aggrid import GridOptionsBuilder, AgGrid, ColumnsAutoSizeMode
 from streamlit_extras.switch_page_button import switch_page
 from data.actions.appointment_actions import get_todays_appointments, update_appointment
 from data.actions.encounter_actions import get_encounter_activities, add_encounter
 from data.actions.practitioner_actions import (
-    get_practitioner,
-    get_practitioner_by_email, verify_practitioner,
+    verify_practitioner,
 )
 from data.conection import create_engine_conection
 from data.create_database import Encounter
 from utilidades.time_utilities import get_today
 from utilidades.vies_utilities import clean, load_logo
-from utilidades.authentication import login
 import streamlit as st
 
 st.set_page_config(
@@ -52,7 +47,7 @@ if st.session_state.user_info == {}:
     clean("Por favor inicie sesión para continuar")
     user_info = login_button(clientId=clientId, domain=domain)
     if user_info:
-        auth, practitioner_id = verify_practitioner(create_engine_conection(), user_info.get("email"))
+        auth, practitioner_id = verify_practitioner(st.session_state.db_engine, user_info.get("email"))
         if auth == "Access permitted":
             st.session_state.practitioner_login_id = practitioner_id
             st.session_state.user_info = user_info

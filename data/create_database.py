@@ -3,14 +3,13 @@ from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean, Fo
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy_schemadisplay import create_schema_graph
 
+from data.conection import create_engine_conection
 
-engine = create_engine("sqlite:///bienestar.db")
-
-Session = sessionmaker(bind=engine)
-session = Session()
+# engine = create_engine_conection()
+# Session = sessionmaker(bind=engine)
+# session = Session()
 
 Base = declarative_base()
-
 
 class Patient(Base):
     __tablename__ = "patient"
@@ -120,8 +119,8 @@ class QuestionnaireResponse(Base):
     points = Column(Integer)
 
 
-#
-Base.metadata.create_all(engine)
+# # #
+# Base.metadata.create_all(engine)
 
 # from sqlalchemy import MetaData
 # from sqlalchemy_schemadisplay import create_schema_graph

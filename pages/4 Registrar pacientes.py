@@ -1,13 +1,11 @@
 import datetime
-import os
+import time
 from time import sleep
-
 import streamlit as st
-from sqlalchemy import create_engine
-
 from data.actions.patient_actions import add_patient
+from data.actions.practitioner_actions import add_practitioner
 from data.conection import create_engine_conection
-from data.create_database import Patient
+from data.create_database import Patient, Practitioner
 from utilidades.lists import tipos_de_paciente
 from utilidades.vies_utilities import clean, load_logo
 
@@ -22,6 +20,26 @@ if st.session_state.user_info == {}:
     clean("Por favor inicie sesión para continuar")
 
 if st.session_state.user_info:
+
+    def register_practicioner():
+        practitioner = Practitioner()
+
+        with st.form("register_practitioner", clear_on_submit=True):
+            practitioner.id = st.text_input(
+                "Cédula*",
+                help="Cualquier documento de identificación es permitido en caso de personas extranjeras",
+            )
+            practitioner.full_name=st.text_input("Nombre completo")
+            practitioner.email = st.text_input("Email")
+            practitioner.phone_number = st.text_input("Teléfono")
+            submit_practitioner=st.form_submit_button("Guardar")
+
+        if submit_practitioner:
+            add_practitioner(st.session_state.db_engine, practitioner.id, practitioner.full_name, practitioner.position, practitioner.email, practitioner.phone_number, True)
+            st.success("Tratante guardado con éxito")
+            time.sleep(2)
+            st.experimental_rerun()
+
 
     def registrar_paciente(base):
         with base:
@@ -164,8 +182,18 @@ if st.session_state.user_info:
         "Ingrese los datos personales del paciente a registrar, los campos con asteriscos (*) son obligatorios",
     )
 
-    base = st.empty()
-    message_result = registrar_paciente(base)
+
+
+    if st.session_state.user_info.get("email") == "alex.pinos@ucuenca.edu.ec":
+        tab1, tab2 = st.tabs(["Pacientes", "Tratantes"])
+        with tab1:
+            base = st.empty()
+            message_result = registrar_paciente(base)
+        with tab2:
+            register_practicioner()
+    else:
+        base = st.empty()
+        message_result = registrar_paciente(base)
 
     if message_result == "Paciente registrado con éxito":
         base.empty()
