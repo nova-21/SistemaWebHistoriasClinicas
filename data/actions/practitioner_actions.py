@@ -39,7 +39,7 @@ def verify_practitioner(db_engine, email):
         practitioner_id = get_practitioner_by_email(db_engine, email)[0]
         return "Access permitted", practitioner_id
     else:
-        return "Access denied"
+        return "Access denied", "no_id"
 
 
 

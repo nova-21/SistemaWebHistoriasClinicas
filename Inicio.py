@@ -52,7 +52,7 @@ if st.session_state.user_info == {}:
     clean("Por favor inicie sesión para continuar")
     user_info = login_button(clientId=clientId, domain=domain)
     if user_info:
-        auth,practitioner_id = verify_practitioner(create_engine_conection(), user_info.get("email"))
+        auth, practitioner_id = verify_practitioner(create_engine_conection(), user_info.get("email"))
         if auth == "Access permitted":
             st.session_state.practitioner_login_id = practitioner_id
             st.session_state.user_info = user_info

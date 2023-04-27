@@ -6,7 +6,7 @@ from data.create_database import Base, Patient
 from data.actions import patient_actions
 
 # Set up the test database engine
-engine = create_engine(os.environ.get("DATABASE"))
+engine = create_engine("sqlite:///../data/bienestar.db")
 Base.metadata.create_all(engine)
 
 # Instantiate a Faker object for generating random data
