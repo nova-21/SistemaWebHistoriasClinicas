@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
+from data.conection import create_engine_conection
 from data.create_database import Practitioner
 
 
@@ -32,6 +33,14 @@ def add_practitioner(db_engine, id, full_name, position, email, phone_number, ac
     finally:
         # Close the session
         session.close()
+
+def verify_practitioner(db_engine, email):
+    if any(p["email"] == email for p in get_practitioner(db_engine)):
+        practitioner_id = get_practitioner_by_email(db_engine, email)[0]
+        return "Access permitted", practitioner_id
+    else:
+        return "Access denied"
+
 
 
 def get_practitioner(db_engine):

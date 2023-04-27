@@ -160,17 +160,20 @@ def get_patient(db_engine, patient_id):
         # Close the session
         session.close()
 
+
 def get_all_patients(db_engine):
     Session = sessionmaker(db_engine)
     session = Session()
 
     try:
-        patient = session.query(Patient.id,
-                Patient.first_name,
-                Patient.second_name,
-                Patient.first_family_name,
-                Patient.second_family_name,
-                Patient.faculty_dependence)
+        patient = session.query(
+            Patient.id,
+            Patient.first_name,
+            Patient.second_name,
+            Patient.first_family_name,
+            Patient.second_family_name,
+            Patient.faculty_dependence,
+        )
         patient_df = pd.DataFrame(
             patient,
             columns=[

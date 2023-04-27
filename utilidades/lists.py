@@ -34,8 +34,7 @@ facultades = {
     "Artes",
     "Ciencias agropecuarias",
     "Ciencias económicas y administrativas",
-    "Ciencias de la hospitalidad"
-    "Ciencias médicas",
+    "Ciencias de la hospitalidad" "Ciencias médicas",
     "Ciencias químicas",
     "Filosofía",
     "Ingeniería",

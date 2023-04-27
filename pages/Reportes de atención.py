@@ -15,9 +15,12 @@ from data.actions.encounter_actions import (
 )
 from data.conection import create_engine_conection
 from utilidades.vies_utilities import clean
+import matplotlib.pyplot as plt
 
 if "db_engine" not in st.session_state:
     st.session_state.db_engine = create_engine_conection()
+
+st.set_page_config(layout="wide")
 
 months_list = [
     "enero",
@@ -34,11 +37,7 @@ months_list = [
     "diciembre",
 ]
 
-year_list = [
-    "2023",
-    "2022",
-    "2021"
-]
+year_list = ["2023", "2022", "2021"]
 title_dict = {
     "encounter_type": "Tipo de atención",
     "faculty_dependence": "Facultad/Dependencia",
@@ -79,7 +78,29 @@ def count_encounter_instances(counts, type_column):
 clean("Reportes mensuales y anuales")
 
 
-def show_appointment_metrics_fullfilled(month,year):
+# def show_appointment_metrics_fullfilled(month,year):
+#     colored_header(label="Citas por atención", color_name="red-50", description="")
+#     appointment_list = get_appointment_report(
+#         st.session_state.db_engine, get_month_number(month), int(year)
+#     )
+#     if appointment_list:
+#         df_appointment_list = pd.DataFrame(
+#             [(a.appointment_type, a.status, a.reason) for a in appointment_list],
+#             columns=["Tipo de cita", "Estado", "Razón"],
+#         )
+#         appointment_counts = df_appointment_list["Estado"].value_counts()
+#         try:
+#             citas_efectivas = appointment_counts["atendida"]
+#             citas_no_efectivas = appointment_counts["no_atendida"]
+#             cola, colb, colc = st.columns(3)
+#             cola.metric("Citas agendadas", citas_efectivas + citas_no_efectivas)
+#             colb.metric("Citas efectivas", citas_efectivas)
+#             colc.metric("Citas no efectivas", citas_no_efectivas)
+#         except:
+#             st.write("No existen suficientes datos del mes para generar el reporte")
+
+
+def show_appointment_metrics_fullfilled(month, year):
     colored_header(label="Citas por atención", color_name="red-50", description="")
     appointment_list = get_appointment_report(
         st.session_state.db_engine, get_month_number(month), int(year)
@@ -93,15 +114,40 @@ def show_appointment_metrics_fullfilled(month,year):
         try:
             citas_efectivas = appointment_counts["atendida"]
             citas_no_efectivas = appointment_counts["no_atendida"]
-            cola, colb, colc = st.columns(3)
-            cola.metric("Citas agendadas", citas_efectivas + citas_no_efectivas)
-            colb.metric("Citas efectivas", citas_efectivas)
-            colc.metric("Citas no efectivas", citas_no_efectivas)
+            fig, ax = plt.subplots()
+            ax.pie(
+                [citas_efectivas, citas_no_efectivas],
+                labels=["Citas efectivas", "Citas no efectivas"],
+                autopct="%1.1f%%",
+            )
+            ax.set_title("Porcentaje de citas por atención")
+            st.pyplot(fig)
         except:
             st.write("No existen suficientes datos del mes para generar el reporte")
 
 
-def show_appointment_metrics_type(month,year):
+# def show_appointment_metrics_type(month,year):
+#     colored_header(label="Citas por tipo", color_name="red-50", description="")
+#     appointment_list = get_appointment_report(
+#         st.session_state.db_engine, get_month_number(month), int(year)
+#     )
+#     if appointment_list:
+#         df_appointment_list = pd.DataFrame(
+#             [(a.appointment_type, a.status, a.reason) for a in appointment_list],
+#             columns=["Tipo de cita", "Estado", "Razón"],
+#         )
+#         try:
+#             appointment_counts = df_appointment_list["Tipo de cita"].value_counts()
+#             primera_vez_count = appointment_counts["Primera vez"]
+#             subsecuente_count = appointment_counts["Subsecuente"]
+#
+#             cola, colb, colc = st.columns(3)
+#             cola.metric("Citas agendadas", primera_vez_count + subsecuente_count)
+#             colb.metric("Primera vez", primera_vez_count)
+#             colc.metric("Subsecuentes", subsecuente_count)
+#         except:
+#             st.write("No existen suficientes datos del mes para generar el reporte")
+def show_appointment_metrics_type(month, year):
     colored_header(label="Citas por tipo", color_name="red-50", description="")
     appointment_list = get_appointment_report(
         st.session_state.db_engine, get_month_number(month), int(year)
@@ -115,15 +161,21 @@ def show_appointment_metrics_type(month,year):
             appointment_counts = df_appointment_list["Tipo de cita"].value_counts()
             primera_vez_count = appointment_counts["Primera vez"]
             subsecuente_count = appointment_counts["Subsecuente"]
-
-            cola, colb, colc = st.columns(3)
-            cola.metric("Citas agendadas", primera_vez_count + subsecuente_count)
-            colb.metric("Primera vez", primera_vez_count)
-            colc.metric("Subsecuentes", subsecuente_count)
+            fig, ax = plt.subplots()
+            ax.pie(
+                [primera_vez_count, subsecuente_count],
+                labels=["Primera vez", "Subsecuentes"],
+                autopct="%1.1f%%",
+            )
+            ax.set_title("Porcentaje de citas por tipo")
+            st.pyplot(fig)
         except:
             st.write("No existen suficientes datos del mes para generar el reporte")
 
-def show_people_sex(month,year):
+
+def show_people_sex(month, year):
+    import plotly.graph_objs as go
+
     colored_header(label="Personas atendidas", color_name="red-50", description="")
     history_result = get_encounter_complete_history(
         st.session_state.db_engine, get_month_number(month), int(year)
@@ -132,22 +184,65 @@ def show_people_sex(month,year):
     unique_ids_count = history_result["id"].nunique()
     hombres_count = gender_counts.get("Masculino")
     mujeres_count = gender_counts.get("Femenino")
-    cola, colb, colc = st.columns(3)
-    cola.metric("Personas atendidas", unique_ids_count)
-    colb.metric("Mujeres", mujeres_count)
-    colc.metric("Hombres", hombres_count)
+    cola, colb = st.columns(2)
+    cola.metric("Mujeres", mujeres_count)
+    colb.metric("Hombres", hombres_count)
+
+    # Create a vertical bar chart
+    data = [
+        go.Bar(
+            x=["Mujeres", "Hombres"],
+            y=[mujeres_count, hombres_count],
+            marker=dict(color=["pink", "blue"]),
+            text=[
+                f"{mujeres_count} ({mujeres_count/unique_ids_count:.1%})",
+                f"{hombres_count} ({hombres_count/unique_ids_count:.1%})",
+            ],
+            textposition="auto",
+            orientation="v",
+        )
+    ]
+    layout = go.Layout(title="Distribución de personas atendidas por género")
+    fig = go.Figure(data=data, layout=layout)
+    st.plotly_chart(fig)
 
 
-def show_encounters(month,year):
+def show_encounters(month, year):
     colored_header(label="Sesiones atendidas", color_name="red-50", description="")
     history_result = get_encounter_complete_history(
         st.session_state.db_engine, get_month_number(month), int(year)
     )
+    cola, colb = st.columns(2)
+
     total_atenciones = history_result.count()
-    st.metric("Total atenciones", total_atenciones[0])
+    cola.metric("Total atenciones", total_atenciones[0])
+    unique_ids_count = history_result["id"].nunique()
+    colb.metric("Personas atendidas", unique_ids_count)
 
 
-def show_graphs(month,year):
+# def show_graphs(month,year):
+#     history_result = get_encounter_complete_history(
+#         st.session_state.db_engine, get_month_number(month), int(year)
+#     )
+#     col1, col2, col3 = st.columns(3)
+#     list_columns = list([col1, col2, col3])
+#     counter = 0
+#     list_chart_topic = history_result.keys()
+#     esta = list()
+#     esta.append("encounter_type")
+#     esta.append("faculty_dependence")
+#     esta.append("patient_type")
+#     for topic in esta:
+#         grouped = history_result.groupby(topic).size().reset_index(name="count")
+#         with list_columns[counter]:
+#             count_encounter_instances(grouped, topic)
+#         if counter == 2:
+#             counter = 0
+#         else:
+#             counter = counter + 1
+
+
+def show_graphs(month, year):
     history_result = get_encounter_complete_history(
         st.session_state.db_engine, get_month_number(month), int(year)
     )
@@ -161,15 +256,17 @@ def show_graphs(month,year):
     esta.append("patient_type")
     for topic in esta:
         grouped = history_result.groupby(topic).size().reset_index(name="count")
+        top_4 = grouped.nlargest(4, "count")
         with list_columns[counter]:
-            count_encounter_instances(grouped, topic)
+            st.write(f"**Número de instancias de encuentros por {topic}**")
+            st.dataframe(top_4, height=200)
         if counter == 2:
             counter = 0
         else:
             counter = counter + 1
 
 
-def show_table(month,year):
+def show_table(month, year):
     history_result = get_encounter_complete_history(
         st.session_state.db_engine, get_month_number(month), int(year)
     )
@@ -198,13 +295,132 @@ def show_table(month,year):
         )
 
 
+import os
+
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+from sqlalchemy import create_engine
+
+engine = create_engine(os.environ.get("DATABASE"))
+
+# Appointments by type
+query_appointments_by_type = """
+    SELECT status, COUNT(*) as count
+    FROM appointment
+    GROUP BY status
+"""
+
+# Appointments by encounter type
+query_appointments_by_encounter_type = """
+    SELECT encounter_type, COUNT(*) as count
+    FROM appointment
+    GROUP BY encounter_type
+"""
+
+# Appointments by sex
+query_appointments_by_sex = """
+    SELECT p.sex, COUNT(*) as count
+    FROM appointment a
+    JOIN patient p ON a.patient_id = p.id
+    GROUP BY p.sex
+"""
+
+# Appointments by faculty
+query_appointments_by_faculty = """
+    SELECT p.faculty_dependence, COUNT(*) as count
+    FROM appointment a
+    JOIN patient p ON a.patient_id = p.id
+    GROUP BY p.faculty_dependence
+"""
+
+# Appointments by appointment type
+query_appointments_by_appointment_type = """
+    SELECT a.appointment_type, COUNT(*) as count
+    FROM appointment a
+    GROUP BY a.appointment_type
+"""
+df_appointments_by_type = pd.read_sql_query(query_appointments_by_type, engine)
+df_appointments_by_encounter_type = pd.read_sql_query(
+    query_appointments_by_encounter_type, engine
+)
+df_appointments_by_sex = pd.read_sql_query(query_appointments_by_sex, engine)
+df_appointments_by_faculty = pd.read_sql_query(query_appointments_by_faculty, engine)
+df_appointments_by_appointment_type = pd.read_sql_query(
+    query_appointments_by_appointment_type, engine
+)
+
+
+def appointments_by_type_chart():
+    fig, ax = plt.subplots()
+    ax.bar(df_appointments_by_type["status"], df_appointments_by_type["count"])
+    plt.xticks(rotation=45, ha="right")
+    ax.set_title("Appointments by type")
+    st.pyplot(fig)
+
+
+def appointments_by_encounter_type_chart():
+    fig, ax = plt.subplots()
+    ax.bar(
+        df_appointments_by_encounter_type["encounter_type"],
+        df_appointments_by_encounter_type["count"],
+    )
+    plt.xticks(rotation=45, ha="right")
+    ax.set_title("Appointments by encounter type")
+    st.pyplot(fig)
+
+
+def appointments_by_sex_chart():
+    fig, ax = plt.subplots()
+    ax.bar(df_appointments_by_sex["sex"], df_appointments_by_sex["count"])
+    plt.xticks(rotation=45, ha="right")
+    ax.set_title("Appointments by sex")
+    st.pyplot(fig)
+
+
+def appointments_by_faculty_chart():
+    fig, ax = plt.subplots()
+    ax.bar(
+        df_appointments_by_faculty["faculty_dependence"],
+        df_appointments_by_faculty["count"],
+    )
+    plt.xticks(rotation=45, ha="right")
+    ax.set_title("Appointments by faculty")
+    st.pyplot(fig)
+
+
+def appointments_by_appointment_type_chart():
+    fig, ax = plt.subplots()
+    ax.bar(
+        df_appointments_by_appointment_type["appointment_type"],
+        df_appointments_by_appointment_type["count"],
+    )
+    plt.xticks(rotation=45, ha="right")
+    ax.set_title("Appointments by type")
+    st.pyplot(fig)
+
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    appointments_by_type_chart()
+    appointments_by_sex_chart()
+with col2:
+    appointments_by_encounter_type_chart()
+    appointments_by_appointment_type_chart()
+with col3:
+    appointments_by_faculty_chart()
+
+
 col1, col2 = st.columns(2)
 with st.sidebar:
     month = st.selectbox("Mes", options=months_list)
     year = st.selectbox("Año", options=year_list)
-show_table(month,year)
-show_appointment_metrics_fullfilled(month,year)
-show_appointment_metrics_type(month,year)
-show_people_sex(month,year)
-show_encounters(month,year)
-show_graphs(month,year)
+# show_table(month,year)
+with col1:
+    show_encounters(month, year)
+    show_appointment_metrics_fullfilled(month, year)
+
+with col2:
+    show_appointment_metrics_type(month, year)
+show_people_sex(month, year)
+show_graphs(month, year)

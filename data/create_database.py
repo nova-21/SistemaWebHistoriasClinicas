@@ -1,8 +1,10 @@
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from sqlalchemy_schemadisplay import create_schema_graph
 
-engine = create_engine(os.environ.get("DATABASE"))
+
+engine = create_engine("sqlite:///bienestar.db")
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -58,6 +60,7 @@ class Practitioner(Base):
     encounter = relationship("Encounter", back_populates="practitioner")
     active = Column(Boolean())
 
+
 class Encounter(Base):
     __tablename__ = "encounter"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -70,6 +73,7 @@ class Encounter(Base):
     patient = relationship("Patient", back_populates="encounter")
     practitioner_id = Column(String(50), ForeignKey("practitioner.id"))
     practitioner = relationship("Practitioner", back_populates="encounter")
+
 
 class Diagnostic(Base):
     __tablename__ = "diagnostic"
@@ -104,7 +108,6 @@ class Questionnaire(Base):
     questions = Column(String())
 
 
-
 class QuestionnaireResponse(Base):
     __tablename__ = "questionnaireresponse"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -116,5 +119,19 @@ class QuestionnaireResponse(Base):
     answers = Column(String())
     points = Column(Integer)
 
+
 #
-# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
+
+# from sqlalchemy import MetaData
+# from sqlalchemy_schemadisplay import create_schema_graph
+#
+# # create the pydot graph object by autoloading all tables via a bound metadata object
+# graph = create_schema_graph(
+#     metadata=MetaData(os.environ.get("DATABASE")),
+#     show_datatypes=False,  # The image would get nasty big if we'd show the datatypes
+#     show_indexes=False,  # ditto for indexes
+#     rankdir="LR",  # From left to right (instead of top to bottom)
+#     concentrate=False,  # Don't try to join the relation lines together
+# )
+# graph.write_png("dbschema.png")  # write out the file

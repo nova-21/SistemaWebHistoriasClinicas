@@ -27,13 +27,16 @@ def update_diagnostics(db_engine, date, patient_id, diagnostics):
         # Close the session
         session.close()
 
+
 def add_diagnostic(db_engine, date, patient_id, diagnostic, type):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
     try:
         # Add the new Diagnostic to the session and commit
-        diag=Diagnostic(patient_id=patient_id,date=date,result=diagnostic, status=type)
+        diag = Diagnostic(
+            patient_id=patient_id, date=date, result=diagnostic, status=type
+        )
         session.add(diag)
         session.commit()
         return "Diagnóstico registrado con éxito"
@@ -60,20 +63,12 @@ def get_diagnostics(db_engine, patient_id, date):
         if len(encounter) > 0:
             df = pd.DataFrame(
                 encounter,
-                columns=[
-                    "Diagnóstico",
-                    "Tipo"
-                ],
+                columns=["Diagnóstico", "Tipo"],
             )
 
             return df
         else:
-            df = pd.DataFrame(
-                columns=[
-                    "Diagnóstico",
-                    "Tipo"
-                ]
-            )
+            df = pd.DataFrame(columns=["Diagnóstico", "Tipo"])
             return df
     finally:
         # Close the session

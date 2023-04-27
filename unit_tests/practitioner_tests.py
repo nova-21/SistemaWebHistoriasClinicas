@@ -11,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 engine = create_engine(os.environ.get("DATABASE"))
 Base.metadata.create_all(engine)
 
+
 class TestAddPractitioner(unittest.TestCase):
     def setUp(self):
         # Create a SQLite database in memory for testing
@@ -28,7 +29,7 @@ class TestAddPractitioner(unittest.TestCase):
 
     def test_add_practitioner(self):
         # Create 20 random practitioners using the faker library
-        fake = Faker('es_MX')
+        fake = Faker("es_MX")
         practitioners = []
         for i in range(20):
             practitioner = Practitioner(
@@ -56,6 +57,7 @@ class TestAddPractitioner(unittest.TestCase):
         # Check that the practitioners were added to the database
         practitioner_count = self.session.query(Practitioner).count()
         self.assertEqual(practitioner_count, 20)
+
 
 if __name__ == "__main__":
     unittest.main()

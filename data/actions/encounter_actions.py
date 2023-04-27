@@ -178,6 +178,7 @@ def get_encounter(db_engine, patient_id, date):
 
         session.close()
 
+
 def get_encounter_activities(db_engine, patient_id):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -185,9 +186,9 @@ def get_encounter_activities(db_engine, patient_id):
     try:
         latest_encounter = (
             session.query(Encounter.activities_sent)
-                .filter(Encounter.patient_id == patient_id)
-                .order_by(desc(Encounter.date))
-                .first()
+            .filter(Encounter.patient_id == patient_id)
+            .order_by(desc(Encounter.date))
+            .first()
         )
         if latest_encounter is not None:
             return latest_encounter
@@ -197,7 +198,6 @@ def get_encounter_activities(db_engine, patient_id):
         # Close the session
 
         session.close()
-
 
 
 # def update_encounter(
@@ -238,10 +238,8 @@ def get_encounter_activities(db_engine, patient_id):
 #         # Close the session
 #         session.close()
 
-def update_encounter(
-    db_engine,
-    encounter_edited
-):
+
+def update_encounter(db_engine, encounter_edited):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
@@ -255,7 +253,8 @@ def update_encounter(
         # Close the session
         session.close()
 
-def update_attachment(db_engine,patient_id,date, attachments):
+
+def update_attachment(db_engine, patient_id, date, attachments):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
@@ -264,13 +263,15 @@ def update_attachment(db_engine,patient_id,date, attachments):
         # Update the Encounter with a new attachment, in the session and commit
         encounter = (
             session.query(Encounter)
-                .filter(Encounter.patient_id == patient_id, Encounter.date == date)
-                .first()
+            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+            .first()
         )
 
         if encounter:
             encounter.date = date
-            if not encounter.attachments: #Inserts the new attachment path separated by ; if it's not empty
+            if (
+                not encounter.attachments
+            ):  # Inserts the new attachment path separated by ; if it's not empty
                 encounter.attachments = attachments
             else:
                 encounter.attachments += ";" + attachments
@@ -283,6 +284,7 @@ def update_attachment(db_engine,patient_id,date, attachments):
         # Close the session
         session.close()
 
+
 def get_attachments_list(db_engine, patient_id, date):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
@@ -290,7 +292,11 @@ def get_attachments_list(db_engine, patient_id, date):
 
     try:
         # Get list of the attachments paths
-        attachments = session.query(Encounter.attachments).filter(Encounter.patient_id == patient_id, Encounter.date == date).first()
+        attachments = (
+            session.query(Encounter.attachments)
+            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+            .first()
+        )
         if attachments[0] is not None:
             return attachments[0].split(";")
         else:

@@ -88,7 +88,9 @@ def get_questionnaire_results(db_engine, date, patient_id):
 
     responses_answers = (
         session.query(
-            Questionnaire.title, QuestionnaireResponse.points,QuestionnaireResponse.result
+            Questionnaire.title,
+            QuestionnaireResponse.points,
+            QuestionnaireResponse.result,
         )
         .join(Questionnaire, Questionnaire.id == QuestionnaireResponse.questionnaire_id)
         .filter(
@@ -105,7 +107,7 @@ def get_questionnaire_results(db_engine, date, patient_id):
         [
             {
                 "Nombre Cuestionario": answer.title,
-                "Puntaje":answer.points,
+                "Puntaje": answer.points,
                 "Resultado": answer.result,
             }
             for answer in responses_answers
@@ -124,7 +126,7 @@ def get_questionnaire_answers(db_engine, date, patient_id):
     # Query the database for QuestionnaireResponse instances with matching date, patient_id, and state='pending'
     responses_answers = (
         session.query(QuestionnaireResponse.id, QuestionnaireResponse.answers)
-            .filter(
+        .filter(
             QuestionnaireResponse.date == date,
             QuestionnaireResponse.patient_id == patient_id,
             QuestionnaireResponse.state == "finished",
