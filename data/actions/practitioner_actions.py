@@ -50,9 +50,7 @@ def get_practitioner(db_engine):
 
     try:
         # Retrieve cedula and nombre columns from paciente table
-        print("start")
-        practitioners = session.query(Practitioner.email, Practitioner.id).all()
-        print("end")
+        practitioners = session.query(Practitioner.email, Practitioner.id).filter(Practitioner.active==True).all()
         return practitioners
     except SQLAlchemyError as e:
         print("Error retrieving patient data:", str(e))

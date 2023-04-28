@@ -27,7 +27,7 @@ from data.actions.encounter_actions import (
 from data.actions.patient_actions import (
     get_patient_search,
     get_patient,
-    get_all_patients,
+    get_all_patients, delete_patient, deactivate_patient,
 )
 from data.actions.questionnaire_actions import get_questionnaires
 from data.actions.questionnaire_response_actions import (
@@ -148,7 +148,7 @@ if st.session_state.user_info:
             edit_encounter = st.button("Editar datos de la sesión")
             if edit_encounter:
                 st.session_state.edit_encounter = True
-            st.button("Recargar")
+            st.button("Recargar página")
 
         with st.sidebar:
             colored_header(
@@ -191,7 +191,7 @@ if st.session_state.user_info:
                 st.session_state.db_engine, patient.id, date_from_selected_encounter
             )
 
-            if st.session_state.edit_encounter:  # TODO add update connection
+            if st.session_state.edit_encounter:
                 controls_container.empty()
                 with controls_container.container():
                     colored_header(
@@ -211,10 +211,10 @@ if st.session_state.user_info:
                         "Fecha de cita",
                         value=datetime.strptime(
                             date_from_selected_encounter, "%Y-%m-%d"
-                        ),
+                        ), disabled=True
                     )
                     encounter_selected.practitioner_name = st.text_input(
-                        "Tratante", value=practitioner_name
+                        "Tratante", value=practitioner_name, disabled=True
                     )
                     encounter_selected.encounter_type = st.selectbox(
                         "Tipo de atención",
@@ -414,7 +414,7 @@ if st.session_state.user_info:
                                 mime="application/octet-stream",
                             )
 
-                with diagnosticos:  # TODO add diagnostic list to encounter table
+                with diagnosticos:
                     diagnostics_list = get_diagnostics(
                         st.session_state.db_engine,
                         st.session_state.patient_id,
@@ -498,18 +498,12 @@ if st.session_state.user_info:
                 print("Hi")
             else:
                 with personal_information_container:
-                    df_encounter_list = pd.DataFrame(
+                    df_personal_data = pd.DataFrame(
                         dataframe_inicial, columns=["Campo", "Valor"]
                     ).astype(
                         str
                     )  # astype because dataframes datatypes have issues being cast to be rendered
-
-                    builder = GridOptionsBuilder.from_dataframe(df_encounter_list)
-                    gridoptions = (
-                        builder.build()
-                    )  # TODO clean this code, choose aggrid or table
-                    # AgGrid(tabla, gridOptions=gridoptions, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
-                    st.table(df_encounter_list)
+                    st.table(df_personal_data)
         with st.expander("**Antecedentes**"):
             st.write("**Personales:** ", patient.personal_history)
             st.write("**Familiares:**", patient.family_history)
@@ -584,7 +578,7 @@ if st.session_state.user_info:
 
     if (
         st.session_state.current_view == "Busqueda"
-    ):  # TODO Change patient search to also direct to the user individual report
+    ):
         main_patient_info_view.empty()
         time.sleep(0.001)
         show_results = False
@@ -642,25 +636,62 @@ if st.session_state.user_info:
             with st.sidebar:
                 st.subheader(selected_patient[0]["Nombre"])
                 colored_header("Opciones", "")
-                if st.button("Historia clínica"):
+                if st.button("Ver historia clínica"):
                     st.session_state.current_view = "Historial"
                     st.session_state.patient_id = selected_patient[0]["Cédula"]
                     st.session_state.previous_page = "Busqueda"
                     st.experimental_rerun()
 
-                # if st.button("Generar reporte"): TODO create reports
+                # if st.button("Generar reporte"): TODO create reports on clicking
                 #     st.session_state.current_view = "generate_report"
                 #     st.write("Reporte")
                 #     st.experimental_rerun()
+
+                if "delete_patient_flag" not in st.session_state:
+                    st.session_state.delete_patient_flag = False
+
+                if "deactivate_patient_flag" not in st.session_state:
+                    st.session_state.deactivate_patient_flag = False
 
                 if st.button("Agendar cita"):
                     st.session_state.id_for_appointment = selected_patient[0]["Cédula"]
                     switch_page("Agendar_citas")
 
-                # if st.button("Dar de baja"):
-                #     st.session_state.current_view = "generate_report"
-                #     st.write("Reporte")
-                #     st.experimental_rerun()
+                if st.button("Dar de baja") and selected_patient != []:
+                    st.session_state.deactivate_patient_flag = True
+
+                if st.session_state.deactivate_patient_flag == True:
+                    st.warning("¿Está seguro? Este cambio no puede ser revertido")
+                    col1, col2 = st.columns(2)
+
+                    if st.button("Si, dar de baja"):
+                        st.error("El tratante ha sido dado de baja")
+                        deactivate_patient(st.session_state.db_engine, selected_patient[0]["Cédula"])
+                        time.sleep(2)
+                        st.session_state.deactivate_patient_flag = False
+                        st.experimental_rerun()
+
+                    if st.button("No, cancelar"):
+                        st.session_state.deactivate_patient_flag = False
+                        st.experimental_rerun()
+
+                if st.button("Borrar del sistema") and selected_patient != []:
+                    st.session_state.delete_patient_flag = True
+
+                if st.session_state.delete_patient_flag == True:
+                    st.warning("¿Está seguro? Este cambio no puede ser revertido")
+                    col1, col2 = st.columns(2)
+
+                    if st.button("Si, eliminar paciente"):
+                        st.error("El tratante ha sido eliminado")
+                        delete_patient(st.session_state.db_engine, selected_patient[0]["Cédula"])
+                        time.sleep(2)
+                        st.session_state.delete_patient_flag = False
+                        st.experimental_rerun()
+
+                    if st.button("No, cancelar"):
+                        st.session_state.delete_patient_flag = False
+                        st.experimental_rerun()
 
     if st.session_state.current_view == "Historial":
         st.markdown(

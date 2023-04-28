@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import or_, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from data.create_database import Patient
+from data.create_database import Patient, Appointment, Encounter, Diagnostic, QuestionnaireResponse
 
 
 def add_patient(
@@ -218,7 +218,7 @@ def update_patient(db_engine, id, fields):
     session.close()
 
 
-def delete_patient(db_engine, id):
+def deactivate_patient(db_engine, id):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
@@ -235,6 +235,36 @@ def delete_patient(db_engine, id):
         patient.active = False
         session.commit()
         print(f"Patient with ID {id} deactivated successfully")
+    except:
+        # Rollback the session in case of an error
+        session.rollback()
+        print("Error: Failed to deactivate Patient")
+    finally:
+        # Close the session
+        session.close()
+
+def delete_patient(db_engine, id):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+
+    # Get the Patient to deactivate
+    patient = session.query(Patient).filter_by(id=id).first()
+
+    if patient is None:
+        print(f"Error: Patient with ID {id} not found")
+        return
+
+    try:
+        # Delete the associated records in other tables
+        session.query(Diagnostic).filter_by(patient_id=id).delete()
+        session.query(QuestionnaireResponse).filter_by(patient_id=id).delete()
+        session.query(Appointment).filter_by(patient_id=id).delete()
+        session.query(Encounter).filter_by(patient_id=id).delete()
+        # Delete the Patient
+        session.delete(patient)
+        session.commit()
+        print(f"Patient with ID {id} deleted successfully")
     except:
         # Rollback the session in case of an error
         session.rollback()

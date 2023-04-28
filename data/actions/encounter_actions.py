@@ -268,14 +268,12 @@ def update_attachment(db_engine, patient_id, date, attachments):
         )
 
         if encounter:
-            encounter.date = date
             if (
                 not encounter.attachments
             ):  # Inserts the new attachment path separated by ; if it's not empty
                 encounter.attachments = attachments
             else:
                 encounter.attachments += ";" + attachments
-            encounter.patient_id = patient_id
             session.commit()
             print("Encounter updated successfully")
         else:
