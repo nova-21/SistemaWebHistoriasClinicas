@@ -21,7 +21,7 @@ from data.actions.encounter_actions import (
     get_encounter,
     update_attachment,
     get_attachments_list,
-    update_encounter,
+    update_encounter, update_treatment, get_treatment, update_eval,
 )
 
 from data.actions.patient_actions import (
@@ -63,8 +63,7 @@ if "encounter_row_selected" not in st.session_state:
 if "previous_page" not in st.session_state:
     st.session_state.previous_page = ""
 
-if "edit_encounter" not in st.session_state:
-    st.session_state.edit_encounter = False
+
 
 if st.session_state.user_info:
     header_container = st.empty()
@@ -137,18 +136,17 @@ if st.session_state.user_info:
         gridoptions = builder.build()
 
         with controls_container.container():
+
             colored_header(label="Opciones", color_name="red-50", description="")
-            st.button(
+            col1, col2 = st.columns([0.5, 1])
+            col1.button(
                 "🏠 Regresar",
                 type="primary",
                 key="dos",
                 on_click=inicio,
             )
-            # st.button("Registrar nueva sesión", on_click=tab_registrar)
-            edit_encounter = st.button("Editar datos de la sesión")
-            if edit_encounter:
-                st.session_state.edit_encounter = True
-            st.button("Recargar página")
+
+            col2.button("Recargar página")
 
         with st.sidebar:
             colored_header(
@@ -191,272 +189,280 @@ if st.session_state.user_info:
                 st.session_state.db_engine, patient.id, date_from_selected_encounter
             )
 
-            if st.session_state.edit_encounter:
-                controls_container.empty()
-                with controls_container.container():
-                    colored_header(
-                        label="Controles", color_name="red-50", description=""
-                    )
-                    cancelado = st.button(
-                        "❌ Cancelar edición",
-                        type="primary",
-                        on_click=change_view_encounter_history_no_id_with_rerun,
-                    )
-                    st.write("")
-                    st.write("")
 
-                placeholder = st.form(key="cita")
-                with placeholder:
-                    encounter_selected.date = st.date_input(
-                        "Fecha de cita",
-                        value=datetime.strptime(
-                            date_from_selected_encounter, "%Y-%m-%d"
-                        ), disabled=True
-                    )
-                    encounter_selected.practitioner_name = st.text_input(
-                        "Tratante", value=practitioner_name, disabled=True
-                    )
-                    encounter_selected.encounter_type = st.selectbox(
-                        "Tipo de atención",
-                        list_encounter_types,
-                        help="Puede escribir aquí para buscar un tipo de atención",
-                    )
-                    encounter_selected.topics_boarded = st.text_area(
-                        "Evolución del paciente:",
-                        value=encounter_selected.topics_boarded,
-                    )
 
-                    encounter_selected.activities_sent = st.text_input(
-                        "Tareas enviadas", value=encounter_selected.activities_sent
-                    )
-                    guardar = st.form_submit_button(label="Guardar")
 
-                if guardar:
-                    update_encounter(st.session_state.db_engine, encounter_selected)
-                    st.success("Se ha guardado los cambios")
-                    time.sleep(1)
-                    st.session_state.edit_encounter = False
-                    st.session_state.encounter_row_selected = 0
+            colored_header(
+                label="Información de la sesión",
+                color_name="red-50",
+                description="",
+            )
+
+            evaluación, instrumentos, diagnosticos, tratamiento, archivos_adjuntos, informacion = st.tabs(
+                [   "Evaluación",
+                    "Instrumentos",
+                    "Diagnósticos",
+                    "Plan de tratamiento",
+                    "Archivos adjuntos",
+                    "Información",
+                ]
+            )
+
+            with tratamiento:
+                treatment_list = get_treatment(
+                    st.session_state.db_engine,
+                    st.session_state.patient_id,
+                    encounter_selected.date,
+                )
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    st.markdown("##### Plan de tratamiento")
+                    with st.form(key="new_treatment", clear_on_submit=False):
+                        treatment = st.text_area(
+                            "###### Escriba el plan de tratamiento y presione guardar cambios", value=treatment_list
+                        )
+
+                        submit = st.form_submit_button("Guardar cambios")
+                if submit:
+                    try:
+                        update_treatment(st.session_state.db_engine,treatment, st.session_state.patient_id, date_from_selected_encounter)
+                        st.success("Diágnostico agregado con éxito")
+                        time.sleep(0.7)
+
+                    except:
+                        st.error("Error al guardar los cambios, intente nuevamente")
+                        time.sleep(2)
+
                     st.experimental_rerun()
 
-            else:
-                colored_header(
-                    label="Información de la sesión",
-                    color_name="red-50",
-                    description="",
+
+            with evaluación:
+                col1,col2 = st.columns(2)
+                with col1:
+                    motive=st.text_area("**Agregar motivo de la consulta**", value = (lambda x: "" if x is None else x)(encounter_selected.motive)
+                                 , help="Motivo general. Ejemplo: Ansiedad generalizada")
+
+                    evolution_notes = st.text_area("**Agregar evolución/Notas de la sesión**", value = (lambda x: "" if x is None else x)(encounter_selected.evolution_notes))
+                    submit = st.button("Guardar cambios")
+                with col2:
+                    actual_demand_illness = st.text_area("**Agregar demanda actual/enfermedad actual**", value = (lambda x: "" if x is None else x)(encounter_selected.actual_demand_illness),
+                                 help="Motivo para la consulta en especifico. Ejemplo: presenta un ataque de ansiedad/panico en ese momento")
+
+                    psychological_evaluation = st.text_area("**Agregar evaluación psicológica**", value = (lambda x: "" if x is None else x)(encounter_selected.psychological_evaluation) ,help="Evaluación de funciones básicas/Procesos cognitivos superiores/Evaluación clínica")
+
+                if submit:
+                    try:
+                        update_eval(st.session_state.db_engine,motive,evolution_notes,actual_demand_illness, psychological_evaluation, st.session_state.patient_id, date_from_selected_encounter)
+                        st.success("Cambios guardados con éxito")
+                        time.sleep(0.7)
+
+                    except:
+                        st.error("Error al guardar los cambios, intente nuevamente")
+                        time.sleep(2)
+
+                    st.experimental_rerun()
+
+            with informacion:
+                dataframe_inicial = [
+                    ["Fecha", encounter_selected.date],
+                    ["Tratante", practitioner_name],
+                    ["Tipo de atención", encounter_selected.encounter_type],
+
+                ]
+
+                # astype because dataframes datatypes have issues being cast to be rendered
+                df_encounter_list = pd.DataFrame(
+                    dataframe_inicial, columns=["Campo", "Valor"]
+                ).astype(str)
+                st.experimental_data_editor(
+                    df_encounter_list, use_container_width=True
                 )
 
-                informacion, cuestionarios, archivos_adjuntos, diagnosticos = st.tabs(
-                    [
-                        "Información",
-                        "Cuestionarios",
-                        "Archivos adjuntos",
-                        "Diagnósticos",
-                    ]
-                )
-                with informacion:
-                    dataframe_inicial = [
-                        ["Fecha", encounter_selected.date],
-                        ["Tratante", practitioner_name],
-                        ["Tipo de atención", encounter_selected.encounter_type],
-
-                        ["Tareas enviadas", encounter_selected.activities_sent],
-                    ]
-
-                    # astype because dataframes datatypes have issues being cast to be rendered
-                    df_encounter_list = pd.DataFrame(
-                        dataframe_inicial, columns=["Campo", "Valor"]
-                    ).astype(str)
-                    st.experimental_data_editor(
-                        df_encounter_list, use_container_width=True
+            with instrumentos:
+                questionnaires = get_questionnaires(st.session_state.db_engine)
+                dict_questionnaires = {}
+                st.markdown("##### Aplicar instrumentos/cuestionarios al paciente")
+                for questionnaire in questionnaires:
+                    dict_questionnaires[questionnaire.name] = questionnaire.id
+                with st.form(key="questionnaires"):
+                    questionnaires_selected = st.multiselect(
+                        "Seleccione los instrumentos/cuestionarios/inventarios que desa aplicar al paciente",
+                        dict_questionnaires.keys(),
                     )
-                    st.text_area(disabled=True, value=encounter_selected.topics_boarded, label="Evolución")
-
-                with cuestionarios:
-                    questionnaires = get_questionnaires(st.session_state.db_engine)
-                    dict_questionnaires = {}
-                    st.markdown("##### Aplicar cuestionarios al paciente")
-                    for questionnaire in questionnaires:
-                        dict_questionnaires[questionnaire.name] = questionnaire.id
-                    with st.form(key="questionnaires"):
-                        questionnaires_selected = st.multiselect(
-                            "Seleccione los cuestionarios/escalas/inventarios que desa asignar al paciente",
-                            dict_questionnaires.keys(),
-                        )
-                        if st.form_submit_button("Guardar"):
-                            for questionnaire in questionnaires_selected:
-                                add_questionnaire_response(
-                                    st.session_state.db_engine,
-                                    date_from_selected_encounter,
-                                    patient.id,
-                                    dict_questionnaires.get(questionnaire),
-                                )
-
-                    quest = get_pending_questionnaire_responses(
-                        st.session_state.db_engine,
-                        date_from_selected_encounter,
-                        patient.id,
-                    )
-                    answers = get_questionnaire_results(
-                        st.session_state.db_engine,
-                        date_from_selected_encounter,
-                        patient.id,
-                    )
-
-                    if len(quest) > 0:
-                        st.markdown("###### Cuestionarios pendientes")
-                        st.dataframe(quest)
-
-                    if len(answers) > 0:
-                        st.markdown("###### Cuestionarios resueltos")
-                        builder = GridOptionsBuilder.from_dataframe(answers)
-                        builder.configure_selection(
-                            selection_mode="single", use_checkbox=True
-                        )
-
-                        gridoptions = builder.build()
-
-                        questionnaire_response_select = AgGrid(
-                            answers,
-                            gridOptions=gridoptions,
-                            fit_columns_on_grid_load=True,
-                            enable_enterprise_modules=False,
-                            update_mode=GridUpdateMode.SELECTION_CHANGED,
-                        )
-
-                        if len(questionnaire_response_select.selected_rows) > 0:
-                            a = get_questionnaire_answers(
+                    if st.form_submit_button("Guardar"):
+                        for questionnaire in questionnaires_selected:
+                            add_questionnaire_response(
                                 st.session_state.db_engine,
-                                encounter_selected.date,
-                                st.session_state.patient_id,
+                                date_from_selected_encounter,
+                                patient.id,
+                                dict_questionnaires.get(questionnaire),
                             )
-                            st.download_button("Descargar respuestas", a.to_string())
 
-                with archivos_adjuntos:
-                    col1, col2 = st.columns([1, 1])
-                    with col1:
-                        st.markdown("##### Cargar archivos")
-                        st.write("")
-                        st.write("")
-                        with st.form(key="upload_file", clear_on_submit=True):
-                            uploaded_files = st.file_uploader(
-                                "Seleccione el archivo a subir",
-                                accept_multiple_files=True,
-                            )
-                            submit = st.form_submit_button("Cargar archivo")
-                    if submit:
-                        for uploaded_file in uploaded_files:
-                            bytes_data = uploaded_file.read()
-                            folder_name = (
-                                str(st.session_state.patient_id)
-                                + "_"
-                                + str(date_from_selected_encounter)
-                            )
-                            folder_path = os.path.join("bin", folder_name)
-                            if not os.path.exists(folder_path):
-                                os.makedirs(folder_path)
-                            file_path = os.path.join(folder_path, uploaded_file.name)
-                            try:
-                                with open(file_path, "wb") as binary_file:
-                                    # Write bytes to file
-                                    binary_file.write(bytes_data)
-                                update_attachment(
-                                    st.session_state.db_engine,
-                                    st.session_state.patient_id,
-                                    date_from_selected_encounter,
-                                    file_path,
-                                )
-                                st.success("El archivo ha sido cargado con éxito")
-                                time.sleep(1)
-                            except InterruptedError:
-                                print(InterruptedError)
-                                st.error(
-                                    "Existió un error al cargar el archivo, intentelo nuevamente"
-                                )
-                                time.sleep(2)
-                        st.experimental_rerun()
-                    with col2:
-                        st.markdown("##### Lista de archivos")
-                        attachments_list = get_attachments_list(
+                quest = get_pending_questionnaire_responses(
+                    st.session_state.db_engine,
+                    date_from_selected_encounter,
+                    patient.id,
+                )
+                answers = get_questionnaire_results(
+                    st.session_state.db_engine,
+                    date_from_selected_encounter,
+                    patient.id,
+                )
+
+                if len(quest) > 0:
+                    st.markdown("###### Cuestionarios pendientes")
+                    st.dataframe(quest)
+
+                if len(answers) > 0:
+                    st.markdown("###### Cuestionarios resueltos")
+                    builder = GridOptionsBuilder.from_dataframe(answers)
+                    builder.configure_selection(
+                        selection_mode="single", use_checkbox=True
+                    )
+
+                    gridoptions = builder.build()
+
+                    questionnaire_response_select = AgGrid(
+                        answers,
+                        gridOptions=gridoptions,
+                        fit_columns_on_grid_load=True,
+                        enable_enterprise_modules=False,
+                        update_mode=GridUpdateMode.SELECTION_CHANGED,
+                    )
+
+                    if len(questionnaire_response_select.selected_rows) > 0:
+                        a = get_questionnaire_answers(
                             st.session_state.db_engine,
+                            encounter_selected.date,
                             st.session_state.patient_id,
-                            date_from_selected_encounter,
                         )
-                        attachments_df = pd.DataFrame(
-                            attachments_list, columns=["Nombre"]
-                        )
-                        builder = GridOptionsBuilder.from_dataframe(attachments_df)
-                        builder.configure_selection(
-                            selection_mode="single", use_checkbox=True
-                        )
+                        st.download_button("Descargar respuestas", a.to_string())
 
-                        gridoptions = builder.build()
-
-                        attached_file_selected = AgGrid(
-                            attachments_df,
-                            gridOptions=gridoptions,
-                            fit_columns_on_grid_load=True,
-                            columns_auto_size_mode=True,
-                            enable_enterprise_modules=False,
-                            update_mode=GridUpdateMode.SELECTION_CHANGED,
+            with archivos_adjuntos:
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    st.markdown("##### Cargar archivos")
+                    st.write("")
+                    st.write("")
+                    with st.form(key="upload_file", clear_on_submit=True):
+                        uploaded_files = st.file_uploader(
+                            "Seleccione el archivo a subir",
+                            accept_multiple_files=True,
                         )
-                        if len(attached_file_selected.selected_rows) > 0:
-                            file_path = attached_file_selected.selected_rows[0][
-                                "Nombre"
-                            ]
-                            with open(file_path, "rb") as f:
-                                data = f.read()
-
-                            st.download_button(
-                                label="Descargar archivo",
-                                data=data,
-                                file_name=file_path,
-                                mime="application/octet-stream",
+                        submit = st.form_submit_button("Cargar archivo")
+                if submit:
+                    for uploaded_file in uploaded_files:
+                        bytes_data = uploaded_file.read()
+                        folder_name = (
+                            str(st.session_state.patient_id)
+                            + "_"
+                            + str(date_from_selected_encounter)
+                        )
+                        folder_path = os.path.join("bin", folder_name)
+                        if not os.path.exists(folder_path):
+                            os.makedirs(folder_path)
+                        file_path = os.path.join(folder_path, uploaded_file.name)
+                        try:
+                            with open(file_path, "wb") as binary_file:
+                                # Write bytes to file
+                                binary_file.write(bytes_data)
+                            update_attachment(
+                                st.session_state.db_engine,
+                                st.session_state.patient_id,
+                                date_from_selected_encounter,
+                                file_path,
                             )
-
-                with diagnosticos:
-                    diagnostics_list = get_diagnostics(
+                            st.success("El archivo ha sido cargado con éxito")
+                            time.sleep(1)
+                        except InterruptedError:
+                            print(InterruptedError)
+                            st.error(
+                                "Existió un error al cargar el archivo, intentelo nuevamente"
+                            )
+                            time.sleep(2)
+                    st.experimental_rerun()
+                with col2:
+                    st.markdown("##### Lista de archivos")
+                    attachments_list = get_attachments_list(
                         st.session_state.db_engine,
                         st.session_state.patient_id,
-                        encounter_selected.date,
+                        date_from_selected_encounter,
                     )
-                    col1, col2 = st.columns([1, 1])
-                    with col1:
-                        st.markdown("##### Agregar un diagnóstico")
-                        with st.form(key="new_diagnostic", clear_on_submit=True):
-                            diagnostic = st.text_input(
-                                "###### Escriba un diagnóstico preliminar o final"
-                            )
-                            exam_type = st.radio(
-                                "Select Exam Type", ("Preliminar", "Final")
-                            )
-                            submit = st.form_submit_button("Guardar")
-                    if submit:
-                        try:
-                            if diagnostic == "":
-                                raise Exception("")
-                            add_diagnostic(
-                                st.session_state.db_engine,
-                                date=encounter_selected.date,
-                                patient_id=st.session_state.patient_id,
-                                diagnostic=diagnostic,
-                                type=exam_type,
-                            )
-                            st.success("Diágnostico agregado con éxito")
-                            time.sleep(0.7)
+                    attachments_df = pd.DataFrame(
+                        attachments_list, columns=["Nombre"]
+                    )
+                    builder = GridOptionsBuilder.from_dataframe(attachments_df)
+                    builder.configure_selection(
+                        selection_mode="single", use_checkbox=True
+                    )
 
-                        except:
-                            st.error("El campo del diagnóstico no puede estar vacío")
-                            time.sleep(2)
+                    gridoptions = builder.build()
 
-                        st.experimental_rerun()
+                    attached_file_selected = AgGrid(
+                        attachments_df,
+                        gridOptions=gridoptions,
+                        fit_columns_on_grid_load=True,
+                        columns_auto_size_mode=True,
+                        enable_enterprise_modules=False,
+                        update_mode=GridUpdateMode.SELECTION_CHANGED,
+                    )
+                    if len(attached_file_selected.selected_rows) > 0:
+                        file_path = attached_file_selected.selected_rows[0][
+                            "Nombre"
+                        ]
+                        with open(file_path, "rb") as f:
+                            data = f.read()
 
-                    with col2:
-                        st.markdown("##### Lista de diagnósticos")
-                        st.experimental_data_editor(
-                            diagnostics_list.set_index(diagnostics_list.columns[0]),
-                            use_container_width=True,
+                        st.download_button(
+                            label="Descargar archivo",
+                            data=data,
+                            file_name=file_path,
+                            mime="application/octet-stream",
                         )
+
+            with diagnosticos:
+                diagnostics_list = get_diagnostics(
+                    st.session_state.db_engine,
+                    st.session_state.patient_id,
+                    encounter_selected.date,
+                )
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    st.markdown("##### Agregar un diagnóstico a la lista")
+                    with st.form(key="new_diagnostic", clear_on_submit=True):
+                        diagnostic = st.text_input(
+                            "###### Escriba un diagnóstico preliminar o final"
+                        )
+                        exam_type = st.radio(
+                            "Select Exam Type", ("Preliminar", "Final")
+                        )
+                        submit = st.form_submit_button("Guardar")
+                if submit:
+                    try:
+                        if diagnostic == "":
+                            raise Exception("")
+                        add_diagnostic(
+                            st.session_state.db_engine,
+                            date=encounter_selected.date,
+                            patient_id=st.session_state.patient_id,
+                            diagnostic=diagnostic,
+                            type=exam_type,
+                        )
+                        st.success("Diágnostico agregado con éxito")
+                        time.sleep(0.7)
+
+                    except:
+                        st.error("El campo del diagnóstico no puede estar vacío")
+                        time.sleep(2)
+
+                    st.experimental_rerun()
+
+                with col2:
+                    st.markdown("##### Lista de diagnósticos")
+                    st.experimental_data_editor(
+                        diagnostics_list.set_index(diagnostics_list.columns[0]),
+                        use_container_width=True,
+                    )
 
         colored_header(label="Datos personales", color_name="red-50", description="")
         with st.expander("**Datos personales**"):
@@ -504,11 +510,22 @@ if st.session_state.user_info:
                         str
                     )  # astype because dataframes datatypes have issues being cast to be rendered
                     st.table(df_personal_data)
-        with st.expander("**Antecedentes**"):
+        with st.expander("**Antecedentes patológicos**"):
             st.write("**Personales:** ", patient.personal_history)
             st.write("**Familiares:**", patient.family_history)
+        with st.expander("**Hábitos**"):
+            st.write(patient.habits)
         with st.expander("**Información adicional**"):
             st.write(patient.extra_information)
+
+        colored_header(label="Resumen sesiones", color_name="red-50", description="")
+        demand, diags, plan = st.tabs(["Demanda actual/enfermedad actual","Diagnósticos","Tratamientos"])
+        with demand:
+            st.write("this")
+        with diags:
+            st.write("this")
+        with plan:
+            st.write("this")
 
     def change_view_encounter_history_no_id_with_rerun():
         st.session_state.current_view = "Historial"
@@ -553,9 +570,6 @@ if st.session_state.user_info:
                 )
                 encounter.topics_boarded = st.text_area(
                     "Indique qué se abordó en la sesión:"
-                )
-                encounter.activities_sent = st.text_area(
-                    "Tareas/actividades a realizar para la proxima sesión"
                 )
                 encounter.attachments = st.file_uploader(
                     "Busque o arrastre archivos a subir"

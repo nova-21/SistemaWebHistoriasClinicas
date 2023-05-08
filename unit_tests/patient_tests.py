@@ -53,6 +53,7 @@ def test_add_patient():
         emergency_contact_phone = f"{random.randint(1000000000, 9999999999)}"
         family_history = "Test 123"
         personal_history = "Test 123"
+        habits = "Smoking"
         extra_information = "Test 123"
         active = random.choice([True, False])
 
@@ -87,6 +88,7 @@ def test_add_patient():
             emergency_contact_phone,
             family_history,
             personal_history,
+            habits,
             extra_information,
             active,
         )

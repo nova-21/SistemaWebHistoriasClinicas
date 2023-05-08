@@ -95,14 +95,14 @@ def registrar_paciente(base):
 
         with st.form("registro", clear_on_submit=False):
             patient.id = st.text_input(
-                "Cédula*",
-                help="Cualquier documento de identificación es permitido en caso de personas extranjeras",
+                "Cédula/Pasaporte*",
+                help="Pasaporte en caso de personas extranjeras",
             )
             patient.first_name = st.text_input("Primer nombre*")
             patient.second_name = st.text_input("Segundo nombre")
             patient.first_family_name = st.text_input("Primer apellido*")
             patient.second_family_name = st.text_input("Segundo apellido")
-            patient.preferred_name = st.text_input("Nombre preferido")
+            patient.preferred_name = st.text_input("Nombre preferido", help="Puede o no ser uno de sus nombres legales")
             patient.birth_date = st.date_input(
                 "Fecha de nacimiento (Año/Mes/Día)*",
                 min_value=datetime.date(1900, 1, 1),
@@ -150,12 +150,14 @@ def registrar_paciente(base):
                 "Teléfono del contacto de emergencia*"
             )
             patient.family_history = st.text_area(
-                "Antecedentes familiares",
-                help="Ejemplo: Información clínica pertinente, relaciones personales con familiares.",
+                "Antecedentes patológicos familiares",
             )
             patient.personal_history = st.text_area(
-                "Antecedentes personales",
-                help="Información clínica relevante del patiente",
+                "Antecedentes patológicos personales",
+            )
+            patient.habits = st.text_area(
+                "Hábitos",
+                help="tabaquismo, alcoholismo, drogas, etc.",
             )
             patient.extra_information = st.text_area(
                 "Información adicional",

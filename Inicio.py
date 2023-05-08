@@ -4,7 +4,7 @@ from auth0_component import login_button
 from st_aggrid import GridOptionsBuilder, AgGrid, ColumnsAutoSizeMode
 from streamlit_extras.switch_page_button import switch_page
 from data.actions.appointment_actions import get_todays_appointments, update_appointment
-from data.actions.encounter_actions import get_encounter_activities, add_encounter
+from data.actions.encounter_actions import add_encounter
 from data.actions.practitioner_actions import (
     verify_practitioner,
 )
@@ -90,18 +90,6 @@ if st.session_state.user_info:
         st.subheader("Información de la cita")
         st.write("**Paciente:**", patients_name)
 
-        if (
-            get_encounter_activities(
-                st.session_state.db_engine, st.session_state.patient_id
-            )
-            is not None
-        ):
-            previous_activities = get_encounter_activities(
-                st.session_state.db_engine, st.session_state.patient_id
-            )[0]
-            st.write(
-                f"**Actividades enviadas en la sesión anterior:** ", previous_activities
-            )
 
         # Define button columns and actions
         col1, col2, col3, col4, col5, col6 = st.columns(6, gap="small")
@@ -111,7 +99,6 @@ if st.session_state.user_info:
             new_encounter.patient_id = st.session_state.patient_id
             new_encounter.date = datetime.datetime.today()
             new_encounter.encounter_type = appointment_selected[0]["Tipo de atención"]
-            new_encounter.activities_sent = ""
             new_encounter.diagnostics = ""
             new_encounter.attachments = ""
             new_encounter.topics_boarded = ""

@@ -35,6 +35,7 @@ def add_patient(
     emergency_contact_phone,
     family_history,
     personal_history,
+    habits,
     extra_information,
     active,
 ):
@@ -72,6 +73,7 @@ def add_patient(
         emergency_contact_phone=emergency_contact_phone,
         family_history=family_history,
         personal_history=personal_history,
+        habits=habits,
         extra_information=extra_information,
         active=active,
     )

@@ -46,7 +46,7 @@ class TestAddEncounter(unittest.TestCase):
         encounter_type = "Follow-up"
         topics_boarded = "Patient reports symptoms of headache and fatigue"
         date = datetime.datetime(2022, 3, 2)
-        activities_sent = "Prescribed medication"
+
         attachments = "N/A"
         patient_id = "2"
         practitioner_id = "2"
@@ -57,7 +57,7 @@ class TestAddEncounter(unittest.TestCase):
             encounter_type=encounter_type,
             topics_boarded=topics_boarded,
             date=date,
-            activities_sent=activities_sent,
+
             attachments=attachments,
             patient_id=patient_id,
             practitioner_id=practitioner_id,
@@ -68,7 +68,6 @@ class TestAddEncounter(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result.encounter_type, encounter_type)
         self.assertEqual(result.topics_boarded, topics_boarded)
-        self.assertEqual(result.activities_sent, activities_sent)
         self.assertEqual(result.attachments, attachments)
         self.assertEqual(result.patient_id, patient_id)
         self.assertEqual(result.practitioner_id, practitioner_id)

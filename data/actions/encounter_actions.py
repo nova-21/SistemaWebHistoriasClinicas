@@ -13,7 +13,6 @@ def add_encounter(
     encounter_type,
     topics_boarded,
     date,
-    activities_sent,
     attachments,
     patient_id,
     practitioner_id,
@@ -28,7 +27,7 @@ def add_encounter(
         encounter_type=encounter_type,
         topics_boarded=topics_boarded,
         date=date,
-        activities_sent=activities_sent,
+
         attachments=attachments,
         patient_id=patient_id,
         practitioner_id=practitioner_id,
@@ -179,21 +178,20 @@ def get_encounter(db_engine, patient_id, date):
         session.close()
 
 
-def get_encounter_activities(db_engine, patient_id):
+def get_treatment(db_engine, patient_id, date):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
     try:
-        latest_encounter = (
-            session.query(Encounter.activities_sent)
-            .filter(Encounter.patient_id == patient_id)
-            .order_by(desc(Encounter.date))
+        treatment = (
+            session.query(Encounter.treatment)
+            .filter(Encounter.patient_id == patient_id, Encounter.date == date)
             .first()
         )
-        if latest_encounter is not None:
-            return latest_encounter
+        if treatment[0] == None:
+            return ""
         else:
-            list()
+            return treatment[0]
     finally:
         # Close the session
 
@@ -252,6 +250,71 @@ def update_encounter(db_engine, encounter_edited):
     finally:
         # Close the session
         session.close()
+
+def update_treatment(db_engine, treatment, patient_id, date):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+
+    try:
+        # Update the Encounter with a new attachment, in the session and commit
+        encounter = (
+            session.query(Encounter)
+                .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+                .first()
+        )
+
+        if encounter:
+            if (
+                    encounter.treatment != treatment
+            ):  # Inserts the new attachment path separated by ; if it's not empty
+                encounter.treatment = treatment
+                session.commit()
+            else:
+                print("No changes")
+            print("Encounter updated successfully")
+        else:
+            print("Error: Encounter not found")
+    finally:
+        # Close the session
+        session.close()
+
+def update_eval(db_engine, motive, evolution_notes, actual_demand_illness, psychological_evaluation, patient_id, date):
+    # Create a Session
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+
+    try:
+        # Update the Encounter with new information, in the session and commit
+        encounter = (
+            session.query(Encounter)
+                .filter(Encounter.patient_id == patient_id, Encounter.date == date)
+                .first()
+        )
+
+        if encounter:
+            # Compare each submit parameter with the corresponding Encounter attribute
+            if motive != encounter.motive:
+                encounter.motive = motive
+            if evolution_notes != encounter.evolution_notes:
+                encounter.evolution_notes = evolution_notes
+            if actual_demand_illness != encounter.actual_demand_illness:
+                encounter.actual_demand_illness = actual_demand_illness
+            if psychological_evaluation != encounter.psychological_evaluation:
+                encounter.psychological_evaluation = psychological_evaluation
+
+            # Commit changes if any of the submit parameters differ from the Encounter attributes
+            if session.dirty:
+                session.commit()
+                print("Encounter updated successfully")
+            else:
+                print("No changes")
+        else:
+            print("Error: Encounter not found")
+    finally:
+        # Close the session
+        session.close()
+
 
 
 def update_attachment(db_engine, patient_id, date, attachments):
