@@ -3,6 +3,8 @@ import random
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from data.conection import create_engine_conection
 from data.create_database import Appointment, Encounter, Patient, Practitioner
 from utilidades.lists import list_encounter_types
 
@@ -14,7 +16,7 @@ def generate_random_date(days_ago):
 
 
 def test_insert_appointments():
-    engine = create_engine("sqlite:///../data/bienestar.db")
+    engine = create_engine_conection()
     Session = sessionmaker(engine)
     db_session = Session()
     patient_ids = db_session.query(Patient.id).all()
@@ -48,7 +50,7 @@ def test_insert_appointments():
 
 
 def test_insert_appointments_subsecuentes():
-    engine = create_engine("sqlite:///../data/bienestar.db")
+    engine = create_engine_conection()
     Session = sessionmaker(engine)
     db_session = Session()
     patient_ids = db_session.query(Patient.id).all()

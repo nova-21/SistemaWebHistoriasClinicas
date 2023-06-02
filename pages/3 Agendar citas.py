@@ -5,7 +5,7 @@ import streamlit as st
 from data.actions.appointment_actions import add_appointment
 from data.conection import create_engine_conection
 from utilidades.lists import list_encounter_types
-from utilidades.vies_utilities import clean, load_logo
+from utilidades.view_utilities import clean, load_logo
 
 load_logo()
 if "logged_in" not in st.session_state:
@@ -19,6 +19,9 @@ if "id_for_appointment" not in st.session_state:
 
 if "practitioner_login_id" not in st.session_state:
     st.session_state.practitioner_login_id = ""
+
+if "user_info" not in st.session_state:
+    st.session_state.user_info = {}
 
 if st.session_state.user_info:
 
@@ -49,7 +52,7 @@ if st.session_state.user_info:
                     "Hora de la cita", step=1800
                 )  # 1800 equals 30 minutes
                 practitioner_id = st.session_state.practitioner_login_id
-                submit = st.form_submit_button(label="Guardar")
+                submit = st.form_submit_button(label="Guardar", type="primary")
 
             if submit:
                 try:

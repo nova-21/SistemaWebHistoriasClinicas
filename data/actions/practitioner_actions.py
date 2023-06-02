@@ -34,6 +34,8 @@ def add_practitioner(db_engine, id, full_name, position, email, phone_number, ac
         # Close the session
         session.close()
 
+
+
 def verify_practitioner(db_engine, email):
     if any(p["email"] == email for p in get_practitioner(db_engine)):
 
@@ -50,7 +52,7 @@ def get_practitioner(db_engine):
 
     try:
         # Retrieve cedula and nombre columns from paciente table
-        practitioners = session.query(Practitioner.email, Practitioner.id).filter(Practitioner.active==True).all()
+        practitioners = session.query(Practitioner.full_name,Practitioner.email, Practitioner.id).filter(Practitioner.active==True).all()
         return practitioners
     except SQLAlchemyError as e:
         print("Error retrieving patient data:", str(e))

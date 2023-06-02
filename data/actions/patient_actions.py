@@ -92,7 +92,7 @@ def add_patient(
         session.close()
 
 
-def add_patient(db_engine, patient):
+def add_patient_object(db_engine, patient):
     # Create a Session
     Session = sessionmaker(bind=db_engine)
     session = Session()
@@ -154,6 +154,7 @@ def get_patient(db_engine, patient_id):
     try:
         # Retrieve cedula and nombre columns from paciente table
         patient = session.query(Patient).filter_by(id=patient_id).first()
+        print(patient)
         return patient
     except SQLAlchemyError as e:
         print("Error retrieving patient data:", str(e))

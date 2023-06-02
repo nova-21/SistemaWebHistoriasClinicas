@@ -29,16 +29,18 @@ tipos_de_paciente = (
     "Familiar",
 )
 
-facultades = {
+facultades = (
+    "Ninguna",
     "Arquitectura y urbanismo",
     "Artes",
     "Ciencias agropecuarias",
     "Ciencias económicas y administrativas",
-    "Ciencias de la hospitalidad" "Ciencias médicas",
+    "Ciencias de la hospitalidad",
+    "Ciencias médicas",
     "Ciencias químicas",
     "Filosofía",
     "Ingeniería",
     "Jurisprudencia",
     "Odontología",
     "Psicología",
-}
+)

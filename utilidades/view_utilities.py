@@ -25,9 +25,21 @@ def load_logo():
     return img
 
 
+def show_header_patient_lookup(header_container):
+    header_container.empty()
+    with header_container.container():
+        img = Image.open("resources/ucuenca.png")
+        st.image(img, width=200)
+        st.subheader("Búsqueda de pacientes")
+
+
+
 def show_header(header_container):
     header_container.empty()
     with header_container.container():
         img = Image.open("resources/ucuenca.png")
         st.image(img, width=200)
-        st.subheader("Perfil e historial del paciente")
+        col1, col2, col3 = st.columns([2,1,1])
+
+        col1.subheader("Perfil e historial del paciente")
+        col3.subheader("Confidencial")

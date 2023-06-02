@@ -1,6 +1,7 @@
 import os
 
 from data.actions.practitioner_actions import add_practitioner
+from data.conection import create_engine_conection
 from data.create_database import Base, Practitioner
 import unittest
 from faker import Faker
@@ -8,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Set up the test database engine
-engine = create_engine("sqlite:///../data/bienestar.db")
+engine = create_engine_conection()
 Base.metadata.create_all(engine)
 
 

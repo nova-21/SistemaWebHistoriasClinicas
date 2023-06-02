@@ -2,11 +2,14 @@ import os
 import random
 from faker import Faker
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
+
+from data.conection import create_engine_conection
 from data.create_database import Base, Patient
 from data.actions import patient_actions
 
 # Set up the test database engine
-engine = create_engine("sqlite:///../data/bienestar.db")
+engine = create_engine_conection()
 Base.metadata.create_all(engine)
 
 # Instantiate a Faker object for generating random data

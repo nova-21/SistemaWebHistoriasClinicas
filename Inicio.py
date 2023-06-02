@@ -11,7 +11,7 @@ from data.actions.practitioner_actions import (
 from data.conection import create_engine_conection
 from data.create_database import Encounter
 from utilidades.time_utilities import get_today
-from utilidades.vies_utilities import clean, load_logo
+from utilidades.view_utilities import clean, load_logo
 import streamlit as st
 
 st.set_page_config(
@@ -93,7 +93,7 @@ if st.session_state.user_info:
 
         # Define button columns and actions
         col1, col2, col3, col4, col5, col6 = st.columns(6, gap="small")
-        if col1.button("Iniciar sesión", type="primary", key="in" + patients_name):
+        if col1.button("Comenzar sesión", type="primary", key="in" + patients_name):
             st.session_state.current_view = "Historial"
             new_encounter = Encounter()
             new_encounter.patient_id = st.session_state.patient_id
@@ -119,13 +119,13 @@ if st.session_state.user_info:
             switch_page("Información pacientes")
             st.stop()
 
-        if col2.button("Ver paciente", key="ver" + patients_name):
+        if col2.button("Explorar paciente", key="ver" + patients_name):
             st.session_state.current_view = "Historial"
             st.session_state.previous_page = "inicio"
             switch_page("Información pacientes")
             st.stop()
 
-        if col3.button("No se realizó", key="falta" + patients_name):
+        if col3.button("Ausentismo/Cancelar", key="falta" + patients_name):
             st.session_state.submit_cita = True
 
         if st.session_state.submit_cita == True:

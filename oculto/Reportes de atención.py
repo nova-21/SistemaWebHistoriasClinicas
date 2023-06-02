@@ -14,7 +14,7 @@ from data.actions.encounter_actions import (
     get_encounters_month,
 )
 from data.conection import create_engine_conection
-from utilidades.vies_utilities import clean
+from utilidades.view_utilities import clean
 import matplotlib.pyplot as plt
 
 if "db_engine" not in st.session_state:

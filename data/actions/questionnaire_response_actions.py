@@ -61,16 +61,18 @@ def get_pending_questionnaire_responses(db_engine, date, patient_id):
 
     # Query the database for QuestionnaireResponse instances with matching date, patient_id, and state='pending'
     pending_responses = (
-        session.query(QuestionnaireResponse)
-        .filter_by(date=date, patient_id=patient_id, state="pending")
-        .all()
+        session.query(QuestionnaireResponse, Questionnaire.name)
+            .join(Questionnaire, QuestionnaireResponse.questionnaire_id == Questionnaire.id)
+            .filter(QuestionnaireResponse.date == date, QuestionnaireResponse.patient_id == patient_id,
+                    QuestionnaireResponse.state == "pending")
+            .all()
     )
 
     # Close the session
     session.close()
     df = pd.DataFrame(
         [
-            {"Cuestionario": response.questionnaire_id, "state": response.state}
+            {"Cuestionario": response.name, "state": "Pendiente" if response[0].state == "pending" else response[0].state}
             for response in pending_responses
         ]
     )

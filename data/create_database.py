@@ -5,9 +5,9 @@ from sqlalchemy_schemadisplay import create_schema_graph
 
 from data.conection import create_engine_conection
 
-# engine = create_engine_conection()
-# Session = sessionmaker(bind=engine)
-# session = Session()
+engine = create_engine_conection()
+Session = sessionmaker(bind=engine)
+session = Session()
 
 Base = declarative_base()
 
@@ -78,7 +78,6 @@ class Encounter(Base):
     practitioner_id = Column(String(50), ForeignKey("practitioner.id"))
     practitioner = relationship("Practitioner", back_populates="encounter")
 
-
 class Diagnostic(Base):
     __tablename__ = "diagnostic"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -87,7 +86,6 @@ class Diagnostic(Base):
     date = Column(Date)
     patient_id = Column(String(10), ForeignKey("patient.id"))
     patient = relationship("Patient", back_populates="diagnostic")
-
 
 class Appointment(Base):
     __tablename__ = "appointment"
@@ -125,7 +123,7 @@ class QuestionnaireResponse(Base):
 
 
 # # #
-# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
 
 # from sqlalchemy import MetaData
 # from sqlalchemy_schemadisplay import create_schema_graph
