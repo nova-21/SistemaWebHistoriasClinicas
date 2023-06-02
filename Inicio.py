@@ -1,4 +1,5 @@
 import datetime
+import os
 import time
 from auth0_component import login_button
 from st_aggrid import GridOptionsBuilder, AgGrid, ColumnsAutoSizeMode
@@ -39,8 +40,8 @@ if "submit_cita" not in st.session_state:
 if "id_for_appointment" not in st.session_state:
     st.session_state.id_for_appointment = ""
 
-clientId = "TeVibn7noxsTqxmqK1L8QGo2NDwiPb8S" # os.environ.get("clientId")
-domain = "dev-olcsmgnyz0patatu.us.auth0.com" # os.environ.get("domain")
+clientId = os.environ.get("clientId")
+domain = os.environ.get("domain")
 
 
 if st.session_state.user_info == {}:
@@ -116,13 +117,13 @@ if st.session_state.user_info:
             )
             st.session_state.edit_encounter = True
             st.session_state.previous_page = "inicio"
-            switch_page("Información pacientes")
+            switch_page("Historia clínica")
             st.stop()
 
         if col2.button("Explorar paciente", key="ver" + patients_name):
             st.session_state.current_view = "Historial"
             st.session_state.previous_page = "inicio"
-            switch_page("Información pacientes")
+            switch_page("Historia clínica")
             st.stop()
 
         if col3.button("Ausentismo/Cancelar", key="falta" + patients_name):
