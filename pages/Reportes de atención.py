@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 import streamlit as st
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, font_manager
 from sqlalchemy import create_engine
 from streamlit_elements import dashboard
 from st_aggrid import GridOptionsBuilder, AgGrid
@@ -114,13 +114,15 @@ def show_appointment_metrics_fullfilled(month, year):
         try:
             citas_efectivas = appointment_counts["atendida"]
             citas_no_efectivas = appointment_counts["no_atendida"]
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(4, 4), dpi=100)
             ax.pie(
                 [citas_efectivas, citas_no_efectivas],
                 labels=["Citas efectivas", "Citas no efectivas"],
                 autopct="%1.1f%%",
+                textprops={'fontsize': 9}
             )
-            ax.set_title("Porcentaje de citas por atención")
+
+
             st.pyplot(fig)
         except:
             st.write("No existen suficientes datos del mes para generar el reporte")
@@ -147,6 +149,7 @@ def show_appointment_metrics_fullfilled(month, year):
 #             colc.metric("Subsecuentes", subsecuente_count)
 #         except:
 #             st.write("No existen suficientes datos del mes para generar el reporte")
+
 def show_appointment_metrics_type(month, year):
     colored_header(label="Citas por tipo", color_name="red-50", description="")
     appointment_list = get_appointment_report(
@@ -161,13 +164,14 @@ def show_appointment_metrics_type(month, year):
             appointment_counts = df_appointment_list["Tipo de cita"].value_counts()
             primera_vez_count = appointment_counts["Primera vez"]
             subsecuente_count = appointment_counts["Subsecuente"]
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(2, 2), dpi=300)
             ax.pie(
                 [primera_vez_count, subsecuente_count],
                 labels=["Primera vez", "Subsecuentes"],
                 autopct="%1.1f%%",
+                textprops={'fontsize': 8}
             )
-            ax.set_title("Porcentaje de citas por tipo")
+
             st.pyplot(fig)
         except:
             st.write("No existen suficientes datos del mes para generar el reporte")
@@ -202,9 +206,9 @@ def show_people_sex(month, year):
             orientation="v",
         )
     ]
-    layout = go.Layout(title="Distribución de personas atendidas por género")
-    fig = go.Figure(data=data, layout=layout)
-    st.plotly_chart(fig)
+    # layout = go.Layout(title="Distribución de personas atendidas por género")
+    # fig = go.Figure(data=data, layout=layout)
+    # st.plotly_chart(fig)
 
 
 def show_encounters(month, year):
@@ -295,120 +299,120 @@ def show_table(month, year):
         )
 
 
-import os
-
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-from sqlalchemy import create_engine
-
-engine = create_engine(os.environ.get("DATABASE"))
-
-# Appointments by type
-query_appointments_by_type = """
-    SELECT status, COUNT(*) as count
-    FROM appointment
-    GROUP BY status
-"""
-
-# Appointments by encounter type
-query_appointments_by_encounter_type = """
-    SELECT encounter_type, COUNT(*) as count
-    FROM appointment
-    GROUP BY encounter_type
-"""
-
-# Appointments by sex
-query_appointments_by_sex = """
-    SELECT p.sex, COUNT(*) as count
-    FROM appointment a
-    JOIN patient p ON a.patient_id = p.id
-    GROUP BY p.sex
-"""
-
-# Appointments by faculty
-query_appointments_by_faculty = """
-    SELECT p.faculty_dependence, COUNT(*) as count
-    FROM appointment a
-    JOIN patient p ON a.patient_id = p.id
-    GROUP BY p.faculty_dependence
-"""
-
-# Appointments by appointment type
-query_appointments_by_appointment_type = """
-    SELECT a.appointment_type, COUNT(*) as count
-    FROM appointment a
-    GROUP BY a.appointment_type
-"""
-df_appointments_by_type = pd.read_sql_query(query_appointments_by_type, engine)
-df_appointments_by_encounter_type = pd.read_sql_query(
-    query_appointments_by_encounter_type, engine
-)
-df_appointments_by_sex = pd.read_sql_query(query_appointments_by_sex, engine)
-df_appointments_by_faculty = pd.read_sql_query(query_appointments_by_faculty, engine)
-df_appointments_by_appointment_type = pd.read_sql_query(
-    query_appointments_by_appointment_type, engine
-)
-
-
-def appointments_by_type_chart():
-    fig, ax = plt.subplots()
-    ax.bar(df_appointments_by_type["status"], df_appointments_by_type["count"])
-    plt.xticks(rotation=45, ha="right")
-    ax.set_title("Appointments by type")
-    st.pyplot(fig)
+# import os
+#
+# import streamlit as st
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# from sqlalchemy import create_engine
+#
+# engine = create_engine_conection()
+#
+# # Appointments by type
+# query_appointments_by_type = """
+#     SELECT status, COUNT(*) as count
+#     FROM appointment
+#     GROUP BY status
+# """
+#
+# # Appointments by encounter type
+# query_appointments_by_encounter_type = """
+#     SELECT encounter_type, COUNT(*) as count
+#     FROM appointment
+#     GROUP BY encounter_type
+# """
+#
+# # Appointments by sex
+# query_appointments_by_sex = """
+#     SELECT p.sex, COUNT(*) as count
+#     FROM appointment a
+#     JOIN patient p ON a.patient_id = p.id
+#     GROUP BY p.sex
+# """
+#
+# # Appointments by faculty
+# query_appointments_by_faculty = """
+#     SELECT p.faculty_dependence, COUNT(*) as count
+#     FROM appointment a
+#     JOIN patient p ON a.patient_id = p.id
+#     GROUP BY p.faculty_dependence
+# """
+#
+# # Appointments by appointment type
+# query_appointments_by_appointment_type = """
+#     SELECT a.appointment_type, COUNT(*) as count
+#     FROM appointment a
+#     GROUP BY a.appointment_type
+# """
+# df_appointments_by_type = pd.read_sql_query(query_appointments_by_type, engine)
+# df_appointments_by_encounter_type = pd.read_sql_query(
+#     query_appointments_by_encounter_type, engine
+# )
+# df_appointments_by_sex = pd.read_sql_query(query_appointments_by_sex, engine)
+# df_appointments_by_faculty = pd.read_sql_query(query_appointments_by_faculty, engine)
+# df_appointments_by_appointment_type = pd.read_sql_query(
+#     query_appointments_by_appointment_type, engine
+# )
 
 
-def appointments_by_encounter_type_chart():
-    fig, ax = plt.subplots()
-    ax.bar(
-        df_appointments_by_encounter_type["encounter_type"],
-        df_appointments_by_encounter_type["count"],
-    )
-    plt.xticks(rotation=45, ha="right")
-    ax.set_title("Appointments by encounter type")
-    st.pyplot(fig)
-
-
-def appointments_by_sex_chart():
-    fig, ax = plt.subplots()
-    ax.bar(df_appointments_by_sex["sex"], df_appointments_by_sex["count"])
-    plt.xticks(rotation=45, ha="right")
-    ax.set_title("Appointments by sex")
-    st.pyplot(fig)
-
-
-def appointments_by_faculty_chart():
-    fig, ax = plt.subplots()
-    ax.bar(
-        df_appointments_by_faculty["faculty_dependence"],
-        df_appointments_by_faculty["count"],
-    )
-    plt.xticks(rotation=45, ha="right")
-    ax.set_title("Appointments by faculty")
-    st.pyplot(fig)
-
-
-def appointments_by_appointment_type_chart():
-    fig, ax = plt.subplots()
-    ax.bar(
-        df_appointments_by_appointment_type["appointment_type"],
-        df_appointments_by_appointment_type["count"],
-    )
-    plt.xticks(rotation=45, ha="right")
-    ax.set_title("Appointments by type")
-    st.pyplot(fig)
-
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    appointments_by_type_chart()
-    appointments_by_sex_chart()
-with col2:
-    appointments_by_encounter_type_chart()
-    appointments_by_appointment_type_chart()
-with col3:
-    appointments_by_faculty_chart()
+# def appointments_by_type_chart():
+#     fig, ax = plt.subplots()
+#     ax.bar(df_appointments_by_type["status"], df_appointments_by_type["count"])
+#     plt.xticks(rotation=45, ha="right")
+#     ax.set_title("Appointments by type")
+#     st.pyplot(fig)
+#
+#
+# def appointments_by_encounter_type_chart():
+#     fig, ax = plt.subplots()
+#     ax.bar(
+#         df_appointments_by_encounter_type["encounter_type"],
+#         df_appointments_by_encounter_type["count"],
+#     )
+#     plt.xticks(rotation=45, ha="right")
+#     ax.set_title("Appointments by encounter type")
+#     st.pyplot(fig)
+#
+#
+# def appointments_by_sex_chart():
+#     fig, ax = plt.subplots()
+#     ax.bar(df_appointments_by_sex["sex"], df_appointments_by_sex["count"])
+#     plt.xticks(rotation=45, ha="right")
+#     ax.set_title("Appointments by sex")
+#     st.pyplot(fig)
+#
+#
+# def appointments_by_faculty_chart():
+#     fig, ax = plt.subplots()
+#     ax.bar(
+#         df_appointments_by_faculty["faculty_dependence"],
+#         df_appointments_by_faculty["count"],
+#     )
+#     plt.xticks(rotation=45, ha="right")
+#     ax.set_title("Appointments by faculty")
+#     st.pyplot(fig)
+#
+#
+# def appointments_by_appointment_type_chart():
+#     fig, ax = plt.subplots()
+#     ax.bar(
+#         df_appointments_by_appointment_type["appointment_type"],
+#         df_appointments_by_appointment_type["count"],
+#     )
+#     plt.xticks(rotation=45, ha="right")
+#     ax.set_title("Appointments by type")
+#     st.pyplot(fig)
+#
+#
+# col1, col2, col3 = st.columns(3)
+# with col1:
+#     appointments_by_type_chart()
+#     appointments_by_sex_chart()
+# with col2:
+#     appointments_by_encounter_type_chart()
+#     appointments_by_appointment_type_chart()
+# with col3:
+#     appointments_by_faculty_chart()
 
 
 col1, col2 = st.columns(2)
@@ -421,6 +425,7 @@ with col1:
     show_appointment_metrics_fullfilled(month, year)
 
 with col2:
+    show_people_sex(month, year)
     show_appointment_metrics_type(month, year)
-show_people_sex(month, year)
+
 show_graphs(month, year)

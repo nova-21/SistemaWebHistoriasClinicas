@@ -123,6 +123,7 @@ def registrar_paciente(base):
             st.write(
                 "##### Ingrese los datos personales y presione Registrar, los campos con asteriscos (*) son obligatorios",
             )
+            st.write("###### Recuérdele al paciente que está en su derecho a rehusarse a otorgar datos no escenciales para el registro")
             patient.id = st.text_input(
                 "Cédula/Pasaporte*",
                 help="Pasaporte en caso de personas extranjeras",
@@ -143,8 +144,8 @@ def registrar_paciente(base):
             patient.email = st.text_input("E-mail*")
             patient.profession_occupation = st.text_input("Profesión/Ocupación").capitalize()
             patient.maritalStatus = st.selectbox(
-                "Estado civil*",
-                ("Soltero", "Casado", "Divorciado", "Viudo", "Union de hecho"),
+                "Estado civil",
+                ("Soltero", "Casado", "Divorciado", "Viudo", "Union de hecho", "Prefiere no decir"),
             )
             patient.patient_type = st.selectbox(
                 "Tipo de paciente*", options=tipos_de_paciente
@@ -166,8 +167,8 @@ def registrar_paciente(base):
                 "Carrera", help="Unicamente en caso de ser estudiante u egresado"
             ).capitalize()
             patient.semester = st.text_input(
-                "Ciclo, en números",
-                help="Actualizar cada semestre, dejar en blanco si es egresado",
+                "Ciclo, en números (Solo para pacientes de tipo Estudiante)",
+                help="Dejar en blanco para egresados, docentes, etc.",
             )
             patient.city_born = st.text_input("Ciudad de nacimiento").capitalize()
             patient.city_residence = st.text_input("Ciudad de residencia").capitalize()
@@ -210,30 +211,28 @@ def registrar_paciente(base):
                         "El campo cédula o identificación es obligatorio."
                     )
                 if patient.first_name == "":
-                    raise ValueError("El campo primer nombre es obligatorio.")
+                    raise ValueError("El campo Primer nombre es obligatorio.")
                 if patient.first_family_name == "":
-                    raise ValueError("El campo primer apellido es obligatorio.")
+                    raise ValueError("El campo Primer apellido es obligatorio.")
                 if patient.birth_date == "":
-                    raise ValueError("El campo fecha de nacimiento es obligatorio.")
-                if patient.maritalStatus == "":
-                    raise ValueError("El campo fecha de nacimiento es obligatorio.")
+                    raise ValueError("El campo Fecha de nacimiento es obligatorio.")
                 if patient.patient_type == "":
-                    raise ValueError("El campo fecha de nacimiento es obligatorio.")
+                    raise ValueError("El campo Tipo de paciente obligatorio.")
                 if patient.emergency_contact_name == "":
-                    raise ValueError("El campo fecha de nacimiento es obligatorio.")
+                    raise ValueError("El campo Contacto de emergencia es obligatorio.")
                 if patient.emergency_contact_relation == "":
-                    raise ValueError("El campo fecha de nacimiento es obligatorio.")
+                    raise ValueError("El campo Relación del contacto de emergencia es obligatorio.")
                 if patient.emergency_contact_phone == "":
-                    raise ValueError("El campo fecha de nacimiento es obligatorio.")
+                    raise ValueError("El campo Teléfono de contacto de emergencia es obligatorio.")
 
                 # TODO add already registered control
                 message_result = add_patient_object(
                     db_engine=st.session_state.db_engine, patient=patient
                 )
                 return message_result
-            except:
+            except Exception as e:
                 st.error(
-                    "Uno o más campos obligatorios se encuentran vacíos, por favor revise los datos y vuelva a guardar."
+                    e.args[0]
                 )
                 sleep(4)
                 st.experimental_rerun()

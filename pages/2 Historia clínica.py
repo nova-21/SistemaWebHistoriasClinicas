@@ -297,13 +297,23 @@ if st.session_state.user_info:
                         dict_questionnaires.keys(),
                     )
                     if st.form_submit_button("Asignar", type="primary"):
-                        for questionnaire in questionnaires_selected:
-                            add_questionnaire_response(
-                                st.session_state.db_engine,
-                                date_from_selected_encounter,
-                                patient.id,
-                                dict_questionnaires.get(questionnaire),
-                            )
+                        try:
+                            for questionnaire in questionnaires_selected:
+                                add_questionnaire_response(
+                                    st.session_state.db_engine,
+                                    date_from_selected_encounter,
+                                    patient.id,
+                                    dict_questionnaires.get(questionnaire),
+                                )
+                            st.success("Asignación de instrumentos con éxito!")
+                            time.sleep(1)
+
+                        except:
+                            st.error("Error en la asignación, intente de nuevo.")
+                            time.sleep(2)
+
+                        finally:
+                            st.experimental_rerun()
 
                 quest = get_pending_questionnaire_responses(
                     st.session_state.db_engine,
@@ -443,7 +453,7 @@ if st.session_state.user_info:
                         exam_type = st.radio(
                             "Select Exam Type", ("Preliminar", "Final")
                         )
-                        submit = st.form_submit_button("Guardar",type="primary")
+                        submit = st.form_submit_button("Agregar",type="primary")
                 if submit:
                     try:
                         if diagnostic == "":
