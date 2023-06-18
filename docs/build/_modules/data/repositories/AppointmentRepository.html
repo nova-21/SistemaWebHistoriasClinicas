@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data.repositories.AppointmentRepository &mdash; Bienestar Historia Clínica 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Bienestar Historia Clínica
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bienestar Historia Clínica</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data.html">data</a></li>
+          <li class="breadcrumb-item"><a href="../repositories.html">data.repositories</a></li>
+      <li class="breadcrumb-item active">data.repositories.AppointmentRepository</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data.repositories.AppointmentRepository</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">sqlite3</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">cast</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">asc</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span> <span class="n">extract</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">data.repositories.PatientRepository</span> <span class="kn">import</span> <span class="n">get_patient</span>
+<span class="kn">from</span> <span class="nn">data.database_declaration</span> <span class="kn">import</span> <span class="n">Appointment</span><span class="p">,</span> <span class="n">Patient</span><span class="p">,</span> <span class="n">Practitioner</span><span class="p">,</span> <span class="n">Encounter</span>
+
+
+<div class="viewcode-block" id="add_appointment"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.AppointmentRepository.add_appointment">[docs]</a><span class="k">def</span> <span class="nf">add_appointment</span><span class="p">(</span>
+        <span class="n">db_engine</span><span class="p">,</span>
+        <span class="n">patient_id</span><span class="p">,</span>
+        <span class="n">practitioner_id</span><span class="p">,</span>
+        <span class="n">appointment_type</span><span class="p">,</span>
+        <span class="n">encounter_type</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">,</span>
+        <span class="n">date</span><span class="p">,</span>
+        <span class="n">time</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add a new appointment to the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): Database engine.</span>
+<span class="sd">        patient_id (int): Patient ID.</span>
+<span class="sd">        practitioner_id (int): Practitioner ID.</span>
+<span class="sd">        appointment_type (str): Appointment type.</span>
+<span class="sd">        encounter_type (str): Encounter type.</span>
+<span class="sd">        status (str): Appointment status.</span>
+<span class="sd">        reason (str): Reason for the appointment.</span>
+<span class="sd">        date (datetime.date): Appointment date.</span>
+<span class="sd">        time (datetime.time): Appointment time.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Success or error message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="c1"># Create a new Appointment instance</span>
+    <span class="n">appointment</span> <span class="o">=</span> <span class="n">Appointment</span><span class="p">()</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">appointment_type</span> <span class="o">=</span> <span class="n">appointment_type</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">patient_id</span> <span class="o">=</span> <span class="n">patient_id</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">practitioner_id</span> <span class="o">=</span> <span class="n">practitioner_id</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">date</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+    <span class="n">appointment</span><span class="o">.</span><span class="n">encounter_type</span> <span class="o">=</span> <span class="n">encounter_type</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">get_appointment</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">patient_id</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;El paciente ya cuenta con una cita en esa fecha, seleccione una distinta.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Add the new Appointment to the session and commit</span>
+        <span class="n">patient_search</span> <span class="o">=</span> <span class="n">get_patient</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">patient_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">patient_search</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;El paciente no se encuentra registrado&quot;</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">appointment</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;Cita registrada con éxito&quot;</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+        <span class="c1"># Rollback the session in case of IntegrityError (e.g. duplicate primary key)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Error con el registro de la cita, revise los datos e intente nuevamente.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">message</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_todays_appointments"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.AppointmentRepository.get_todays_appointments">[docs]</a><span class="k">def</span> <span class="nf">get_todays_appointments</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">practitioner_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get today&#39;s appointments for a specific practitioner.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): Database engine.</span>
+<span class="sd">        practitioner_id (int): Practitioner ID.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: DataFrame containing appointment information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create the session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="c1"># Get current time in the specified timezone</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+    <span class="kn">import</span> <span class="nn">pytz</span>
+
+    <span class="n">timezone</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="s2">&quot;US/Eastern&quot;</span><span class="p">)</span>
+    <span class="n">utc_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+    <span class="n">local_time</span> <span class="o">=</span> <span class="n">utc_time</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=-</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">local_time</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">local_time</span><span class="p">)</span>
+
+    <span class="c1"># format the date as Y-M-D</span>
+    <span class="n">today_str</span> <span class="o">=</span> <span class="n">local_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># query the appointments and join with the related patient and practitioner</span>
+    <span class="n">appointments</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">Appointment</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">Appointment</span><span class="o">.</span><span class="n">encounter_type</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">first_family_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">faculty_dependence</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">career</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">phone_number</span><span class="p">,</span>
+        <span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Patient</span><span class="p">,</span> <span class="n">Appointment</span><span class="o">.</span><span class="n">patient_id</span> <span class="o">==</span> <span class="n">Patient</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Practitioner</span><span class="p">,</span> <span class="n">Appointment</span><span class="o">.</span><span class="n">practitioner_id</span> <span class="o">==</span> <span class="n">Practitioner</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">cast</span><span class="p">(</span><span class="n">Appointment</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span> <span class="o">==</span> <span class="n">today_str</span><span class="p">,</span>
+            <span class="n">Appointment</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;booked&quot;</span><span class="p">,</span>
+            <span class="n">Practitioner</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">practitioner_id</span>
+        <span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">asc</span><span class="p">(</span><span class="n">Appointment</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># create a dataframe from the query results</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">appointments</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;Hora&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Tipo de atención&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Cédula&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Nombre&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Apellido&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Dependencia&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Carrera&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Teléfono&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># add a new column called &quot;Nombre completo&quot; by joining &quot;first_name&quot; and &quot;first_family_name&quot;</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Paciente&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Nombre&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Apellido&quot;</span><span class="p">]</span>
+    <span class="c1"># drop the &quot;Nombre&quot; and &quot;Apellido&quot; columns</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Nombre&quot;</span><span class="p">,</span> <span class="s2">&quot;Apellido&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># move the &quot;Nombre completo&quot; column to the fourth position</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">cols</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">cols</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;Paciente&quot;</span><span class="p">)))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+
+    <span class="c1"># close the session</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="get_appointment_report"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.AppointmentRepository.get_appointment_report">[docs]</a><span class="k">def</span> <span class="nf">get_appointment_report</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get appointment report for a specific month and year.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): Database engine.</span>
+<span class="sd">        month (int): Month.</span>
+<span class="sd">        year (int): Year.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of Appointment objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create the session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">end_date</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">month</span> <span class="o">&lt;</span> <span class="mi">12</span>
+        <span class="k">else</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">appointments</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Appointment</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">and_</span><span class="p">(</span><span class="n">Appointment</span><span class="o">.</span><span class="n">date</span> <span class="o">&gt;=</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">Appointment</span><span class="o">.</span><span class="n">date</span> <span class="o">&lt;</span> <span class="n">end_date</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># close the session</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">appointments</span></div>
+
+
+<div class="viewcode-block" id="get_appointment"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.AppointmentRepository.get_appointment">[docs]</a><span class="k">def</span> <span class="nf">get_appointment</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">patient_id</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get appointment for a specific patient and date.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): Database engine.</span>
+<span class="sd">        patient_id (int): Patient ID.</span>
+<span class="sd">        date (datetime.date): Appointment date.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Tuple containing appointment information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create the session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="c1"># query the appointments and join with the related patient and practitioner</span>
+    <span class="n">appointments</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">Appointment</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">first_family_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">faculty_dependence</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">career</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">phone_number</span><span class="p">,</span>
+        <span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Patient</span><span class="p">,</span> <span class="n">Appointment</span><span class="o">.</span><span class="n">patient_id</span> <span class="o">==</span> <span class="n">Patient</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Practitioner</span><span class="p">,</span> <span class="n">Appointment</span><span class="o">.</span><span class="n">practitioner_id</span> <span class="o">==</span> <span class="n">Practitioner</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">cast</span><span class="p">(</span><span class="n">Appointment</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span> <span class="o">==</span> <span class="n">cast</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">String</span><span class="p">),</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">patient_id</span><span class="p">,</span>
+        <span class="p">)</span>
+            <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># close the session</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">appointments</span></div>
+
+
+<div class="viewcode-block" id="update_appointment"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.AppointmentRepository.update_appointment">[docs]</a><span class="k">def</span> <span class="nf">update_appointment</span><span class="p">(</span>
+        <span class="n">db_engine</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">,</span>
+        <span class="n">date</span><span class="p">,</span>
+        <span class="n">patient_id</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update an appointment in the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): Database engine.</span>
+<span class="sd">        status (str): Appointment status.</span>
+<span class="sd">        reason (str): Reason for the appointment.</span>
+<span class="sd">        date (datetime.date): Appointment date.</span>
+<span class="sd">        patient_id (int): Patient ID.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Update the Appointment in the session and commit</span>
+        <span class="n">appointment</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Appointment</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Appointment</span><span class="o">.</span><span class="n">date</span> <span class="o">==</span> <span class="n">date</span><span class="p">,</span> <span class="n">Appointment</span><span class="o">.</span><span class="n">patient_id</span> <span class="o">==</span> <span class="n">patient_id</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">appointment</span><span class="p">:</span>
+            <span class="n">appointment</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+            <span class="n">appointment</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Appointment updated successfully&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Appointment not found&quot;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="delete_appointment"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.AppointmentRepository.delete_appointment">[docs]</a><span class="k">def</span> <span class="nf">delete_appointment</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">appointment_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete an appointment from the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): Database engine.</span>
+<span class="sd">        appointment_id (int): Appointment ID.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Delete the Appointment from the session and commit</span>
+        <span class="n">appointment</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Appointment</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Appointment</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">appointment_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">appointment</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">appointment</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Appointment deleted successfully&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Appointment not found&quot;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alex Pinos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

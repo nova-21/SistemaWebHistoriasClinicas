@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utilities package &mdash; Bienestar Historia Clínica 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Bienestar Historia Clínica
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">utilities package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-utilities.lists">utilities.lists module</a><ul>
+<li><a class="reference internal" href="#utilities.lists.posiciones_tratantes"><code class="docutils literal notranslate"><span class="pre">posiciones_tratantes</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-utilities.session_state_utilities">utilities.session_state_utilities module</a><ul>
+<li><a class="reference internal" href="#utilities.session_state_utilities.get_or_create_session_state"><code class="docutils literal notranslate"><span class="pre">get_or_create_session_state()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-utilities.time_utilities">utilities.time_utilities module</a><ul>
+<li><a class="reference internal" href="#utilities.time_utilities.calculate_age"><code class="docutils literal notranslate"><span class="pre">calculate_age()</span></code></a></li>
+<li><a class="reference internal" href="#utilities.time_utilities.get_today"><code class="docutils literal notranslate"><span class="pre">get_today()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-utilities.view_utilities">utilities.view_utilities module</a><ul>
+<li><a class="reference internal" href="#utilities.view_utilities.clean"><code class="docutils literal notranslate"><span class="pre">clean()</span></code></a></li>
+<li><a class="reference internal" href="#utilities.view_utilities.load_image"><code class="docutils literal notranslate"><span class="pre">load_image()</span></code></a></li>
+<li><a class="reference internal" href="#utilities.view_utilities.load_logo"><code class="docutils literal notranslate"><span class="pre">load_logo()</span></code></a></li>
+<li><a class="reference internal" href="#utilities.view_utilities.show_header"><code class="docutils literal notranslate"><span class="pre">show_header()</span></code></a></li>
+<li><a class="reference internal" href="#utilities.view_utilities.show_header_patient_lookup"><code class="docutils literal notranslate"><span class="pre">show_header_patient_lookup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-utilities">Module contents</a><ul>
+<li><a class="reference internal" href="#utilities.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Bienestar Historia Clínica</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">utilities package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/utilities.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="utilities-package">
+<h1>utilities package<a class="headerlink" href="#utilities-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-utilities.lists">
+<span id="utilities-lists-module"></span><h2>utilities.lists module<a class="headerlink" href="#module-utilities.lists" title="Permalink to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="utilities.lists.posiciones_tratantes">
+<span class="sig-prename descclassname"><span class="pre">utilities.lists.</span></span><span class="sig-name descname"><span class="pre">posiciones_tratantes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Administrador',</span> <span class="pre">'Psicóloco</span> <span class="pre">Educativo',</span> <span class="pre">'Psicólogo</span> <span class="pre">Clínico',</span> <span class="pre">'Psiquiatra'}</span></em><a class="headerlink" href="#utilities.lists.posiciones_tratantes" title="Permalink to this definition"></a></dt>
+<dd><p>The list_encounter_types variable contains different types of encounters or sessions.
+These can include individual therapy, crisis intervention, counseling, reports, certificates,
+interviews, family therapy, couples therapy, daycare records, psychological assessments,
+occupational assessments, licensing assessments, containment, home visits, process closure,
+play therapy, academic counseling, special educational needs, vocational and career guidance.</p>
+<p>The tipos_de_paciente variable contains different types of patients.
+These can include students, graduates, workers, teachers, retirees, and family members.</p>
+<p>The facultades variable contains different faculties or schools.
+These can include Architecture and Urbanism, Arts, Agricultural Sciences, Economics and Administration,
+Hospitality Sciences, Medical Sciences, Chemical Sciences, Philosophy, Engineering, Law, Dentistry, and Psychology.</p>
+<p>The posiciones_tratantes variable is a set of different treating positions.
+These can include Clinical Psychologist, Educational Psychologist, Psychiatrist, and Administrator.</p>
+</dd></dl>
+
+</section>
+<section id="module-utilities.session_state_utilities">
+<span id="utilities-session-state-utilities-module"></span><h2>utilities.session_state_utilities module<a class="headerlink" href="#module-utilities.session_state_utilities" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.session_state_utilities.get_or_create_session_state">
+<span class="sig-prename descclassname"><span class="pre">utilities.session_state_utilities.</span></span><span class="sig-name descname"><span class="pre">get_or_create_session_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/session_state_utilities.html#get_or_create_session_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.session_state_utilities.get_or_create_session_state" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves the value from the Streamlit session state with the given key. If the key doesn’t exist,
+initializes it with the default value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The key to retrieve or create in the session state.</p></li>
+<li><p><strong>default_value</strong> (<em>any</em>) – The default value to set if the key doesn’t exist.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value associated with the key in the session state.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>any</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-utilities.time_utilities">
+<span id="utilities-time-utilities-module"></span><h2>utilities.time_utilities module<a class="headerlink" href="#module-utilities.time_utilities" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.time_utilities.calculate_age">
+<span class="sig-prename descclassname"><span class="pre">utilities.time_utilities.</span></span><span class="sig-name descname"><span class="pre">calculate_age</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">birth_date</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/time_utilities.html#calculate_age"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.time_utilities.calculate_age" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the age based on the provided birth date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>birth_date</strong> (<em>str</em>) – The birth date in the format Y-M-D.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The calculated age.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.time_utilities.get_today">
+<span class="sig-prename descclassname"><span class="pre">utilities.time_utilities.</span></span><span class="sig-name descname"><span class="pre">get_today</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/time_utilities.html#get_today"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.time_utilities.get_today" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves the current date in the US/Eastern timezone and returns it as a string in the format Y-M-D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current date formatted as Y-M-D.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-utilities.view_utilities">
+<span id="utilities-view-utilities-module"></span><h2>utilities.view_utilities module<a class="headerlink" href="#module-utilities.view_utilities" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.view_utilities.clean">
+<span class="sig-prename descclassname"><span class="pre">utilities.view_utilities.</span></span><span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subheader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/view_utilities.html#clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.view_utilities.clean" title="Permalink to this definition"></a></dt>
+<dd><p>Displays a clean header section with an image, subheader, and optional instructions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subheader</strong> (<em>str</em>) – The subheader text to display.</p></li>
+<li><p><strong>instructions</strong> (<em>str</em><em>, </em><em>optional</em>) – Additional instructions to display. Defaults to “”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.view_utilities.load_image">
+<span class="sig-prename descclassname"><span class="pre">utilities.view_utilities.</span></span><span class="sig-name descname"><span class="pre">load_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/view_utilities.html#load_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.view_utilities.load_image" title="Permalink to this definition"></a></dt>
+<dd><p>Loads and returns an image from the specified path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The loaded image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>PIL.Image.Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.view_utilities.load_logo">
+<span class="sig-prename descclassname"><span class="pre">utilities.view_utilities.</span></span><span class="sig-name descname"><span class="pre">load_logo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/view_utilities.html#load_logo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.view_utilities.load_logo" title="Permalink to this definition"></a></dt>
+<dd><p>Loads and returns the logo image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The loaded logo image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>PIL.Image.Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.view_utilities.show_header">
+<span class="sig-prename descclassname"><span class="pre">utilities.view_utilities.</span></span><span class="sig-name descname"><span class="pre">show_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header_container</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/view_utilities.html#show_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.view_utilities.show_header" title="Permalink to this definition"></a></dt>
+<dd><p>Displays the header section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>header_container</strong> – The container for the header section.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.view_utilities.show_header_patient_lookup">
+<span class="sig-prename descclassname"><span class="pre">utilities.view_utilities.</span></span><span class="sig-name descname"><span class="pre">show_header_patient_lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header_container</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/view_utilities.html#show_header_patient_lookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.view_utilities.show_header_patient_lookup" title="Permalink to this definition"></a></dt>
+<dd><p>Displays the header section for patient lookup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>header_container</strong> – The container for the header section.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-utilities">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-utilities" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="utilities.main">
+<span class="sig-prename descclassname"><span class="pre">utilities.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utilities.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alex Pinos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

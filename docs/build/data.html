@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data package &mdash; Bienestar Historia Clínica 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Bienestar Historia Clínica
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">data package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-data.database_connection">data.database_connection module</a><ul>
+<li><a class="reference internal" href="#data.database_connection.create_engine_conection"><code class="docutils literal notranslate"><span class="pre">create_engine_conection()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data.database_declaration">data.database_declaration module</a><ul>
+<li><a class="reference internal" href="#data.database_declaration.Appointment"><code class="docutils literal notranslate"><span class="pre">Appointment</span></code></a><ul>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.appointment_type"><code class="docutils literal notranslate"><span class="pre">Appointment.appointment_type</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.date"><code class="docutils literal notranslate"><span class="pre">Appointment.date</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.encounter_type"><code class="docutils literal notranslate"><span class="pre">Appointment.encounter_type</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.id"><code class="docutils literal notranslate"><span class="pre">Appointment.id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.patient"><code class="docutils literal notranslate"><span class="pre">Appointment.patient</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.patient_id"><code class="docutils literal notranslate"><span class="pre">Appointment.patient_id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.practitioner"><code class="docutils literal notranslate"><span class="pre">Appointment.practitioner</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.practitioner_id"><code class="docutils literal notranslate"><span class="pre">Appointment.practitioner_id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.reason"><code class="docutils literal notranslate"><span class="pre">Appointment.reason</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.status"><code class="docutils literal notranslate"><span class="pre">Appointment.status</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Appointment.time"><code class="docutils literal notranslate"><span class="pre">Appointment.time</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data.database_declaration.Diagnostic"><code class="docutils literal notranslate"><span class="pre">Diagnostic</span></code></a><ul>
+<li><a class="reference internal" href="#data.database_declaration.Diagnostic.date"><code class="docutils literal notranslate"><span class="pre">Diagnostic.date</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Diagnostic.id"><code class="docutils literal notranslate"><span class="pre">Diagnostic.id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Diagnostic.patient"><code class="docutils literal notranslate"><span class="pre">Diagnostic.patient</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Diagnostic.patient_id"><code class="docutils literal notranslate"><span class="pre">Diagnostic.patient_id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Diagnostic.result"><code class="docutils literal notranslate"><span class="pre">Diagnostic.result</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Diagnostic.status"><code class="docutils literal notranslate"><span class="pre">Diagnostic.status</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter"><code class="docutils literal notranslate"><span class="pre">Encounter</span></code></a><ul>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.actual_demand_illness"><code class="docutils literal notranslate"><span class="pre">Encounter.actual_demand_illness</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.attachments"><code class="docutils literal notranslate"><span class="pre">Encounter.attachments</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.date"><code class="docutils literal notranslate"><span class="pre">Encounter.date</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.encounter_type"><code class="docutils literal notranslate"><span class="pre">Encounter.encounter_type</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.evolution_notes"><code class="docutils literal notranslate"><span class="pre">Encounter.evolution_notes</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.id"><code class="docutils literal notranslate"><span class="pre">Encounter.id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.motive"><code class="docutils literal notranslate"><span class="pre">Encounter.motive</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.patient"><code class="docutils literal notranslate"><span class="pre">Encounter.patient</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.patient_id"><code class="docutils literal notranslate"><span class="pre">Encounter.patient_id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.practitioner"><code class="docutils literal notranslate"><span class="pre">Encounter.practitioner</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.practitioner_id"><code class="docutils literal notranslate"><span class="pre">Encounter.practitioner_id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.psychological_evaluation"><code class="docutils literal notranslate"><span class="pre">Encounter.psychological_evaluation</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.topics_boarded"><code class="docutils literal notranslate"><span class="pre">Encounter.topics_boarded</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Encounter.treatment"><code class="docutils literal notranslate"><span class="pre">Encounter.treatment</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data.database_declaration.Patient"><code class="docutils literal notranslate"><span class="pre">Patient</span></code></a><ul>
+<li><a class="reference internal" href="#data.database_declaration.Patient.active"><code class="docutils literal notranslate"><span class="pre">Patient.active</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.address"><code class="docutils literal notranslate"><span class="pre">Patient.address</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.appointment"><code class="docutils literal notranslate"><span class="pre">Patient.appointment</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.birth_date"><code class="docutils literal notranslate"><span class="pre">Patient.birth_date</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.career"><code class="docutils literal notranslate"><span class="pre">Patient.career</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.children"><code class="docutils literal notranslate"><span class="pre">Patient.children</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.city_born"><code class="docutils literal notranslate"><span class="pre">Patient.city_born</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.city_residence"><code class="docutils literal notranslate"><span class="pre">Patient.city_residence</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.diagnostic"><code class="docutils literal notranslate"><span class="pre">Patient.diagnostic</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.email"><code class="docutils literal notranslate"><span class="pre">Patient.email</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.emergency_contact_name"><code class="docutils literal notranslate"><span class="pre">Patient.emergency_contact_name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.emergency_contact_phone"><code class="docutils literal notranslate"><span class="pre">Patient.emergency_contact_phone</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.emergency_contact_relation"><code class="docutils literal notranslate"><span class="pre">Patient.emergency_contact_relation</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.encounter"><code class="docutils literal notranslate"><span class="pre">Patient.encounter</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.extra_information"><code class="docutils literal notranslate"><span class="pre">Patient.extra_information</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.faculty_dependence"><code class="docutils literal notranslate"><span class="pre">Patient.faculty_dependence</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.family_history"><code class="docutils literal notranslate"><span class="pre">Patient.family_history</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.first_family_name"><code class="docutils literal notranslate"><span class="pre">Patient.first_family_name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.first_name"><code class="docutils literal notranslate"><span class="pre">Patient.first_name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.gender"><code class="docutils literal notranslate"><span class="pre">Patient.gender</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.habits"><code class="docutils literal notranslate"><span class="pre">Patient.habits</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.id"><code class="docutils literal notranslate"><span class="pre">Patient.id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.lives_with"><code class="docutils literal notranslate"><span class="pre">Patient.lives_with</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.marital_status"><code class="docutils literal notranslate"><span class="pre">Patient.marital_status</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.patient_type"><code class="docutils literal notranslate"><span class="pre">Patient.patient_type</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.personal_history"><code class="docutils literal notranslate"><span class="pre">Patient.personal_history</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.phone_number"><code class="docutils literal notranslate"><span class="pre">Patient.phone_number</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.preferred_name"><code class="docutils literal notranslate"><span class="pre">Patient.preferred_name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.profession_occupation"><code class="docutils literal notranslate"><span class="pre">Patient.profession_occupation</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.second_family_name"><code class="docutils literal notranslate"><span class="pre">Patient.second_family_name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.second_name"><code class="docutils literal notranslate"><span class="pre">Patient.second_name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.semester"><code class="docutils literal notranslate"><span class="pre">Patient.semester</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.sex"><code class="docutils literal notranslate"><span class="pre">Patient.sex</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Patient.sexual_orientation"><code class="docutils literal notranslate"><span class="pre">Patient.sexual_orientation</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner"><code class="docutils literal notranslate"><span class="pre">Practitioner</span></code></a><ul>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.active"><code class="docutils literal notranslate"><span class="pre">Practitioner.active</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.appointment"><code class="docutils literal notranslate"><span class="pre">Practitioner.appointment</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.email"><code class="docutils literal notranslate"><span class="pre">Practitioner.email</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.encounter"><code class="docutils literal notranslate"><span class="pre">Practitioner.encounter</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.full_name"><code class="docutils literal notranslate"><span class="pre">Practitioner.full_name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.id"><code class="docutils literal notranslate"><span class="pre">Practitioner.id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.phone_number"><code class="docutils literal notranslate"><span class="pre">Practitioner.phone_number</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Practitioner.position"><code class="docutils literal notranslate"><span class="pre">Practitioner.position</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data.database_declaration.Questionnaire"><code class="docutils literal notranslate"><span class="pre">Questionnaire</span></code></a><ul>
+<li><a class="reference internal" href="#data.database_declaration.Questionnaire.id"><code class="docutils literal notranslate"><span class="pre">Questionnaire.id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Questionnaire.name"><code class="docutils literal notranslate"><span class="pre">Questionnaire.name</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Questionnaire.questions"><code class="docutils literal notranslate"><span class="pre">Questionnaire.questions</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.Questionnaire.title"><code class="docutils literal notranslate"><span class="pre">Questionnaire.title</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse</span></code></a><ul>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.answers"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.answers</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.date"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.date</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.id"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.patient_id"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.patient_id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.points"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.points</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.questionnaire_id"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.questionnaire_id</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.result"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.result</span></code></a></li>
+<li><a class="reference internal" href="#data.database_declaration.QuestionnaireResponse.state"><code class="docutils literal notranslate"><span class="pre">QuestionnaireResponse.state</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data.tester">data.tester module</a></li>
+<li><a class="reference internal" href="#module-data">Module contents</a><ul>
+<li><a class="reference internal" href="#data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Bienestar Historia Clínica</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">data package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-package">
+<h1>data package<a class="headerlink" href="#data-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-data.database_connection">
+<span id="data-database-connection-module"></span><h2>data.database_connection module<a class="headerlink" href="#module-data.database_connection" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data.database_connection.create_engine_conection">
+<span class="sig-prename descclassname"><span class="pre">data.database_connection.</span></span><span class="sig-name descname"><span class="pre">create_engine_conection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_connection.html#create_engine_conection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_connection.create_engine_conection" title="Permalink to this definition"></a></dt>
+<dd><p>Create a SQLAlchemy engine connection to the database.</p>
+</dd></dl>
+
+</section>
+<section id="module-data.database_declaration">
+<span id="data-database-declaration-module"></span><h2>data.database_declaration module<a class="headerlink" href="#module-data.database_declaration" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.database_declaration.</span></span><span class="sig-name descname"><span class="pre">Appointment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_declaration.html#Appointment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_declaration.Appointment" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A class representing the Appointment table in the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.appointment_type">
+<span class="sig-name descname"><span class="pre">appointment_type</span></span><a class="headerlink" href="#data.database_declaration.Appointment.appointment_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#data.database_declaration.Appointment.date" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.encounter_type">
+<span class="sig-name descname"><span class="pre">encounter_type</span></span><a class="headerlink" href="#data.database_declaration.Appointment.encounter_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.database_declaration.Appointment.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.patient">
+<span class="sig-name descname"><span class="pre">patient</span></span><a class="headerlink" href="#data.database_declaration.Appointment.patient" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.patient_id">
+<span class="sig-name descname"><span class="pre">patient_id</span></span><a class="headerlink" href="#data.database_declaration.Appointment.patient_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.practitioner">
+<span class="sig-name descname"><span class="pre">practitioner</span></span><a class="headerlink" href="#data.database_declaration.Appointment.practitioner" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.practitioner_id">
+<span class="sig-name descname"><span class="pre">practitioner_id</span></span><a class="headerlink" href="#data.database_declaration.Appointment.practitioner_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.reason">
+<span class="sig-name descname"><span class="pre">reason</span></span><a class="headerlink" href="#data.database_declaration.Appointment.reason" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#data.database_declaration.Appointment.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Appointment.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#data.database_declaration.Appointment.time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.database_declaration.Diagnostic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.database_declaration.</span></span><span class="sig-name descname"><span class="pre">Diagnostic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_declaration.html#Diagnostic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_declaration.Diagnostic" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A class representing the Diagnostic table in the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Diagnostic.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#data.database_declaration.Diagnostic.date" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Diagnostic.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.database_declaration.Diagnostic.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Diagnostic.patient">
+<span class="sig-name descname"><span class="pre">patient</span></span><a class="headerlink" href="#data.database_declaration.Diagnostic.patient" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Diagnostic.patient_id">
+<span class="sig-name descname"><span class="pre">patient_id</span></span><a class="headerlink" href="#data.database_declaration.Diagnostic.patient_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Diagnostic.result">
+<span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#data.database_declaration.Diagnostic.result" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Diagnostic.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#data.database_declaration.Diagnostic.status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.database_declaration.</span></span><span class="sig-name descname"><span class="pre">Encounter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_declaration.html#Encounter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_declaration.Encounter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A class representing the Encounter table in the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.actual_demand_illness">
+<span class="sig-name descname"><span class="pre">actual_demand_illness</span></span><a class="headerlink" href="#data.database_declaration.Encounter.actual_demand_illness" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.attachments">
+<span class="sig-name descname"><span class="pre">attachments</span></span><a class="headerlink" href="#data.database_declaration.Encounter.attachments" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#data.database_declaration.Encounter.date" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.encounter_type">
+<span class="sig-name descname"><span class="pre">encounter_type</span></span><a class="headerlink" href="#data.database_declaration.Encounter.encounter_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.evolution_notes">
+<span class="sig-name descname"><span class="pre">evolution_notes</span></span><a class="headerlink" href="#data.database_declaration.Encounter.evolution_notes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.database_declaration.Encounter.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.motive">
+<span class="sig-name descname"><span class="pre">motive</span></span><a class="headerlink" href="#data.database_declaration.Encounter.motive" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.patient">
+<span class="sig-name descname"><span class="pre">patient</span></span><a class="headerlink" href="#data.database_declaration.Encounter.patient" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.patient_id">
+<span class="sig-name descname"><span class="pre">patient_id</span></span><a class="headerlink" href="#data.database_declaration.Encounter.patient_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.practitioner">
+<span class="sig-name descname"><span class="pre">practitioner</span></span><a class="headerlink" href="#data.database_declaration.Encounter.practitioner" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.practitioner_id">
+<span class="sig-name descname"><span class="pre">practitioner_id</span></span><a class="headerlink" href="#data.database_declaration.Encounter.practitioner_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.psychological_evaluation">
+<span class="sig-name descname"><span class="pre">psychological_evaluation</span></span><a class="headerlink" href="#data.database_declaration.Encounter.psychological_evaluation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.topics_boarded">
+<span class="sig-name descname"><span class="pre">topics_boarded</span></span><a class="headerlink" href="#data.database_declaration.Encounter.topics_boarded" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Encounter.treatment">
+<span class="sig-name descname"><span class="pre">treatment</span></span><a class="headerlink" href="#data.database_declaration.Encounter.treatment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.database_declaration.Patient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.database_declaration.</span></span><span class="sig-name descname"><span class="pre">Patient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_declaration.html#Patient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_declaration.Patient" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A class representing the Patient table in the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#data.database_declaration.Patient.active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.address">
+<span class="sig-name descname"><span class="pre">address</span></span><a class="headerlink" href="#data.database_declaration.Patient.address" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.appointment">
+<span class="sig-name descname"><span class="pre">appointment</span></span><a class="headerlink" href="#data.database_declaration.Patient.appointment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.birth_date">
+<span class="sig-name descname"><span class="pre">birth_date</span></span><a class="headerlink" href="#data.database_declaration.Patient.birth_date" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.career">
+<span class="sig-name descname"><span class="pre">career</span></span><a class="headerlink" href="#data.database_declaration.Patient.career" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.children">
+<span class="sig-name descname"><span class="pre">children</span></span><a class="headerlink" href="#data.database_declaration.Patient.children" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.city_born">
+<span class="sig-name descname"><span class="pre">city_born</span></span><a class="headerlink" href="#data.database_declaration.Patient.city_born" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.city_residence">
+<span class="sig-name descname"><span class="pre">city_residence</span></span><a class="headerlink" href="#data.database_declaration.Patient.city_residence" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.diagnostic">
+<span class="sig-name descname"><span class="pre">diagnostic</span></span><a class="headerlink" href="#data.database_declaration.Patient.diagnostic" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#data.database_declaration.Patient.email" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.emergency_contact_name">
+<span class="sig-name descname"><span class="pre">emergency_contact_name</span></span><a class="headerlink" href="#data.database_declaration.Patient.emergency_contact_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.emergency_contact_phone">
+<span class="sig-name descname"><span class="pre">emergency_contact_phone</span></span><a class="headerlink" href="#data.database_declaration.Patient.emergency_contact_phone" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.emergency_contact_relation">
+<span class="sig-name descname"><span class="pre">emergency_contact_relation</span></span><a class="headerlink" href="#data.database_declaration.Patient.emergency_contact_relation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.encounter">
+<span class="sig-name descname"><span class="pre">encounter</span></span><a class="headerlink" href="#data.database_declaration.Patient.encounter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.extra_information">
+<span class="sig-name descname"><span class="pre">extra_information</span></span><a class="headerlink" href="#data.database_declaration.Patient.extra_information" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.faculty_dependence">
+<span class="sig-name descname"><span class="pre">faculty_dependence</span></span><a class="headerlink" href="#data.database_declaration.Patient.faculty_dependence" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.family_history">
+<span class="sig-name descname"><span class="pre">family_history</span></span><a class="headerlink" href="#data.database_declaration.Patient.family_history" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.first_family_name">
+<span class="sig-name descname"><span class="pre">first_family_name</span></span><a class="headerlink" href="#data.database_declaration.Patient.first_family_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.first_name">
+<span class="sig-name descname"><span class="pre">first_name</span></span><a class="headerlink" href="#data.database_declaration.Patient.first_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.gender">
+<span class="sig-name descname"><span class="pre">gender</span></span><a class="headerlink" href="#data.database_declaration.Patient.gender" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.habits">
+<span class="sig-name descname"><span class="pre">habits</span></span><a class="headerlink" href="#data.database_declaration.Patient.habits" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.database_declaration.Patient.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.lives_with">
+<span class="sig-name descname"><span class="pre">lives_with</span></span><a class="headerlink" href="#data.database_declaration.Patient.lives_with" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.marital_status">
+<span class="sig-name descname"><span class="pre">marital_status</span></span><a class="headerlink" href="#data.database_declaration.Patient.marital_status" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.patient_type">
+<span class="sig-name descname"><span class="pre">patient_type</span></span><a class="headerlink" href="#data.database_declaration.Patient.patient_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.personal_history">
+<span class="sig-name descname"><span class="pre">personal_history</span></span><a class="headerlink" href="#data.database_declaration.Patient.personal_history" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.phone_number">
+<span class="sig-name descname"><span class="pre">phone_number</span></span><a class="headerlink" href="#data.database_declaration.Patient.phone_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.preferred_name">
+<span class="sig-name descname"><span class="pre">preferred_name</span></span><a class="headerlink" href="#data.database_declaration.Patient.preferred_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.profession_occupation">
+<span class="sig-name descname"><span class="pre">profession_occupation</span></span><a class="headerlink" href="#data.database_declaration.Patient.profession_occupation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.second_family_name">
+<span class="sig-name descname"><span class="pre">second_family_name</span></span><a class="headerlink" href="#data.database_declaration.Patient.second_family_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.second_name">
+<span class="sig-name descname"><span class="pre">second_name</span></span><a class="headerlink" href="#data.database_declaration.Patient.second_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.semester">
+<span class="sig-name descname"><span class="pre">semester</span></span><a class="headerlink" href="#data.database_declaration.Patient.semester" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.sex">
+<span class="sig-name descname"><span class="pre">sex</span></span><a class="headerlink" href="#data.database_declaration.Patient.sex" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Patient.sexual_orientation">
+<span class="sig-name descname"><span class="pre">sexual_orientation</span></span><a class="headerlink" href="#data.database_declaration.Patient.sexual_orientation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.database_declaration.</span></span><span class="sig-name descname"><span class="pre">Practitioner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_declaration.html#Practitioner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_declaration.Practitioner" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A class representing the Practitioner table in the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.active" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.appointment">
+<span class="sig-name descname"><span class="pre">appointment</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.appointment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.email" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.encounter">
+<span class="sig-name descname"><span class="pre">encounter</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.encounter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.full_name">
+<span class="sig-name descname"><span class="pre">full_name</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.full_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.phone_number">
+<span class="sig-name descname"><span class="pre">phone_number</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.phone_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Practitioner.position">
+<span class="sig-name descname"><span class="pre">position</span></span><a class="headerlink" href="#data.database_declaration.Practitioner.position" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.database_declaration.Questionnaire">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.database_declaration.</span></span><span class="sig-name descname"><span class="pre">Questionnaire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_declaration.html#Questionnaire"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_declaration.Questionnaire" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A class representing the Questionnaire table in the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Questionnaire.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.database_declaration.Questionnaire.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Questionnaire.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#data.database_declaration.Questionnaire.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Questionnaire.questions">
+<span class="sig-name descname"><span class="pre">questions</span></span><a class="headerlink" href="#data.database_declaration.Questionnaire.questions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.Questionnaire.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#data.database_declaration.Questionnaire.title" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.database_declaration.</span></span><span class="sig-name descname"><span class="pre">QuestionnaireResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/database_declaration.html#QuestionnaireResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>A class representing the QuestionnaireResponse table in the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.answers">
+<span class="sig-name descname"><span class="pre">answers</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.answers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.date" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.patient_id">
+<span class="sig-name descname"><span class="pre">patient_id</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.patient_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.points">
+<span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.points" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.questionnaire_id">
+<span class="sig-name descname"><span class="pre">questionnaire_id</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.questionnaire_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.result">
+<span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.result" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.database_declaration.QuestionnaireResponse.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#data.database_declaration.QuestionnaireResponse.state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data.tester">
+<span id="data-tester-module"></span><h2>data.tester module<a class="headerlink" href="#module-data.tester" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data.main">
+<span class="sig-prename descclassname"><span class="pre">data.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alex Pinos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

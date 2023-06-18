@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data.repositories.PatientRepository &mdash; Bienestar Historia Clínica 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Bienestar Historia Clínica
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bienestar Historia Clínica</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data.html">data</a></li>
+          <li class="breadcrumb-item"><a href="../repositories.html">data.repositories</a></li>
+      <li class="breadcrumb-item active">data.repositories.PatientRepository</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data.repositories.PatientRepository</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">or_</span><span class="p">,</span> <span class="n">func</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">IntegrityError</span><span class="p">,</span> <span class="n">SQLAlchemyError</span>
+<span class="kn">from</span> <span class="nn">data.database_declaration</span> <span class="kn">import</span> <span class="n">Patient</span><span class="p">,</span> <span class="n">Appointment</span><span class="p">,</span> <span class="n">Encounter</span><span class="p">,</span> <span class="n">Diagnostic</span><span class="p">,</span> <span class="n">QuestionnaireResponse</span>
+
+
+<div class="viewcode-block" id="add_patient"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.add_patient">[docs]</a><span class="k">def</span> <span class="nf">add_patient</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">first_name</span><span class="p">,</span> <span class="n">second_name</span><span class="p">,</span> <span class="n">first_family_name</span><span class="p">,</span> <span class="n">second_family_name</span><span class="p">,</span>
+                <span class="n">preferred_name</span><span class="p">,</span> <span class="n">birth_date</span><span class="p">,</span> <span class="n">sex</span><span class="p">,</span> <span class="n">gender</span><span class="p">,</span> <span class="n">sexual_orientation</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span>
+                <span class="n">email</span><span class="p">,</span> <span class="n">profession_occupation</span><span class="p">,</span> <span class="n">marital_status</span><span class="p">,</span> <span class="n">patient_type</span><span class="p">,</span> <span class="n">faculty_dependence</span><span class="p">,</span>
+                <span class="n">career</span><span class="p">,</span> <span class="n">semester</span><span class="p">,</span> <span class="n">city_born</span><span class="p">,</span> <span class="n">city_residence</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">lives_with</span><span class="p">,</span>
+                <span class="n">emergency_contact_name</span><span class="p">,</span> <span class="n">emergency_contact_relation</span><span class="p">,</span> <span class="n">emergency_contact_phone</span><span class="p">,</span>
+                <span class="n">family_history</span><span class="p">,</span> <span class="n">personal_history</span><span class="p">,</span> <span class="n">habits</span><span class="p">,</span> <span class="n">extra_information</span><span class="p">,</span> <span class="n">active</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a new patient to the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+<span class="sd">        id (str): The patient ID.</span>
+<span class="sd">        first_name (str): The first name of the patient.</span>
+<span class="sd">        second_name (str): The second name of the patient.</span>
+<span class="sd">        first_family_name (str): The first family name of the patient.</span>
+<span class="sd">        second_family_name (str): The second family name of the patient.</span>
+<span class="sd">        preferred_name (str): The preferred name of the patient.</span>
+<span class="sd">        birth_date (datetime.date): The birth date of the patient.</span>
+<span class="sd">        sex (str): The sex of the patient.</span>
+<span class="sd">        gender (str): The gender of the patient.</span>
+<span class="sd">        sexual_orientation (str): The sexual orientation of the patient.</span>
+<span class="sd">        phone_number (str): The phone number of the patient.</span>
+<span class="sd">        email (str): The email address of the patient.</span>
+<span class="sd">        profession_occupation (str): The profession or occupation of the patient.</span>
+<span class="sd">        marital_status (str): The marital status of the patient.</span>
+<span class="sd">        patient_type (str): The type of patient.</span>
+<span class="sd">        faculty_dependence (str): The faculty or dependence of the patient.</span>
+<span class="sd">        career (str): The career of the patient.</span>
+<span class="sd">        semester (int): The semester of the patient.</span>
+<span class="sd">        city_born (str): The city where the patient was born.</span>
+<span class="sd">        city_residence (str): The city of residence of the patient.</span>
+<span class="sd">        address (str): The address of the patient.</span>
+<span class="sd">        children (int): The number of children of the patient.</span>
+<span class="sd">        lives_with (str): Information about who the patient lives with.</span>
+<span class="sd">        emergency_contact_name (str): The name of the emergency contact person.</span>
+<span class="sd">        emergency_contact_relation (str): The relation to the emergency contact person.</span>
+<span class="sd">        emergency_contact_phone (str): The phone number of the emergency contact person.</span>
+<span class="sd">        family_history (str): The family history of the patient.</span>
+<span class="sd">        personal_history (str): The personal history of the patient.</span>
+<span class="sd">        habits (str): The habits of the patient.</span>
+<span class="sd">        extra_information (str): Any extra information about the patient.</span>
+<span class="sd">        active (bool): The active status of the patient.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: A message indicating the result of the operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="c1"># Create a new Patient instance</span>
+    <span class="n">patient</span> <span class="o">=</span> <span class="n">Patient</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+        <span class="n">first_name</span><span class="o">=</span><span class="n">first_name</span><span class="p">,</span>
+        <span class="n">second_name</span><span class="o">=</span><span class="n">second_name</span><span class="p">,</span>
+        <span class="n">first_family_name</span><span class="o">=</span><span class="n">first_family_name</span><span class="p">,</span>
+        <span class="n">second_family_name</span><span class="o">=</span><span class="n">second_family_name</span><span class="p">,</span>
+        <span class="n">preferred_name</span><span class="o">=</span><span class="n">preferred_name</span><span class="p">,</span>
+        <span class="n">birth_date</span><span class="o">=</span><span class="n">birth_date</span><span class="p">,</span>
+        <span class="n">sex</span><span class="o">=</span><span class="n">sex</span><span class="p">,</span>
+        <span class="n">gender</span><span class="o">=</span><span class="n">gender</span><span class="p">,</span>
+        <span class="n">sexual_orientation</span><span class="o">=</span><span class="n">sexual_orientation</span><span class="p">,</span>
+        <span class="n">phone_number</span><span class="o">=</span><span class="n">phone_number</span><span class="p">,</span>
+        <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+        <span class="n">profession_occupation</span><span class="o">=</span><span class="n">profession_occupation</span><span class="p">,</span>
+        <span class="n">marital_status</span><span class="o">=</span><span class="n">marital_status</span><span class="p">,</span>
+        <span class="n">patient_type</span><span class="o">=</span><span class="n">patient_type</span><span class="p">,</span>
+        <span class="n">faculty_dependence</span><span class="o">=</span><span class="n">faculty_dependence</span><span class="p">,</span>
+        <span class="n">career</span><span class="o">=</span><span class="n">career</span><span class="p">,</span>
+        <span class="n">semester</span><span class="o">=</span><span class="n">semester</span><span class="p">,</span>
+        <span class="n">city_born</span><span class="o">=</span><span class="n">city_born</span><span class="p">,</span>
+        <span class="n">city_residence</span><span class="o">=</span><span class="n">city_residence</span><span class="p">,</span>
+        <span class="n">address</span><span class="o">=</span><span class="n">address</span><span class="p">,</span>
+        <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span>
+        <span class="n">lives_with</span><span class="o">=</span><span class="n">lives_with</span><span class="p">,</span>
+        <span class="n">emergency_contact_name</span><span class="o">=</span><span class="n">emergency_contact_name</span><span class="p">,</span>
+        <span class="n">emergency_contact_relation</span><span class="o">=</span><span class="n">emergency_contact_relation</span><span class="p">,</span>
+        <span class="n">emergency_contact_phone</span><span class="o">=</span><span class="n">emergency_contact_phone</span><span class="p">,</span>
+        <span class="n">family_history</span><span class="o">=</span><span class="n">family_history</span><span class="p">,</span>
+        <span class="n">personal_history</span><span class="o">=</span><span class="n">personal_history</span><span class="p">,</span>
+        <span class="n">habits</span><span class="o">=</span><span class="n">habits</span><span class="p">,</span>
+        <span class="n">extra_information</span><span class="o">=</span><span class="n">extra_information</span><span class="p">,</span>
+        <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Add the new Patient to the session and commit</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">patient</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;Paciente registrado&quot;</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+        <span class="c1"># Rollback the session in case of IntegrityError (e.g. duplicate primary key)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;El paciente ya se encuentra registrado&quot;</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="add_patient_object"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.add_patient_object">[docs]</a><span class="k">def</span> <span class="nf">add_patient_object</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">patient</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a new patient to the database using a Patient object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+<span class="sd">        patient (Patient): The Patient object representing the patient to add.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: A message indicating the result of the operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Add the new Patient to the session and commit</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">patient</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;Paciente registrado con éxito&quot;</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+        <span class="c1"># Rollback the session in case of IntegrityError (e.g. duplicate primary key)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;El paciente ya se encuentra registrado&quot;</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_patient_search"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.get_patient_search">[docs]</a><span class="k">def</span> <span class="nf">get_patient_search</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">id_or_lastname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Search for patients in the database based on the ID or last name.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+<span class="sd">        id_or_lastname (str): The ID or last name to search for.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: A list of tuples containing the patient data matching the search criteria.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Retrieve cedula and nombre columns from paciente table</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                <span class="n">Patient</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="n">Patient</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+                <span class="n">Patient</span><span class="o">.</span><span class="n">second_name</span><span class="p">,</span>
+                <span class="n">Patient</span><span class="o">.</span><span class="n">first_family_name</span><span class="p">,</span>
+                <span class="n">Patient</span><span class="o">.</span><span class="n">second_family_name</span><span class="p">,</span>
+                <span class="n">Patient</span><span class="o">.</span><span class="n">faculty_dependence</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">or_</span><span class="p">(</span>
+                    <span class="n">Patient</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">id_or_lastname</span><span class="p">,</span>
+                    <span class="n">func</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span><span class="n">Patient</span><span class="o">.</span><span class="n">first_family_name</span><span class="p">)</span><span class="o">.</span><span class="n">like</span><span class="p">(</span>
+                        <span class="n">func</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%</span><span class="si">{</span><span class="n">id_or_lastname</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="n">func</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span><span class="n">Patient</span><span class="o">.</span><span class="n">second_family_name</span><span class="p">)</span><span class="o">.</span><span class="n">like</span><span class="p">(</span>
+                        <span class="n">func</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%</span><span class="si">{</span><span class="n">id_or_lastname</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span>
+    <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error retrieving patient data:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_patient"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.get_patient">[docs]</a><span class="k">def</span> <span class="nf">get_patient</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">patient_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a patient from the database based on the ID.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+<span class="sd">        patient_id (str): The ID of the patient to retrieve.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Patient: The Patient object representing the retrieved patient.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Retrieve cedula and nombre columns from paciente table</span>
+        <span class="n">patient</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Patient</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">patient_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">patient</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">patient</span>
+    <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error retrieving patient data:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_all_patients"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.get_all_patients">[docs]</a><span class="k">def</span> <span class="nf">get_all_patients</span><span class="p">(</span><span class="n">db_engine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get all patients from the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: A DataFrame containing all the patient data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">patient</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">second_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">first_family_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">second_family_name</span><span class="p">,</span>
+            <span class="n">Patient</span><span class="o">.</span><span class="n">faculty_dependence</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">patient_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">patient</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;Cédula&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Nombre1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Nombre2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Apellido1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Apellido2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Facultad/Dependencia&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">patient_df</span>
+    <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error retrieving patient data:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="update_patient"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.update_patient">[docs]</a><span class="k">def</span> <span class="nf">update_patient</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update a patient&#39;s information in the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+<span class="sd">        id (str): The ID of the patient to update.</span>
+<span class="sd">        fields (dict): A dictionary containing the fields to update and their new values.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="c1"># Get the Patient to update</span>
+    <span class="n">patient</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Patient</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">patient</span><span class="p">:</span>
+        <span class="c1"># Update the Patient fields</span>
+        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">patient</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># Commit the changes</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Patient updated successfully&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Patient with given ID not found&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Close the session</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="deactivate_patient"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.deactivate_patient">[docs]</a><span class="k">def</span> <span class="nf">deactivate_patient</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deactivate a patient in the database by setting the &#39;active&#39; field to False.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+<span class="sd">        id (str): The ID of the patient to deactivate.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="c1"># Get the Patient to deactivate</span>
+    <span class="n">patient</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Patient</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">patient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Patient with ID </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Deactivate the Patient by setting the &#39;active&#39; field to False</span>
+        <span class="n">patient</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient with ID </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> deactivated successfully&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1"># Rollback the session in case of an error</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Failed to deactivate Patient&quot;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="delete_patient"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PatientRepository.delete_patient">[docs]</a><span class="k">def</span> <span class="nf">delete_patient</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete a patient from the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): The database engine.</span>
+<span class="sd">        id (str): The ID of the patient to delete.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a Session</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+    <span class="c1"># Get the Patient to delete</span>
+    <span class="n">patient</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Patient</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">patient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Patient with ID </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Delete the associated records in other tables</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Diagnostic</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">patient_id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Appointment</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">patient_id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Encounter</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">patient_id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">QuestionnaireResponse</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">patient_id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="c1"># Delete the Patient</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">patient</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient with ID </span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> deleted successfully&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1"># Rollback the session in case of an error</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Failed to delete Patient&quot;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alex Pinos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

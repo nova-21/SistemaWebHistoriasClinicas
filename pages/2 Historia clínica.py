@@ -14,34 +14,34 @@ from st_aggrid import (
 )
 from streamlit_extras.switch_page_button import switch_page
 
-from data.actions.diagnostic_action import get_diagnostics, add_diagnostic
-from data.actions.encounter_actions import (
+from data.repositories.DiagnosticRepository import get_diagnostics, add_diagnostic
+from data.repositories.EncounterRepository import (
     add_encounter,
     get_encounter_history,
     get_encounter,
     update_attachment,
     get_attachments_list,
-    update_encounter, update_treatment, get_treatment, update_eval,
+    update_encounter, update_treatment, get_treatment, update_eval, add_encounter_object,
 )
 
-from data.actions.patient_actions import (
+from data.repositories.PatientRepository import (
     get_patient_search,
     get_patient,
     get_all_patients, delete_patient, deactivate_patient,
 )
-from data.actions.questionnaire_actions import get_questionnaires
-from data.actions.questionnaire_response_actions import (
+from data.repositories.QuestionnaireRepository import get_questionnaires
+from data.repositories.QuestionnaireResponseRepository import (
     get_pending_questionnaire_responses,
     add_questionnaire_response,
     get_questionnaire_results,
     get_questionnaire_answers,
 )
-from data.conection import create_engine_conection
-from data.create_database import Encounter
+from data.database_connection import create_engine_conection
+from data.database_declaration import Encounter
 
-from utilidades.lists import list_encounter_types
-from utilidades.time_utilities import calculate_age
-from utilidades.view_utilities import show_header, clean, show_header_patient_lookup
+from utilities.lists import list_encounter_types
+from utilities.time_utilities import calculate_age
+from utilities.view_utilities import show_header, clean, show_header_patient_lookup
 
 if "db_engine" not in st.session_state:
     st.session_state.db_engine = create_engine_conection()
@@ -588,7 +588,7 @@ if st.session_state.user_info:
                 submit = st.form_submit_button("Guardar")
 
         if submit:
-            add_encounter(st.session_state.db_engine, encounter)
+            add_encounter_object(st.session_state.db_engine, encounter)
             with register_encounter_container.empty():
                 st.success(
                     "La sesión fue grabada con éxito"

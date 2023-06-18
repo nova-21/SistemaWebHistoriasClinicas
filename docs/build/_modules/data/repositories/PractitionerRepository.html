@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data.repositories.PractitionerRepository &mdash; Bienestar Historia Clínica 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Bienestar Historia Clínica
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bienestar Historia Clínica</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data.html">data</a></li>
+          <li class="breadcrumb-item"><a href="../repositories.html">data.repositories</a></li>
+      <li class="breadcrumb-item active">data.repositories.PractitionerRepository</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data.repositories.PractitionerRepository</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
+<span class="kn">from</span> <span class="nn">data.database_declaration</span> <span class="kn">import</span> <span class="n">Practitioner</span>
+
+<div class="viewcode-block" id="add_practitioner"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PractitionerRepository.add_practitioner">[docs]</a><span class="k">def</span> <span class="nf">add_practitioner</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">practitioner_id</span><span class="p">,</span> <span class="n">full_name</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">active</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a new practitioner to the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): SQLAlchemy database engine.</span>
+<span class="sd">        practitioner_id (int): Practitioner ID.</span>
+<span class="sd">        full_name (str): Full name of the practitioner.</span>
+<span class="sd">        position (str): Position of the practitioner.</span>
+<span class="sd">        email (str): Email address of the practitioner.</span>
+<span class="sd">        phone_number (str): Phone number of the practitioner.</span>
+<span class="sd">        active (bool): Flag indicating if the practitioner is active.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a session using the provided database engine</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="c1"># Create a new Practitioner instance</span>
+        <span class="n">practitioner</span> <span class="o">=</span> <span class="n">Practitioner</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">practitioner_id</span><span class="p">,</span>
+            <span class="n">full_name</span><span class="o">=</span><span class="n">full_name</span><span class="p">,</span>
+            <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+            <span class="n">phone_number</span><span class="o">=</span><span class="n">phone_number</span><span class="p">,</span>
+            <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Add the new Practitioner to the session and commit the changes</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">practitioner</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New Practitioner added successfully&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+            <span class="c1"># Rollback the session in case of IntegrityError (e.g., duplicate primary key)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Practitioner with the same ID already exists&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_practitioners"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PractitionerRepository.get_practitioners">[docs]</a><span class="k">def</span> <span class="nf">get_practitioners</span><span class="p">(</span><span class="n">db_engine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve a list of active practitioners from the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): SQLAlchemy database engine.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of tuples containing practitioner information (full name, email, ID, position).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a session using the provided database engine</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Retrieve active practitioners&#39; full name, email, ID, and position</span>
+            <span class="n">practitioners</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                <span class="n">Practitioner</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
+                <span class="n">Practitioner</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                <span class="n">Practitioner</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="n">Practitioner</span><span class="o">.</span><span class="n">position</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Practitioner</span><span class="o">.</span><span class="n">active</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">practitioners</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error retrieving practitioner data:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="get_practitioner_by_email"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PractitionerRepository.get_practitioner_by_email">[docs]</a><span class="k">def</span> <span class="nf">get_practitioner_by_email</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve a practitioner&#39;s ID based on the email.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): SQLAlchemy database engine.</span>
+<span class="sd">        email (str): Email address of the practitioner.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Practitioner ID, or None if not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a session using the provided database engine</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Retrieve the practitioner&#39;s ID based on the email</span>
+            <span class="n">practitioner</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Practitioner</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">practitioner</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error retrieving practitioner data:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="update_practitioner"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PractitionerRepository.update_practitioner">[docs]</a><span class="k">def</span> <span class="nf">update_practitioner</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">practitioner_id</span><span class="p">,</span> <span class="n">full_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phone_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update a practitioner&#39;s information in the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): SQLAlchemy database engine.</span>
+<span class="sd">        practitioner_id (int): Practitioner ID.</span>
+<span class="sd">        full_name (str, optional): Updated full name of the practitioner. Defaults to None.</span>
+<span class="sd">        position (str, optional): Updated position of the practitioner. Defaults to None.</span>
+<span class="sd">        email (str, optional): Updated email address of the practitioner. Defaults to None.</span>
+<span class="sd">        phone_number (str, optional): Updated phone number of the practitioner. Defaults to None.</span>
+<span class="sd">        active (bool, optional): Updated flag indicating if the practitioner is active. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a session using the provided database engine</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="c1"># Get the Practitioner to update based on the ID</span>
+        <span class="n">practitioner</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Practitioner</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">practitioner_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">practitioner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Practitioner with ID </span><span class="si">{</span><span class="n">practitioner_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">full_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">practitioner</span><span class="o">.</span><span class="n">full_name</span> <span class="o">=</span> <span class="n">full_name</span>
+        <span class="k">if</span> <span class="n">position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">practitioner</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span>
+        <span class="k">if</span> <span class="n">email</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">practitioner</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">email</span>
+        <span class="k">if</span> <span class="n">phone_number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">practitioner</span><span class="o">.</span><span class="n">phone_number</span> <span class="o">=</span> <span class="n">phone_number</span>
+        <span class="k">if</span> <span class="n">active</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">practitioner</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">active</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Commit the changes to the database</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Practitioner with ID </span><span class="si">{</span><span class="n">practitioner_id</span><span class="si">}</span><span class="s2"> updated successfully&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Failed to update Practitioner&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="delete_practitioner"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PractitionerRepository.delete_practitioner">[docs]</a><span class="k">def</span> <span class="nf">delete_practitioner</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">practitioner_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mark a practitioner as inactive in the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): SQLAlchemy database engine.</span>
+<span class="sd">        practitioner_id (int): Practitioner ID.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a session using the provided database engine</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="c1"># Get the Practitioner to delete based on the ID</span>
+        <span class="n">practitioner</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Practitioner</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">practitioner_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">practitioner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Practitioner with ID </span><span class="si">{</span><span class="n">practitioner_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Mark the Practitioner as inactive (set the &#39;active&#39; field to False) and commit the changes</span>
+            <span class="n">practitioner</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Practitioner with ID </span><span class="si">{</span><span class="n">practitioner_id</span><span class="si">}</span><span class="s2"> marked as inactive successfully&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Failed to mark Practitioner as inactive&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="verify_practitioner"><a class="viewcode-back" href="../../../data.repositories.html#data.repositories.PractitionerRepository.verify_practitioner">[docs]</a><span class="k">def</span> <span class="nf">verify_practitioner</span><span class="p">(</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verify the access rights of a practitioner based on the email.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_engine (sqlalchemy.engine.Engine): SQLAlchemy database engine.</span>
+<span class="sd">        email (str): Email address of the practitioner.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Tuple containing the access status, practitioner ID, and role.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a session using the provided database engine</span>
+    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Retrieve the practitioner based on the email</span>
+            <span class="n">practitioner</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Practitioner</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">practitioner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">practitioner</span><span class="o">.</span><span class="n">position</span> <span class="o">==</span> <span class="s2">&quot;Administrador&quot;</span><span class="p">:</span>
+                    <span class="c1"># Return access authorized with the practitioner&#39;s ID and role</span>
+                    <span class="k">return</span> <span class="s2">&quot;Access authorized&quot;</span><span class="p">,</span> <span class="n">practitioner</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;Administrator&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;Access authorized&quot;</span><span class="p">,</span> <span class="n">practitioner</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;Practitioner&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;Access denied&quot;</span><span class="p">,</span> <span class="s2">&quot;no_id&quot;</span><span class="p">,</span> <span class="s2">&quot;no_role&quot;</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error retrieving practitioner data:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="s2">&quot;Access denied&quot;</span><span class="p">,</span> <span class="s2">&quot;no_id&quot;</span><span class="p">,</span> <span class="s2">&quot;no_role&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alex Pinos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

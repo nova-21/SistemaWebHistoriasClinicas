@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>unit_tests package &mdash; Bienestar Historia Clínica 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Bienestar Historia Clínica
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">unit_tests package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-unit_tests.appointment_encounter">unit_tests.appointment_encounter module</a><ul>
+<li><a class="reference internal" href="#unit_tests.appointment_encounter.TestInsertAppointments"><code class="docutils literal notranslate"><span class="pre">TestInsertAppointments</span></code></a><ul>
+<li><a class="reference internal" href="#unit_tests.appointment_encounter.TestInsertAppointments.setUpClass"><code class="docutils literal notranslate"><span class="pre">TestInsertAppointments.setUpClass()</span></code></a></li>
+<li><a class="reference internal" href="#unit_tests.appointment_encounter.TestInsertAppointments.tearDownClass"><code class="docutils literal notranslate"><span class="pre">TestInsertAppointments.tearDownClass()</span></code></a></li>
+<li><a class="reference internal" href="#unit_tests.appointment_encounter.TestInsertAppointments.test_insert_appointments"><code class="docutils literal notranslate"><span class="pre">TestInsertAppointments.test_insert_appointments()</span></code></a></li>
+<li><a class="reference internal" href="#unit_tests.appointment_encounter.TestInsertAppointments.test_insert_appointments_subsecuentes"><code class="docutils literal notranslate"><span class="pre">TestInsertAppointments.test_insert_appointments_subsecuentes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-unit_tests.patient_tests">unit_tests.patient_tests module</a><ul>
+<li><a class="reference internal" href="#unit_tests.patient_tests.TestAddPatient"><code class="docutils literal notranslate"><span class="pre">TestAddPatient</span></code></a><ul>
+<li><a class="reference internal" href="#unit_tests.patient_tests.TestAddPatient.test_add_patient"><code class="docutils literal notranslate"><span class="pre">TestAddPatient.test_add_patient()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-unit_tests.practitioner_tests">unit_tests.practitioner_tests module</a><ul>
+<li><a class="reference internal" href="#unit_tests.practitioner_tests.TestAddPatient"><code class="docutils literal notranslate"><span class="pre">TestAddPatient</span></code></a><ul>
+<li><a class="reference internal" href="#unit_tests.practitioner_tests.TestAddPatient.test_add_patient"><code class="docutils literal notranslate"><span class="pre">TestAddPatient.test_add_patient()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-unit_tests">Module contents</a><ul>
+<li><a class="reference internal" href="#unit_tests.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Bienestar Historia Clínica</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">unit_tests package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/unit_tests.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="unit-tests-package">
+<h1>unit_tests package<a class="headerlink" href="#unit-tests-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-unit_tests.appointment_encounter">
+<span id="unit-tests-appointment-encounter-module"></span><h2>unit_tests.appointment_encounter module<a class="headerlink" href="#module-unit_tests.appointment_encounter" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="unit_tests.appointment_encounter.TestInsertAppointments">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">unit_tests.appointment_encounter.</span></span><span class="sig-name descname"><span class="pre">TestInsertAppointments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/appointment_encounter.html#TestInsertAppointments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.appointment_encounter.TestInsertAppointments" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>A test case class for inserting appointments into the database.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="unit_tests.appointment_encounter.TestInsertAppointments.setUpClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/appointment_encounter.html#TestInsertAppointments.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.appointment_encounter.TestInsertAppointments.setUpClass" title="Permalink to this definition"></a></dt>
+<dd><p>Set up the test database engine and session.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="unit_tests.appointment_encounter.TestInsertAppointments.tearDownClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/appointment_encounter.html#TestInsertAppointments.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.appointment_encounter.TestInsertAppointments.tearDownClass" title="Permalink to this definition"></a></dt>
+<dd><p>Clean up the test database engine and session.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="unit_tests.appointment_encounter.TestInsertAppointments.test_insert_appointments">
+<span class="sig-name descname"><span class="pre">test_insert_appointments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/appointment_encounter.html#TestInsertAppointments.test_insert_appointments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.appointment_encounter.TestInsertAppointments.test_insert_appointments" title="Permalink to this definition"></a></dt>
+<dd><p>Test for inserting appointments into the database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="unit_tests.appointment_encounter.TestInsertAppointments.test_insert_appointments_subsecuentes">
+<span class="sig-name descname"><span class="pre">test_insert_appointments_subsecuentes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/appointment_encounter.html#TestInsertAppointments.test_insert_appointments_subsecuentes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.appointment_encounter.TestInsertAppointments.test_insert_appointments_subsecuentes" title="Permalink to this definition"></a></dt>
+<dd><p>Test for inserting subsequent appointments into the database.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-unit_tests.patient_tests">
+<span id="unit-tests-patient-tests-module"></span><h2>unit_tests.patient_tests module<a class="headerlink" href="#module-unit_tests.patient_tests" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="unit_tests.patient_tests.TestAddPatient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">unit_tests.patient_tests.</span></span><span class="sig-name descname"><span class="pre">TestAddPatient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/patient_tests.html#TestAddPatient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.patient_tests.TestAddPatient" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>A test case class for adding patients to the database.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="unit_tests.patient_tests.TestAddPatient.test_add_patient">
+<span class="sig-name descname"><span class="pre">test_add_patient</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/patient_tests.html#TestAddPatient.test_add_patient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.patient_tests.TestAddPatient.test_add_patient" title="Permalink to this definition"></a></dt>
+<dd><p>Test for adding a patient to the database.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-unit_tests.practitioner_tests">
+<span id="unit-tests-practitioner-tests-module"></span><h2>unit_tests.practitioner_tests module<a class="headerlink" href="#module-unit_tests.practitioner_tests" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="unit_tests.practitioner_tests.TestAddPatient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">unit_tests.practitioner_tests.</span></span><span class="sig-name descname"><span class="pre">TestAddPatient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/practitioner_tests.html#TestAddPatient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.practitioner_tests.TestAddPatient" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>A test case class for adding patients to the database.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="unit_tests.practitioner_tests.TestAddPatient.test_add_patient">
+<span class="sig-name descname"><span class="pre">test_add_patient</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests/practitioner_tests.html#TestAddPatient.test_add_patient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.practitioner_tests.TestAddPatient.test_add_patient" title="Permalink to this definition"></a></dt>
+<dd><p>Test for adding a patient to the database.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-unit_tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-unit_tests" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="unit_tests.main">
+<span class="sig-prename descclassname"><span class="pre">unit_tests.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/unit_tests.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#unit_tests.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alex Pinos.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

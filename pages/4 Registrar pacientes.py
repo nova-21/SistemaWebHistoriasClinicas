@@ -6,47 +6,46 @@ import pandas as pd
 import streamlit as st
 from st_aggrid import GridOptionsBuilder, ColumnsAutoSizeMode, AgGrid
 
-from data.actions.patient_actions import add_patient_object
-from data.actions.practitioner_actions import add_practitioner, get_practitioner, delete_practitioner
-from data.conection import create_engine_conection
-from data.create_database import Patient, Practitioner
-from utilidades.lists import tipos_de_paciente, facultades
-from utilidades.view_utilities import clean, load_logo
+from data.repositories.PatientRepository import add_patient_object
+from data.repositories.PractitionerRepository import add_practitioner, get_practitioners, delete_practitioner
+from data.database_connection import create_engine_conection
+from data.database_declaration import Patient, Practitioner
+from utilities.lists import tipos_de_paciente, facultades, posiciones_tratantes
+from utilities.session_state_utilities import get_or_create_session_state
+from utilities.view_utilities import clean, load_logo
 
 load_logo()
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = True
-
-if "db_engine" not in st.session_state:
-    st.session_state.db_engine = create_engine_conection()
-
-if "user_info" not in st.session_state:
-    st.session_state.user_info = {}
-
-if st.session_state.user_info == {}:
-    clean("Por favor inicie sesión para continuar")
-
-if "delete_practitioner_flag" not in st.session_state:
-    st.session_state.delete_practitioner_flag = False
-
-
 
 def register_practicioner(base_practitioner):
+    """
+        Registers a practitioner.
+
+        Args:
+            base_practitioner: The base container practitioner.
+
+        """
     with base_practitioner:
         practitioner = Practitioner()
 
         with st.form("register_practitioner", clear_on_submit=False):
             st.write("#### Registro de tratantes")
-            st.write("##### Ingrese los datos personales y presione Registrar. Los campos con asterisco (*) son obligatorios")
+            st.write(
+                "##### Ingrese los datos personales y presione Registrar. Los campos con asterisco (*) son obligatorios")
             practitioner.id = st.text_input(
                 "Cédula*",
                 help="Cualquier documento de identificación es permitido en caso de personas extranjeras",
+                value=get_or_create_session_state("practitioner_id", "")
             )
-            practitioner.full_name=st.text_input("Nombre completo*").lower().title()
-            practitioner.email = st.text_input("Email*")
-            practitioner.position = st.selectbox("Posición*",("Psicólogo Clínico", "Psicóloco Educativo", "Psiquiatra", "Administrador"))
-            practitioner.phone_number = st.text_input("Teléfono*")
-            submit_practitioner=st.form_submit_button("Registrar", type="primary")
+            practitioner.full_name = st.text_input("Nombre completo*",
+                                                   value=get_or_create_session_state("practitioner_full_name",
+                                                                                     "")).lower().title()
+            practitioner.email = st.text_input("Email*", value=get_or_create_session_state("practitioner_email", ""))
+            practitioner.position = st.selectbox("Posición*", posiciones_tratantes,
+                                                 index=get_or_create_session_state("practitioner_position_index", 0))
+            practitioner.phone_number = st.text_input("Teléfono*",
+                                                      value=get_or_create_session_state("practitioner_phone_number",
+                                                                                        ""))
+            submit_practitioner = st.form_submit_button("Registrar", type="primary")
 
         if submit_practitioner:
             try:
@@ -58,24 +57,42 @@ def register_practicioner(base_practitioner):
                     raise ValueError("El campo Posición es obligatorio.")
                 if practitioner.phone_number == "":
                     raise ValueError("El campo Teléfono es obligatorio.")
-                add_practitioner(st.session_state.db_engine, practitioner.id, practitioner.full_name, practitioner.position,
-                                 practitioner.email, practitioner.phone_number, True)
 
-            except:
-                st.error(
-                "Uno o más campos obligatorios se encuentran vacíos, por favor revise los datos y vuelva a guardar."
+                add_practitioner(
+                    st.session_state.db_engine,
+                    practitioner.id,
+                    practitioner.full_name,
+                    practitioner.position,
+                    practitioner.email,
+                    practitioner.phone_number,
+                    True
                 )
-            sleep(4)
-            st.experimental_rerun()
-            st.success("Tratante guardado con éxito")
-            time.sleep(2)
-            st.experimental_rerun()
+
+                st.success("Tratante guardado con éxito")
+                time.sleep(2)
+                st.experimental_rerun()
+
+            except ValueError as e:
+                st.error(str(e))
+                sleep(4)
+                st.experimental_rerun()
+
+            except Exception:
+                st.error(
+                    "Uno o más campos obligatorios se encuentran vacíos, por favor revise los datos y vuelva a guardar.")
+                sleep(4)
+                st.experimental_rerun()
 
 def remove_practitioner():
-    practitioners_list = get_practitioner(st.session_state.db_engine)
-    practitioners_history = pd.DataFrame(practitioners_list, columns=['full_name','email', 'id'])
+    """
+        Disables access to practitioner in the system
+
+        """
+    practitioners_list = get_practitioners(st.session_state.db_engine)
+    practitioners_history = pd.DataFrame(practitioners_list, columns=['full_name', 'email', 'id', 'position'])
     if len(practitioners_list) == 0:
         st.success("No tiene citas pendientes el día de hoy")
+
     builder = GridOptionsBuilder.from_dataframe(practitioners_history)
     builder.configure_selection(selection_mode="single", use_checkbox=False)
     builder.configure_default_column(
@@ -96,23 +113,34 @@ def remove_practitioner():
     practitioner_selected = sesion["selected_rows"]
 
     if st.button("Dar de baja al tratante", type="primary") and practitioner_selected != []:
-        st.session_state.delete_practitioner_flag = True
+        get_or_create_session_state("delete_practitioner_flag", True)
 
-    if st.session_state.delete_practitioner_flag == True:
+    if get_or_create_session_state("delete_practitioner_flag", False) == True:
         st.warning("¿Está seguro? Este cambio no puede ser revertido")
-        col1,col2 = st.columns([0.3,3])
+        col1, col2 = st.columns([0.3, 3])
         if col1.button("Si, dar de baja"):
             st.error("El tratante ha sido dado de baja")
-            delete_practitioner(st.session_state.db_engine,practitioner_selected[0]["id"])
+            delete_practitioner(st.session_state.db_engine, practitioner_selected[0]["id"])
             time.sleep(2)
-            st.session_state.delete_practitioner_flag = False
+            get_or_create_session_state("delete_practitioner_flag", False)
             st.experimental_rerun()
 
         if col2.button("No, cancelar"):
-            st.session_state.delete_practitioner_flag = False
+            get_or_create_session_state("delete_practitioner_flag", False)
             st.experimental_rerun()
 
+
 def registrar_paciente(base):
+    """
+        Creates a patient registration form and handles the submission.
+
+        Args:
+            base: The base Streamlit element to display the form.
+            db_engine: The database engine connection.
+
+        Returns:
+            str: A message indicating the status of the patient registration.
+        """
 
     with base:
 
@@ -237,30 +265,49 @@ def registrar_paciente(base):
                 sleep(4)
                 st.experimental_rerun()
 
-if st.session_state.user_info:
-    clean(
-        "Registro de pacientes y tratantes",
 
-    )
-    if st.session_state.user_info.get("email") == "alex.pinos@ucuenca.edu.ec":
+
+logged_in = get_or_create_session_state("logged_in", True)
+db_engine = get_or_create_session_state("db_engine", create_engine_conection())
+user_info = get_or_create_session_state("user_info", {})
+base_patient = st.empty()
+
+# Check if user is logged in
+if st.session_state.user_info:
+    clean("Registro de pacientes y tratantes")
+
+    # Check if the user is an administrator
+    if st.session_state.practitioner_position == "Administrator":
+        # Create tabs for Patients, Practitioners, and Removing Practitioners
         tab1, tab2, tab3 = st.tabs(["Pacientes", "Tratantes", "Dar de baja tratante"])
+
+        # Handle registration of patients
         with tab1:
             base_patient = st.empty()
             message_result = registrar_paciente(base_patient)
+
+        # Handle registration of practitioners
         with tab2:
             base_practitioner = st.empty()
             register_practicioner(base_practitioner)
+
+        # Handle removal of practitioners
         with tab3:
             base_rem_practitioner = st.empty()
             remove_practitioner()
+
+    # If the user is not an administrator, only handle patient registration
     else:
         base = st.empty()
         message_result = registrar_paciente(base)
 
+    # Display success message and accept button if patient registration is successful
     if message_result == "Paciente registrado con éxito":
         base_patient.empty()
         st.success(message_result)
         st.button("Aceptar")
+
+    # Display error message and accept button if patient is already registered
     if message_result == "El paciente ya se encuentra registrado":
         base_patient.empty()
         st.error(message_result)
